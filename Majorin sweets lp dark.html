@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Majorin Sweets - 魔法じゃない、本物の甘さ</title>
+  <meta name="description" content="魔法じゃない、本物の甘さ。痛みと共に生きる人々へ、完璧じゃない支えを。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+    
+    @keyframes sparkle {
+      0%, 100% {
+        opacity: 0;
+        transform: scale(0);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes petalFall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(244, 194, 194, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(244, 194, 194, 0.6);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+    
+    @keyframes magicGlow {
+      0%, 100% {
+        box-shadow: 0 0 30px rgba(74, 14, 78, 0.4), 0 0 60px rgba(212, 175, 55, 0.2);
+      }
+      50% {
+        box-shadow: 0 0 50px rgba(74, 14, 78, 0.6), 0 0 100px rgba(212, 175, 55, 0.4);
+      }
+    }
+    
+    .petal {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #F4C2C2, transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: petalFall 10s linear infinite;
+    }
+    
+    .petal:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .petal:nth-child(2) { left: 20%; animation-delay: 2s; }
+    .petal:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .petal:nth-child(4) { left: 40%; animation-delay: 1s; }
+    .petal:nth-child(5) { left: 50%; animation-delay: 3s; }
+    .petal:nth-child(6) { left: 60%; animation-delay: 5s; }
+    .petal:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+    .petal:nth-child(8) { left: 80%; animation-delay: 4.5s; }
+    .petal:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+    
+    @media (max-width: 768px) {
+      [data-grid] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    function MajorinSweetsLP() {
+      const [scrollY, setScrollY] = useState(0);
+      const [isVisible, setIsVisible] = useState({});
+      const sectionRefs = useRef({});
+
+      useEffect(() => {
+        const handleScroll = () => {
+          setScrollY(window.scrollY);
+          
+          Object.keys(sectionRefs.current).forEach(key => {
+            const element = sectionRefs.current[key];
+            if (element) {
+              const rect = element.getBoundingClientRect();
+              const isInView = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+              setIsVisible(prev => ({ ...prev, [key]: isInView }));
+            }
+          });
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+      const scrollToReservation = () => {
+        const ctaSection = document.getElementById('reservation');
+        if (ctaSection) {
+          ctaSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+
+      return (
+        <div style={styles.container}>
+          {/* Floating Petals */}
+          <div style={styles.petalsContainer}>
+            {[...Array(9)].map((_, i) => (
+              <div key={i} className="petal" />
+            ))}
+          </div>
+
+          {/* Hero Section with Image */}
+          <section style={styles.hero}>
+            <div style={styles.heroImageOverlay}>
+              <img 
+                src="images/image01.JPG" 
+                alt="Majorin Sweets" 
+                style={styles.heroImage}
+              />
+              <div style={styles.heroGradientOverlay} />
+            </div>
+            
+            <div style={styles.heroContent}>
+              <div style={styles.logoContainer}>
+                <h1 style={styles.logo}>MAJORIN SWEETS</h1>
+                <div style={styles.ornament}>🌹 ✦ 🌹</div>
+              </div>
+              <p style={styles.tagline}>
+                完璧な人生なんて、ない。<br />
+                でも、完璧な一瞬は、ある。
+              </p>
+              <p style={styles.subTagline}>
+                魔法じゃない、本物の甘さ
+              </p>
+              
+              <div style={styles.heroCTAGroup}>
+                <button style={styles.heroCTAButton} onClick={scrollToReservation}>
+                  予約する
+                </button>
+                <button style={styles.heroCTAButtonSecondary} onClick={() => {
+                  const storySection = document.getElementById('story');
+                  if (storySection) storySection.scrollIntoView({ behavior: 'smooth' });
+                }}>
+                  ストーリーを知る
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Workshop Image Section */}
+          <section 
+            ref={el => sectionRefs.current['workshop'] = el}
+            style={{
+              ...styles.section,
+              ...styles.workshopSection,
+              opacity: isVisible['workshop'] ? 1 : 0,
+              transform: isVisible['workshop'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.workshopImageContainer}>
+                <img 
+                  src="images/image02.JPG" 
+                  alt="Majorin's Workshop" 
+                  style={styles.workshopImage}
+                />
+                <div style={styles.workshopTextOverlay}>
+                  <h2 style={styles.workshopTitle}>マジョリンの工房</h2>
+                  <p style={styles.workshopText}>
+                    ここで、魔法ではなく心を込めて<br />
+                    一つひとつ、お菓子を作っています
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Value Proposition */}
+          <section 
+            ref={el => sectionRefs.current['value'] = el}
+            style={{
+              ...styles.section,
+              ...styles.valueSection,
+              opacity: isVisible['value'] ? 1 : 0,
+              transform: isVisible['value'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.valueMainTitle}>
+                痛みを消さない。<br />
+                痛みと生きる力をくれる。
+              </h2>
+              <div style={styles.valueCards} data-grid>
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueIcon}>🪄</div>
+                  <h4 style={styles.miniValueTitle}>魔法は、置いた</h4>
+                  <p style={styles.miniValueText}>
+                    問題を消すのではなく、<br />向き合う力を
+                  </p>
+                </div>
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueIcon}>🍰</div>
+                  <h4 style={styles.miniValueTitle}>不完全でいい</h4>
+                  <p style={styles.miniValueText}>
+                    完璧より、<br />心がこもっている方が強い
+                  </p>
+                </div>
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueIcon}>💌</div>
+                  <h4 style={styles.miniValueTitle}>真実の一言</h4>
+                  <p style={styles.miniValueText}>
+                    50種類のカード。<br />あなたに必要な言葉
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Story Section */}
+          <section 
+            id="story"
+            ref={el => sectionRefs.current['story'] = el}
+            style={{
+              ...styles.section,
+              ...styles.lightSection,
+              opacity: isVisible['story'] ? 1 : 0,
+              transform: isVisible['story'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.sectionTitle}>STORY</h2>
+              <h3 style={styles.subtitle}>なぜ、魔女はお菓子を作るのか</h3>
+              
+              <div style={styles.storyGrid} data-grid>
+                <div style={styles.storyCard}>
+                  <div style={styles.cardIcon}>🔮</div>
+                  <h4 style={styles.cardTitle}>完璧だった、過去</h4>
+                  <p style={styles.cardText}>
+                    数百年間、私は「解決の魔女」。<br />
+                    病気も、失恋も、貧困も。<br />
+                    魔法で、すべてを消してきた。
+                  </p>
+                </div>
+                
+                <div style={styles.storyCard}>
+                  <div style={styles.cardIcon}>💔</div>
+                  <h4 style={styles.cardTitle}>気づいた、真実</h4>
+                  <p style={styles.cardText}>
+                    痛みを消すことと、人を救うことは違う。<br />
+                    痛みこそが、人を育てる。<br />
+                    私は、人を弱くしていた。
+                  </p>
+                </div>
+                
+                <div style={styles.storyCard}>
+                  <div style={styles.cardIcon}>🍰</div>
+                  <h4 style={styles.cardTitle}>選んだ、道</h4>
+                  <p style={styles.cardText}>
+                    だから、杖を置いた。<br />
+                    お菓子は痛みを消さない。<br />
+                    でも、痛みと生きる力をくれる。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Majorin Crafting Image */}
+          <section 
+            ref={el => sectionRefs.current['crafting'] = el}
+            style={{
+              ...styles.section,
+              ...styles.craftingSection,
+              opacity: isVisible['crafting'] ? 1 : 0,
+              transform: isVisible['crafting'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.craftingImageContainer}>
+                <img 
+                  src="images/image03.JPG" 
+                  alt="Majorin crafting sweets" 
+                  style={styles.craftingImage}
+                />
+                <div style={styles.craftingTextOverlay}>
+                  <h3 style={styles.craftingTitle}>
+                    「魔法で作ったものは、魔法で壊れる。<br />
+                    でも、手で作ったものは、心に残る」
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* The Moment */}
+          <section 
+            ref={el => sectionRefs.current['turning'] = el}
+            style={{
+              ...styles.section,
+              ...styles.roseSection,
+              opacity: isVisible['turning'] ? 1 : 0,
+              transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out 0.2s'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.sectionTitle}>THE MOMENT</h2>
+              <h3 style={styles.subtitle}>すべてが変わった、ある雨の日</h3>
+              
+              <div style={styles.turningContent}>
+                <div style={styles.epiphanyBox}>
+                  <p style={styles.epiphanyQuote}>
+                    「これ、亡くなった母が作ってくれたケーキと<br />
+                    同じ味なんです。<br />
+                    不器用で、形は歪だったけど...温かくて」
+                  </p>
+                  <p style={styles.epiphanyAuthor}>― エレナ、街のカフェにて</p>
+                </div>
+                
+                <div style={styles.epiphany}>
+                  <p style={styles.epiphanyText}>
+                    その瞬間、私は理解した。
+                  </p>
+                  <p style={styles.epiphanyHighlight}>
+                    お菓子は、痛みを消さない。<br />
+                    でも、痛みと一緒に生きる力をくれる。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ========== DARK TRANSITION STARTS HERE ========== */}
+
+          {/* Philosophy - DARK VERSION */}
+          <section 
+            ref={el => sectionRefs.current['philosophy'] = el}
+            style={{
+              ...styles.section,
+              ...styles.darkSection,
+              opacity: isVisible['philosophy'] ? 1 : 0,
+              transform: isVisible['philosophy'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out 0.3s'
+            }}
+          >
+            {/* Magic particles background */}
+            <div style={styles.magicBackground}>
+              <div style={styles.magicParticle1} />
+              <div style={styles.magicParticle2} />
+              <div style={styles.magicParticle3} />
+            </div>
+            
+            <div style={styles.sectionContent}>
+              <div style={styles.darkOrnamentalDivider}>━━━━━ ✦ ━━━━━</div>
+              <h2 style={styles.darkPhilosophyTitle}>完璧じゃなくても、本物であれ</h2>
+              
+              <div style={styles.darkPhilosophyGrid} data-grid>
+                <div style={styles.darkPhilosophyCard}>
+                  <p style={styles.darkPhilosophyQuote}>
+                    痛みを消すな。<br />痛みと生きろ。
+                  </p>
+                </div>
+                <div style={styles.darkPhilosophyCard}>
+                  <p style={styles.darkPhilosophyQuote}>
+                    魔法で作ったものは、<br />魔法で壊れる。
+                  </p>
+                </div>
+                <div style={styles.darkPhilosophyCard}>
+                  <p style={styles.darkPhilosophyQuote}>
+                    手で作ったものは、<br />心に残る。
+                  </p>
+                </div>
+                <div style={styles.darkPhilosophyCard}>
+                  <p style={styles.darkPhilosophyQuote}>
+                    完璧より、<br />本物。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Products - DARK VERSION */}
+          <section 
+            ref={el => sectionRefs.current['products'] = el}
+            style={{
+              ...styles.section,
+              ...styles.purpleSection,
+              opacity: isVisible['products'] ? 1 : 0,
+              transform: isVisible['products'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.darkOrnamentalDivider}>━━━━━ ✦ ━━━━━</div>
+              <h2 style={styles.darkSectionTitle}>EXPERIENCE</h2>
+              <h3 style={styles.darkSubtitle}>あなたが受け取るもの</h3>
+              
+              <div style={styles.darkProductExperience}>
+                <div style={styles.darkExperienceItem}>
+                  <div style={styles.darkExperienceNumber}>01</div>
+                  <h4 style={styles.darkExperienceItemTitle}>不完全な美味しさ</h4>
+                  <p style={styles.darkExperienceItemText}>
+                    チョコは飛び散るし、生地は崩れる。<br />
+                    でも、魔法は使わない。<br />
+                    不器用で、失敗だらけ。それが、愛おしい。
+                  </p>
+                  <div style={styles.darkExperienceDetail}>
+                    🌹 手作りケーキ1個 + オリジナルボックス
+                  </div>
+                </div>
+
+                <div style={styles.darkExperienceItem}>
+                  <div style={styles.darkExperienceNumber}>02</div>
+                  <h4 style={styles.darkExperienceItemTitle}>真実のカード</h4>
+                  <p style={styles.darkExperienceItemText}>
+                    全50種類からランダムで1枚。<br />
+                    一言で、核心を突く。<br />
+                    「で?」「それだけよ」「逃げるな」
+                  </p>
+                  <div style={styles.darkExperienceDetail}>
+                    💌 マジョリンからの手書きメッセージカード
+                  </div>
+                </div>
+
+                <div style={styles.darkExperienceItem}>
+                  <div style={styles.darkExperienceNumber}>03</div>
+                  <h4 style={styles.darkExperienceItemTitle}>向き合う時間</h4>
+                  <p style={styles.darkExperienceItemText}>
+                    お菓子を食べる15分間。<br />
+                    それは、自分と向き合う時間。<br />
+                    完璧じゃない自分を、受け入れる時間。
+                  </p>
+                  <div style={styles.darkExperienceDetail}>
+                    ✨ あなただけの、完璧な一瞬
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.darkLimitationBox}>
+                <p style={styles.darkLimitationTitle}>🌹 完全予約制 | 月100個限定 🌹</p>
+                <p style={styles.darkLimitationText}>
+                  私のお菓子は、逃げたい人には向いてない。<br />
+                  向き合いたい人のための、本物の支え。
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Testimonials - DARK VERSION */}
+          <section 
+            ref={el => sectionRefs.current['testimonial'] = el}
+            style={{
+              ...styles.section,
+              ...styles.darkSection,
+              opacity: isVisible['testimonial'] ? 1 : 0,
+              transform: isVisible['testimonial'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.darkOrnamentalDivider}>━━━━━ ✦ ━━━━━</div>
+              <h2 style={styles.darkSectionTitle}>VOICES</h2>
+              <h3 style={styles.darkSubtitle}>向き合った人たちの声</h3>
+              
+              <div style={styles.darkTestimonialGrid} data-grid>
+                <div style={styles.darkTestimonialCard}>
+                  <p style={styles.darkTestimonialText}>
+                    「カードには『で?』の一言だけ。<br />
+                    涙が止まらなかった。<br />
+                    逃げてた自分に、気づいてしまった」
+                  </p>
+                  <p style={styles.darkTestimonialAuthor}>― 30代女性、会社員</p>
+                </div>
+                
+                <div style={styles.darkTestimonialCard}>
+                  <p style={styles.darkTestimonialText}>
+                    「ケーキは崩れてたけど、<br />
+                    それが逆に良かった。<br />
+                    完璧じゃなくていいんだって」
+                  </p>
+                  <p style={styles.darkTestimonialAuthor}>― 40代男性、経営者</p>
+                </div>
+                
+                <div style={styles.darkTestimonialCard}>
+                  <p style={styles.darkTestimonialText}>
+                    「『それだけよ』というカード。<br />
+                    シンプルだけど、深い。<br />
+                    考えすぎてた自分に刺さった」
+                  </p>
+                  <p style={styles.darkTestimonialAuthor}>― 20代女性、学生</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ - DARK VERSION */}
+          <section 
+            ref={el => sectionRefs.current['faq'] = el}
+            style={{
+              ...styles.section,
+              ...styles.purpleSection,
+              opacity: isVisible['faq'] ? 1 : 0,
+              transform: isVisible['faq'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.darkOrnamentalDivider}>━━━━━ ✦ ━━━━━</div>
+              <h2 style={styles.darkSectionTitle}>FAQ</h2>
+              <h3 style={styles.darkSubtitle}>よくある質問</h3>
+              
+              <div style={styles.darkFaqList}>
+                <div style={styles.darkFaqItem}>
+                  <h4 style={styles.darkFaqQuestion}>Q. 本当に魔法は使わないんですか?</h4>
+                  <p style={styles.darkFaqAnswer}>
+                    A. 使いません。料理だけは、魔法で美味しくできない。心を込めることは、魔法ではできません。
+                  </p>
+                </div>
+                
+                <div style={styles.darkFaqItem}>
+                  <h4 style={styles.darkFaqQuestion}>Q. カードはどうやって選ばれるんですか?</h4>
+                  <p style={styles.darkFaqAnswer}>
+                    A. ランダムです。でも不思議と、その人に必要な言葉が届く。それが、唯一残った魔法かもしれません。
+                  </p>
+                </div>
+                
+                <div style={styles.darkFaqItem}>
+                  <h4 style={styles.darkFaqQuestion}>Q. 賞味期限は?</h4>
+                  <p style={styles.darkFaqAnswer}>
+                    A. 到着から3日間。保存料も使いません。だから、「今」食べてほしい。
+                  </p>
+                </div>
+                
+                <div style={styles.darkFaqItem}>
+                  <h4 style={styles.darkFaqQuestion}>Q. ギフトとして送れますか?</h4>
+                  <p style={styles.darkFaqAnswer}>
+                    A. 送れます。でも、カードは送り主ではなく、受け取る人へのメッセージになります。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Manifesto - DARK VERSION */}
+          <section 
+            ref={el => sectionRefs.current['manifesto'] = el}
+            style={{
+              ...styles.section,
+              ...styles.darkSection,
+              opacity: isVisible['manifesto'] ? 1 : 0,
+              transform: isVisible['manifesto'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out 0.2s'
+            }}
+          >
+            {/* Magic particles background */}
+            <div style={styles.magicBackground}>
+              <div style={styles.magicParticle1} />
+              <div style={styles.magicParticle2} />
+            </div>
+            
+            <div style={styles.sectionContent}>
+              <div style={styles.darkOrnamentalDivider}>━━━━━ ✦ ━━━━━</div>
+              <h2 style={styles.darkManifestoTitle}>最後に</h2>
+              
+              <div style={styles.darkManifestoContent}>
+                <p style={styles.darkManifestoText}>
+                  私はマジョリン。<br />
+                  かつて、完璧な魔女だった。
+                </p>
+                <p style={styles.darkManifestoText}>
+                  でも気づいた。<br />
+                  痛みを消すことと、人を救うことは、違う。
+                </p>
+                <p style={styles.darkManifestoHighlight}>
+                  私のお菓子は、痛みを消さない。<br />
+                  でも、痛みと一緒に生きる力をくれる。
+                </p>
+                <p style={styles.darkManifestoText}>
+                  完璧な人生なんて、ない。<br />
+                  でも、完璧な一瞬は、ある。
+                </p>
+                <p style={styles.darkManifestoText}>
+                  あなたに必要なのは、魔法じゃない。<br />
+                  本物の甘さ。
+                </p>
+                <p style={styles.darkManifestoClosing}>
+                  That's all.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* CTA - DARK VERSION */}
+          <section 
+            id="reservation"
+            ref={el => sectionRefs.current['cta'] = el}
+            style={{
+              ...styles.section,
+              ...styles.purpleSection,
+              opacity: isVisible['cta'] ? 1 : 0,
+              transform: isVisible['cta'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.darkCtaContent}>
+                <h2 style={styles.darkCtaTitle}>MAJORIN SWEETS</h2>
+                <p style={styles.darkCtaSubtitle}>🌹 完全予約制 | 月100個限定 🌹</p>
+                
+                <div style={styles.darkPriceBox}>
+                  <p style={styles.darkPriceLabel}>お一人様</p>
+                  <p style={styles.darkPriceAmount}>¥3,800</p>
+                  <p style={styles.darkPriceNote}>（税込・送料込）</p>
+                </div>
+
+                <div style={styles.darkCtaButtons}>
+                  <button style={styles.darkCtaButton} onClick={() => alert('予約ページへ遷移します')}>
+                    今すぐ予約する
+                  </button>
+                </div>
+
+                <div style={styles.darkCtaNote}>
+                  <p style={styles.darkCtaNoteText}>
+                    ※ 月初に予約を開始し、100個に達し次第締め切ります<br />
+                    ※ お届けまで2-3週間程度お時間をいただきます
+                  </p>
+                </div>
+
+                <div style={styles.darkFooter}>
+                  <p style={styles.darkFooterText}>
+                    痛みと共に生きる人々に、<br />
+                    完璧じゃない甘さを。<br />
+                    魔法じゃない、本物の支えを。
+                  </p>
+                  <div style={styles.darkFooterLinks}>
+                    <a href="#story" style={styles.darkFooterLink}>ストーリー</a>
+                    <span style={styles.darkFooterSeparator}>|</span>
+                    <a href="#" style={styles.darkFooterLink}>特定商取引法</a>
+                    <span style={styles.darkFooterSeparator}>|</span>
+                    <a href="#" style={styles.darkFooterLink}>プライバシーポリシー</a>
+                  </div>
+                  <p style={styles.darkCopyright}>© 2026 Majorin Sweets. All rights reserved.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    const styles = {
+      container: {
+        margin: 0,
+        padding: 0,
+        backgroundColor: '#FFF8F0',
+        color: '#5A4A42',
+        fontFamily: "'Cormorant Garamond', serif",
+        overflowX: 'hidden',
+        position: 'relative',
+      },
+      
+      // Petals
+      petalsContainer: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 1,
+      },
+      
+      // Hero Section
+      hero: {
+        position: 'relative',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+      },
+      heroImageOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      },
+      heroImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      heroGradientOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(to bottom, rgba(255, 248, 240, 0.3) 0%, rgba(255, 248, 240, 0.7) 100%)',
+      },
+      heroContent: {
+        position: 'relative',
+        zIndex: 2,
+        textAlign: 'center',
+        padding: '0 20px',
+      },
+      logoContainer: {
+        marginBottom: '40px',
+        animation: 'fadeInUp 1.5s ease-out',
+      },
+      logo: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 7vw, 5rem)',
+        fontWeight: 700,
+        letterSpacing: '0.3em',
+        margin: 0,
+        color: '#8B6F47',
+        textShadow: '2px 2px 4px rgba(139, 111, 71, 0.3)',
+      },
+      ornament: {
+        fontSize: '2rem',
+        color: '#C9A27E',
+        marginTop: '20px',
+      },
+      tagline: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+        lineHeight: 1.8,
+        color: '#6B5447',
+        marginBottom: '20px',
+        animation: 'fadeInUp 1.5s ease-out 0.3s both',
+        fontWeight: 600,
+      },
+      subTagline: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
+        color: '#A67C52',
+        marginBottom: '50px',
+        animation: 'fadeInUp 1.5s ease-out 0.4s both',
+        fontStyle: 'italic',
+      },
+      heroCTAGroup: {
+        display: 'flex',
+        gap: '20px',
+        justifyContent: 'center',
+        animation: 'fadeInUp 1.5s ease-out 0.5s both',
+        flexWrap: 'wrap',
+      },
+      heroCTAButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1rem',
+        padding: '18px 50px',
+        background: 'linear-gradient(135deg, #C9A27E 0%, #A67C52 100%)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 8px 20px rgba(201, 162, 126, 0.4)',
+      },
+      heroCTAButtonSecondary: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1rem',
+        padding: '18px 50px',
+        background: 'transparent',
+        color: '#A67C52',
+        border: '2px solid #A67C52',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+      },
+      
+      // Workshop Section
+      workshopSection: {
+        padding: '0',
+        minHeight: '70vh',
+      },
+      workshopImageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: '70vh',
+        overflow: 'hidden',
+      },
+      workshopImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      workshopTextOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'linear-gradient(to top, rgba(255, 248, 240, 0.95) 0%, transparent 100%)',
+        padding: '60px 40px 40px',
+        textAlign: 'center',
+      },
+      workshopTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(2rem, 5vw, 3rem)',
+        color: '#8B6F47',
+        marginBottom: '20px',
+        fontStyle: 'italic',
+      },
+      workshopText: {
+        fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+        color: '#6B5447',
+        lineHeight: 1.8,
+      },
+      
+      // Crafting Section
+      craftingSection: {
+        padding: '0',
+        minHeight: '70vh',
+      },
+      craftingImageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: '70vh',
+        overflow: 'hidden',
+      },
+      craftingImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      craftingTextOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'linear-gradient(to top, rgba(244, 194, 194, 0.95) 0%, transparent 100%)',
+        padding: '60px 40px 40px',
+        textAlign: 'center',
+      },
+      craftingTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 2rem)',
+        color: '#8B6F47',
+        fontStyle: 'italic',
+        lineHeight: 1.8,
+      },
+      
+      // Common Sections
+      section: {
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '100px 20px',
+        position: 'relative',
+      },
+      lightSection: {
+        background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5E8 100%)',
+      },
+      roseSection: {
+        background: 'linear-gradient(135deg, #FFE8E8 0%, #FFF0F0 50%, #FFE8F5 100%)',
+      },
+      valueSection: {
+        background: 'linear-gradient(180deg, #FFF0F0 0%, #FFE8E8 100%)',
+      },
+      sectionContent: {
+        maxWidth: '1200px',
+        width: '100%',
+        margin: '0 auto',
+        position: 'relative',
+        zIndex: 2,
+      },
+      ornamentalDivider: {
+        textAlign: 'center',
+        color: '#C9A27E',
+        fontSize: '1.5rem',
+        marginBottom: '40px',
+        letterSpacing: '0.3em',
+      },
+      sectionTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        textAlign: 'center',
+        letterSpacing: '0.3em',
+        marginBottom: '20px',
+        color: '#8B6F47',
+        textShadow: '2px 2px 4px rgba(139, 111, 71, 0.2)',
+      },
+      subtitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        textAlign: 'center',
+        color: '#A67C52',
+        marginBottom: '80px',
+        fontStyle: 'italic',
+      },
+      
+      // Value Section
+      valueMainTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+        textAlign: 'center',
+        color: '#8B6F47',
+        marginBottom: '80px',
+        lineHeight: 1.6,
+        fontWeight: 600,
+      },
+      valueCards: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '40px',
+        maxWidth: '1000px',
+        margin: '0 auto',
+      },
+      miniValueCard: {
+        textAlign: 'center',
+        padding: '40px 20px',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '20px',
+        border: '2px solid rgba(201, 162, 126, 0.3)',
+        transition: 'all 0.4s ease',
+        cursor: 'pointer',
+        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+      },
+      miniValueIcon: {
+        fontSize: '3rem',
+        marginBottom: '20px',
+      },
+      miniValueTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.5rem',
+        color: '#8B6F47',
+        marginBottom: '15px',
+      },
+      miniValueText: {
+        fontSize: '1.1rem',
+        lineHeight: 1.8,
+        color: '#6B5447',
+      },
+      
+      // Story Section
+      storyGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '40px',
+        marginTop: '60px',
+      },
+      storyCard: {
+        background: 'rgba(255, 255, 255, 0.8)',
+        border: '2px solid rgba(201, 162, 126, 0.3)',
+        padding: '40px',
+        borderRadius: '20px',
+        textAlign: 'center',
+        transition: 'all 0.4s ease',
+        cursor: 'pointer',
+        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+      },
+      cardIcon: {
+        fontSize: '3rem',
+        marginBottom: '20px',
+      },
+      cardTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.5rem',
+        marginBottom: '20px',
+        color: '#A67C52',
+      },
+      cardText: {
+        fontSize: '1.1rem',
+        lineHeight: 1.8,
+        color: '#6B5447',
+      },
+      
+      // Turning Point
+      turningContent: {
+        maxWidth: '900px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '60px',
+      },
+      epiphanyBox: {
+        padding: '50px 40px',
+        background: 'rgba(255, 255, 255, 0.8)',
+        borderLeft: '4px solid #C9A27E',
+        borderRadius: '15px',
+        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+      },
+      epiphanyQuote: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 1.8rem)',
+        fontStyle: 'italic',
+        color: '#A67C52',
+        lineHeight: 1.8,
+        marginBottom: '20px',
+      },
+      epiphanyAuthor: {
+        fontSize: '1rem',
+        color: '#8B6F47',
+        textAlign: 'right',
+      },
+      epiphany: {
+        textAlign: 'center',
+        padding: '50px 40px',
+        background: 'rgba(244, 194, 194, 0.3)',
+        borderRadius: '20px',
+        border: '2px solid rgba(201, 162, 126, 0.3)',
+        boxShadow: '0 4px 15px rgba(244, 194, 194, 0.3)',
+      },
+      epiphanyText: {
+        fontSize: '1.2rem',
+        lineHeight: 2,
+        color: '#6B5447',
+        marginBottom: '30px',
+      },
+      epiphanyHighlight: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.6rem',
+        lineHeight: 2,
+        color: '#A67C52',
+        fontStyle: 'italic',
+        padding: '30px 0',
+        margin: '30px 0',
+        borderTop: '1px solid rgba(201, 162, 126, 0.3)',
+        borderBottom: '1px solid rgba(201, 162, 126, 0.3)',
+      },
+
+      // ========== DARK STYLES ==========
+      
+      // Dark Sections
+      darkSection: {
+        background: 'linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)',
+      },
+      purpleSection: {
+        background: 'linear-gradient(135deg, #2a1a2a 0%, #1a0a1a 100%)',
+      },
+      
+      // Magic Background
+      magicBackground: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        pointerEvents: 'none',
+        overflow: 'hidden',
+      },
+      magicParticle1: {
+        position: 'absolute',
+        top: '20%',
+        left: '10%',
+        width: '300px',
+        height: '300px',
+        background: 'radial-gradient(circle, rgba(74, 14, 78, 0.3), transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+        animation: 'float 8s ease-in-out infinite',
+      },
+      magicParticle2: {
+        position: 'absolute',
+        bottom: '20%',
+        right: '10%',
+        width: '400px',
+        height: '400px',
+        background: 'radial-gradient(circle, rgba(212, 165, 165, 0.2), transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(80px)',
+        animation: 'float 10s ease-in-out infinite reverse',
+      },
+      magicParticle3: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '500px',
+        height: '500px',
+        background: 'radial-gradient(circle, rgba(169, 169, 169, 0.1), transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(100px)',
+        animation: 'pulse 6s ease-in-out infinite',
+      },
+      
+      // Dark Ornamental Divider
+      darkOrnamentalDivider: {
+        textAlign: 'center',
+        color: '#D4AF37',
+        fontSize: '1.5rem',
+        marginBottom: '40px',
+        letterSpacing: '0.5em',
+      },
+      
+      // Dark Section Title
+      darkSectionTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        textAlign: 'center',
+        letterSpacing: '0.3em',
+        marginBottom: '20px',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #c0c0c0 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      },
+      darkSubtitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        textAlign: 'center',
+        color: '#a9a9a9',
+        marginBottom: '80px',
+        fontStyle: 'italic',
+      },
+      
+      // Dark Philosophy
+      darkPhilosophyTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+        textAlign: 'center',
+        color: '#D4A5A5',
+        marginBottom: '80px',
+        fontStyle: 'italic',
+      },
+      darkPhilosophyGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '30px',
+      },
+      darkPhilosophyCard: {
+        background: 'rgba(212, 165, 165, 0.05)',
+        border: '1px solid rgba(212, 165, 165, 0.2)',
+        padding: '50px 30px',
+        borderRadius: '8px',
+        textAlign: 'center',
+        transition: 'all 0.4s ease',
+        cursor: 'pointer',
+      },
+      darkPhilosophyQuote: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.3rem',
+        lineHeight: 1.8,
+        color: '#e0e0e0',
+        fontStyle: 'italic',
+      },
+      
+      // Dark Products/Experience
+      darkProductExperience: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '50px',
+        marginBottom: '80px',
+      },
+      darkExperienceItem: {
+        background: 'rgba(169, 169, 169, 0.05)',
+        border: '1px solid rgba(212, 175, 55, 0.2)',
+        padding: '50px 40px',
+        borderRadius: '8px',
+        transition: 'all 0.4s ease',
+      },
+      darkExperienceNumber: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '2rem',
+        color: '#D4AF37',
+        marginBottom: '20px',
+        letterSpacing: '0.2em',
+      },
+      darkExperienceItemTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '2rem',
+        color: '#D4AF37',
+        marginBottom: '20px',
+      },
+      darkExperienceItemText: {
+        fontSize: '1.2rem',
+        lineHeight: 2,
+        color: '#c0c0c0',
+        marginBottom: '30px',
+      },
+      darkExperienceDetail: {
+        fontSize: '1rem',
+        color: '#D4A5A5',
+        padding: '15px',
+        background: 'rgba(74, 14, 78, 0.2)',
+        borderRadius: '8px',
+        borderLeft: '3px solid #D4AF37',
+      },
+      darkLimitationBox: {
+        textAlign: 'center',
+        padding: '60px 40px',
+        background: 'rgba(74, 14, 78, 0.2)',
+        borderRadius: '8px',
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+        animation: 'magicGlow 4s ease-in-out infinite',
+      },
+      darkLimitationTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '2rem',
+        color: '#D4AF37',
+        letterSpacing: '0.2em',
+        marginBottom: '20px',
+      },
+      darkLimitationText: {
+        fontSize: '1.3rem',
+        lineHeight: 2,
+        color: '#c0c0c0',
+        fontStyle: 'italic',
+      },
+      
+      // Dark Testimonials
+      darkTestimonialGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '40px',
+        marginTop: '60px',
+      },
+      darkTestimonialCard: {
+        background: 'rgba(169, 169, 169, 0.05)',
+        border: '1px solid rgba(212, 175, 55, 0.2)',
+        padding: '40px',
+        borderRadius: '8px',
+        transition: 'all 0.4s ease',
+      },
+      darkTestimonialText: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.2rem',
+        lineHeight: 1.8,
+        color: '#e0e0e0',
+        fontStyle: 'italic',
+        marginBottom: '20px',
+      },
+      darkTestimonialAuthor: {
+        fontSize: '1rem',
+        color: '#D4A5A5',
+        textAlign: 'right',
+      },
+      
+      // Dark FAQ
+      darkFaqList: {
+        maxWidth: '900px',
+        margin: '60px auto 0',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '30px',
+      },
+      darkFaqItem: {
+        background: 'rgba(169, 169, 169, 0.05)',
+        border: '1px solid rgba(212, 175, 55, 0.2)',
+        padding: '30px',
+        borderRadius: '8px',
+        transition: 'all 0.4s ease',
+      },
+      darkFaqQuestion: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.3rem',
+        color: '#D4AF37',
+        marginBottom: '15px',
+      },
+      darkFaqAnswer: {
+        fontSize: '1.1rem',
+        lineHeight: 1.8,
+        color: '#b0b0b0',
+      },
+      
+      // Dark Manifesto
+      darkManifestoTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        textAlign: 'center',
+        letterSpacing: '0.2em',
+        marginBottom: '80px',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #D4A5A5 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      },
+      darkManifestoContent: {
+        maxWidth: '800px',
+        margin: '0 auto',
+        textAlign: 'center',
+      },
+      darkManifestoText: {
+        fontSize: '1.4rem',
+        lineHeight: 2.2,
+        color: '#c0c0c0',
+        marginBottom: '40px',
+      },
+      darkManifestoHighlight: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.8rem',
+        lineHeight: 2,
+        color: '#D4A5A5',
+        fontStyle: 'italic',
+        padding: '40px',
+        background: 'rgba(212, 165, 165, 0.1)',
+        borderRadius: '8px',
+        marginBottom: '40px',
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+      },
+      darkManifestoClosing: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '2.5rem',
+        color: '#D4AF37',
+        letterSpacing: '0.3em',
+        marginTop: '60px',
+      },
+      
+      // Dark CTA
+      darkCtaContent: {
+        textAlign: 'center',
+        maxWidth: '800px',
+        margin: '0 auto',
+      },
+      darkCtaTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+        letterSpacing: '0.3em',
+        marginBottom: '20px',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #c0c0c0 50%, #D4A5A5 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      },
+      darkCtaSubtitle: {
+        fontSize: '1.2rem',
+        color: '#a9a9a9',
+        letterSpacing: '0.2em',
+        marginBottom: '60px',
+      },
+      darkPriceBox: {
+        padding: '40px',
+        background: 'rgba(74, 14, 78, 0.2)',
+        borderRadius: '8px',
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+        marginBottom: '50px',
+      },
+      darkPriceLabel: {
+        fontSize: '1rem',
+        color: '#a9a9a9',
+        marginBottom: '10px',
+        letterSpacing: '0.1em',
+      },
+      darkPriceAmount: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '3.5rem',
+        color: '#D4AF37',
+        fontWeight: 700,
+        marginBottom: '10px',
+      },
+      darkPriceNote: {
+        fontSize: '1rem',
+        color: '#c0c0c0',
+      },
+      darkCtaButtons: {
+        display: 'flex',
+        gap: '30px',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        marginBottom: '40px',
+      },
+      darkCtaButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1.2rem',
+        padding: '22px 70px',
+        background: 'linear-gradient(135deg, #4A0E4E 0%, #D4AF37 100%)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 10px 30px rgba(74, 14, 78, 0.4)',
+      },
+      darkCtaNote: {
+        marginBottom: '80px',
+      },
+      darkCtaNoteText: {
+        fontSize: '0.9rem',
+        color: '#a9a9a9',
+        lineHeight: 1.8,
+      },
+      darkFooter: {
+        paddingTop: '60px',
+        borderTop: '1px solid rgba(169, 169, 169, 0.2)',
+      },
+      darkFooterText: {
+        fontSize: '1.2rem',
+        lineHeight: 2,
+        color: '#a9a9a9',
+        fontStyle: 'italic',
+        marginBottom: '30px',
+      },
+      darkFooterLinks: {
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '15px',
+        marginBottom: '20px',
+        flexWrap: 'wrap',
+      },
+      darkFooterLink: {
+        color: '#D4A5A5',
+        textDecoration: 'none',
+        fontSize: '0.9rem',
+        transition: 'color 0.3s ease',
+      },
+      darkFooterSeparator: {
+        color: '#D4AF37',
+      },
+      darkCopyright: {
+        fontSize: '0.8rem',
+        color: '#a9a9a9',
+        marginTop: '20px',
+      },
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MajorinSweetsLP />);
+  </script>
+</body>
+</html>

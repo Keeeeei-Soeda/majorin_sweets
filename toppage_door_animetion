@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Majorin Sweets - 魔法の世界へようこそ</title>
+  <meta name="description" content="魔法じゃない、本物の甘さ。扉を開けて、マジョリンの世界へ。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background: #0a0a0a;
+    }
+    
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes petalFall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes butlerAppear {
+      0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    @keyframes choicesFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes zoomIn {
+      0% {
+        transform: scale(1);
+      }
+      100% {
+        transform: scale(1.5);
+      }
+    }
+    
+    @keyframes doorGlow {
+      0%, 100% {
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 80px rgba(212, 175, 55, 0.6);
+      }
+    }
+    
+    @keyframes productFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .petal {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #F4C2C2, transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: petalFall 10s linear infinite;
+    }
+    
+    .petal:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .petal:nth-child(2) { left: 20%; animation-delay: 2s; }
+    .petal:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .petal:nth-child(4) { left: 40%; animation-delay: 1s; }
+    .petal:nth-child(5) { left: 50%; animation-delay: 3s; }
+    .petal:nth-child(6) { left: 60%; animation-delay: 5s; }
+    .petal:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+    .petal:nth-child(8) { left: 80%; animation-delay: 4.5s; }
+    .petal:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+    
+    @media (max-width: 768px) {
+      [data-grid] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    function MajorinSweetsLP() {
+      const [scrollY, setScrollY] = useState(0);
+      const [isVisible, setIsVisible] = useState({});
+      const [doorState, setDoorState] = useState('closed'); // closed, opening, open, shopping, story
+      const [showButler, setShowButler] = useState(false);
+      const [showChoices, setShowChoices] = useState(false);
+      
+      const sectionRefs = useRef({});
+      const doorSectionRef = useRef(null);
+
+      useEffect(() => {
+        const handleScroll = () => {
+          setScrollY(window.scrollY);
+          
+          // 通常のセクション表示制御
+          Object.keys(sectionRefs.current).forEach(key => {
+            const element = sectionRefs.current[key];
+            if (element) {
+              const rect = element.getBoundingClientRect();
+              const isInView = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+              setIsVisible(prev => ({ ...prev, [key]: isInView }));
+            }
+          });
+          
+          // 扉のスクロール制御
+          if (doorSectionRef.current && doorState === 'closed') {
+            const rect = doorSectionRef.current.getBoundingClientRect();
+            // 扉が画面中央に来たら開く
+            if (rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2) {
+              setDoorState('opening');
+              
+              // 扉が開くアニメーション完了後
+              setTimeout(() => {
+                setDoorState('open');
+                setShowButler(true);
+                
+                // 執事登場後、選択肢を表示
+                setTimeout(() => {
+                  setShowChoices(true);
+                }, 1000);
+              }, 2000);
+            }
+          }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, [doorState]);
+
+      const handleChoice = (choice) => {
+        if (choice === 'buy') {
+          setDoorState('shopping');
+          // 商品画面へのトランジション
+          setTimeout(() => {
+            const productSection = document.getElementById('products');
+            if (productSection) {
+              productSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 500);
+        } else if (choice === 'story') {
+          setDoorState('story');
+          const storySection = document.getElementById('story');
+          if (storySection) {
+            storySection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      };
+
+      const scrollToReservation = () => {
+        const ctaSection = document.getElementById('reservation');
+        if (ctaSection) {
+          ctaSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+
+      return (
+        <div style={styles.container}>
+          {/* Floating Petals */}
+          <div style={styles.petalsContainer}>
+            {[...Array(9)].map((_, i) => (
+              <div key={i} className="petal" />
+            ))}
+          </div>
+
+          {/* Hero Section */}
+          <section style={styles.hero}>
+            <div style={styles.heroImageOverlay}>
+              <img 
+                src="images/image01.JPG" 
+                alt="Majorin Sweets" 
+                style={styles.heroImage}
+              />
+              <div style={styles.heroGradientOverlay} />
+            </div>
+            
+            <div style={styles.heroContent}>
+              <div style={styles.logoContainer}>
+                <h1 style={styles.logo}>MAJORIN SWEETS</h1>
+                <div style={styles.ornament}>🌹 ✦ 🌹</div>
+              </div>
+              <p style={styles.tagline}>
+                完璧な人生なんて、ない。<br />
+                でも、完璧な一瞬は、ある。
+              </p>
+              <p style={styles.subTagline}>
+                魔法の扉を開けて、マジョリンの世界へ
+              </p>
+              
+              <div style={styles.scrollHint}>
+                <p style={styles.scrollHintText}>↓ スクロールして扉を開ける ↓</p>
+              </div>
+            </div>
+          </section>
+
+          {/* ========== DOOR SECTION ========== */}
+          <section 
+            ref={doorSectionRef}
+            style={styles.doorSection}
+          >
+            <div style={styles.doorBackground}>
+              {/* 扉画像全体（背景） */}
+              <img 
+                src="images/IMG_0155.JPG" 
+                alt="Door Background" 
+                style={styles.doorBackgroundImage}
+              />
+              
+              {/* 左扉 */}
+              <div 
+                style={{
+                  ...styles.door,
+                  ...styles.doorLeft,
+                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'shopping' || doorState === 'story'
+                    ? 'perspective(1200px) rotateY(-105deg)'
+                    : 'rotateY(0deg)',
+                }}
+              >
+                <img 
+                  src="images/IMG_0155.JPG" 
+                  alt="Left Door" 
+                  style={styles.doorImage}
+                />
+              </div>
+              
+              {/* 右扉 */}
+              <div 
+                style={{
+                  ...styles.door,
+                  ...styles.doorRight,
+                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'shopping' || doorState === 'story'
+                    ? 'perspective(1200px) rotateY(105deg)'
+                    : 'rotateY(0deg)',
+                }}
+              >
+                <img 
+                  src="images/IMG_0155.JPG" 
+                  alt="Right Door" 
+                  style={{...styles.doorImage, objectPosition: 'right'}}
+                />
+              </div>
+              
+              {/* 扉の奥の世界 */}
+              {(doorState === 'open' || doorState === 'shopping' || doorState === 'story') && (
+                <div style={styles.behindDoor}>
+                  {/* ウェルカムテキスト */}
+                  {showButler && (
+                    <div style={styles.welcomeBox}>
+                      <h2 style={styles.welcomeTitle}>ようこそ、マジョリンの世界へ</h2>
+                      <p style={styles.welcomeText}>
+                        執事がお迎えいたします。<br />
+                        どちらをお選びになりますか？
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* 選択肢ボタン */}
+                  {showChoices && doorState === 'open' && (
+                    <div style={styles.choicesContainer}>
+                      <button 
+                        style={styles.choiceButton}
+                        onClick={() => handleChoice('buy')}
+                      >
+                        <span style={styles.choiceIcon}>🛍️</span>
+                        <span style={styles.choiceText}>マジョリンスイーツを買う</span>
+                      </button>
+                      
+                      <button 
+                        style={styles.choiceButtonSecondary}
+                        onClick={() => handleChoice('story')}
+                      >
+                        <span style={styles.choiceIcon}>📖</span>
+                        <span style={styles.choiceText}>ストーリーをみる</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* 閉じた扉の装飾 */}
+              {doorState === 'closed' && (
+                <div style={styles.doorDecoration}>
+                  <img 
+                    src="images/IMG_0151.JPG" 
+                    alt="Door Emblem" 
+                    style={styles.doorEmblem}
+                  />
+                  <p style={styles.doorHint}>スクロールして扉を開く</p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* ========== PRODUCT SELECTION (商品選択) ========== */}
+          {doorState === 'shopping' && (
+            <section id="products" style={styles.productSection}>
+              <div style={styles.productSectionContent}>
+                <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+                <h2 style={styles.productTitle}>お好きなスイーツをお選びください</h2>
+                <p style={styles.productSubtitle}>すべて手作り、心を込めて</p>
+                
+                <div style={styles.productGrid}>
+                  {/* 商品1 */}
+                  <div style={styles.productCard}>
+                    <div style={styles.productImageContainer}>
+                      <img 
+                        src="images/image03.JPG" 
+                        alt="定番セット" 
+                        style={styles.productImage}
+                      />
+                    </div>
+                    <div style={styles.productInfo}>
+                      <h3 style={styles.productName}>定番セット</h3>
+                      <p style={styles.productDescription}>
+                        手作りケーキ1個 + 真実のカード<br />
+                        マジョリンからのメッセージ付き
+                      </p>
+                      <p style={styles.productPrice}>¥3,800</p>
+                      <button style={styles.productButton} onClick={scrollToReservation}>
+                        予約する
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* 商品2 */}
+                  <div style={styles.productCard}>
+                    <div style={styles.productImageContainer}>
+                      <img 
+                        src="images/image02.JPG" 
+                        alt="プレミアムセット" 
+                        style={styles.productImage}
+                      />
+                    </div>
+                    <div style={styles.productInfo}>
+                      <h3 style={styles.productName}>プレミアムセット</h3>
+                      <p style={styles.productDescription}>
+                        手作りケーキ2個 + 真実のカード2枚<br />
+                        特別なオリジナルボックス
+                      </p>
+                      <p style={styles.productPrice}>¥7,200</p>
+                      <button style={styles.productButton} onClick={scrollToReservation}>
+                        予約する
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* 商品3 */}
+                  <div style={styles.productCard}>
+                    <div style={styles.productImageContainer}>
+                      <img 
+                        src="images/image01.JPG" 
+                        alt="ギフトセット" 
+                        style={styles.productImage}
+                      />
+                    </div>
+                    <div style={styles.productInfo}>
+                      <h3 style={styles.productName}>ギフトセット</h3>
+                      <p style={styles.productDescription}>
+                        大切な人への贈り物<br />
+                        ギフトラッピング + メッセージ代筆
+                      </p>
+                      <p style={styles.productPrice}>¥4,500</p>
+                      <button style={styles.productButton} onClick={scrollToReservation}>
+                        予約する
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* ========== STORY SECTION (ストーリー) ========== */}
+          {doorState === 'story' && (
+            <>
+              {/* Value Proposition */}
+              <section 
+                id="story"
+                ref={el => sectionRefs.current['value'] = el}
+                style={{
+                  ...styles.section,
+                  ...styles.valueSection,
+                  opacity: isVisible['value'] ? 1 : 0,
+                  transform: isVisible['value'] ? 'translateY(0)' : 'translateY(50px)',
+                  transition: 'all 1s ease-out'
+                }}
+              >
+                <div style={styles.sectionContent}>
+                  <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+                  <h2 style={styles.valueMainTitle}>
+                    痛みを消さない。<br />
+                    痛みと生きる力をくれる。
+                  </h2>
+                  <div style={styles.valueCards} data-grid>
+                    <div style={styles.miniValueCard}>
+                      <div style={styles.miniValueIcon}>🪄</div>
+                      <h4 style={styles.miniValueTitle}>魔法は、置いた</h4>
+                      <p style={styles.miniValueText}>
+                        問題を消すのではなく、<br />向き合う力を
+                      </p>
+                    </div>
+                    <div style={styles.miniValueCard}>
+                      <div style={styles.miniValueIcon}>🍰</div>
+                      <h4 style={styles.miniValueTitle}>不完全でいい</h4>
+                      <p style={styles.miniValueText}>
+                        完璧より、<br />心がこもっている方が強い
+                      </p>
+                    </div>
+                    <div style={styles.miniValueCard}>
+                      <div style={styles.miniValueIcon}>💌</div>
+                      <h4 style={styles.miniValueTitle}>真実の一言</h4>
+                      <p style={styles.miniValueText}>
+                        50種類のカード。<br />あなたに必要な言葉
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Story Cards */}
+              <section 
+                ref={el => sectionRefs.current['story'] = el}
+                style={{
+                  ...styles.section,
+                  ...styles.lightSection,
+                  opacity: isVisible['story'] ? 1 : 0,
+                  transform: isVisible['story'] ? 'translateY(0)' : 'translateY(50px)',
+                  transition: 'all 1s ease-out'
+                }}
+              >
+                <div style={styles.sectionContent}>
+                  <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+                  <h2 style={styles.sectionTitle}>STORY</h2>
+                  <h3 style={styles.subtitle}>なぜ、魔女はお菓子を作るのか</h3>
+                  
+                  <div style={styles.storyGrid} data-grid>
+                    <div style={styles.storyCard}>
+                      <div style={styles.cardIcon}>🔮</div>
+                      <h4 style={styles.cardTitle}>完璧だった、過去</h4>
+                      <p style={styles.cardText}>
+                        数百年間、私は「解決の魔女」。<br />
+                        病気も、失恋も、貧困も。<br />
+                        魔法で、すべてを消してきた。
+                      </p>
+                    </div>
+                    
+                    <div style={styles.storyCard}>
+                      <div style={styles.cardIcon}>💔</div>
+                      <h4 style={styles.cardTitle}>気づいた、真実</h4>
+                      <p style={styles.cardText}>
+                        痛みを消すことと、人を救うことは違う。<br />
+                        痛みこそが、人を育てる。<br />
+                        私は、人を弱くしていた。
+                      </p>
+                    </div>
+                    
+                    <div style={styles.storyCard}>
+                      <div style={styles.cardIcon}>🍰</div>
+                      <h4 style={styles.cardTitle}>選んだ、道</h4>
+                      <p style={styles.cardText}>
+                        だから、杖を置いた。<br />
+                        お菓子は痛みを消さない。<br />
+                        でも、痛みと生きる力をくれる。
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div style={styles.backToShopContainer}>
+                    <button 
+                      style={styles.backToShopButton}
+                      onClick={() => {
+                        setDoorState('shopping');
+                        const productSection = document.getElementById('products');
+                        if (productSection) {
+                          productSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                    >
+                      🛍️ スイーツを選ぶ
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* ========== CTA SECTION ========== */}
+          <section 
+            id="reservation"
+            style={styles.ctaSection}
+          >
+            <div style={styles.ctaSectionContent}>
+              <h2 style={styles.ctaTitle}>MAJORIN SWEETS</h2>
+              <p style={styles.ctaSubtitle}>🌹 完全予約制 | 月100個限定 🌹</p>
+              
+              <div style={styles.priceBox}>
+                <p style={styles.priceLabel}>お一人様</p>
+                <p style={styles.priceAmount}>¥3,800〜</p>
+                <p style={styles.priceNote}>（税込・送料込）</p>
+              </div>
+
+              <div style={styles.ctaButtons}>
+                <button style={styles.ctaButton} onClick={() => alert('予約ページへ遷移します')}>
+                  今すぐ予約する
+                </button>
+              </div>
+
+              <div style={styles.ctaNote}>
+                <p style={styles.ctaNoteText}>
+                  ※ 月初に予約を開始し、100個に達し次第締め切ります<br />
+                  ※ お届けまで2-3週間程度お時間をいただきます
+                </p>
+              </div>
+
+              <div style={styles.footer}>
+                <p style={styles.footerText}>
+                  痛みと共に生きる人々に、<br />
+                  完璧じゃない甘さを。<br />
+                  魔法じゃない、本物の支えを。
+                </p>
+                <p style={styles.copyright}>© 2026 Majorin Sweets. All rights reserved.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    const styles = {
+      container: {
+        margin: 0,
+        padding: 0,
+        backgroundColor: '#0a0a0a',
+        color: '#e0e0e0',
+        fontFamily: "'Cormorant Garamond', serif",
+        overflowX: 'hidden',
+        position: 'relative',
+      },
+      
+      petalsContainer: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 1,
+      },
+      
+      // ========== HERO SECTION ==========
+      hero: {
+        position: 'relative',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+      },
+      heroImageOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      },
+      heroImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      heroGradientOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(to bottom, rgba(10, 10, 10, 0.4) 0%, rgba(10, 10, 10, 0.8) 100%)',
+      },
+      heroContent: {
+        position: 'relative',
+        zIndex: 2,
+        textAlign: 'center',
+        padding: '0 20px',
+      },
+      logoContainer: {
+        marginBottom: '40px',
+        animation: 'fadeInUp 1.5s ease-out',
+      },
+      logo: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 7vw, 5rem)',
+        fontWeight: 700,
+        letterSpacing: '0.3em',
+        margin: 0,
+        background: 'linear-gradient(135deg, #D4AF37 0%, #F4C2C2 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textShadow: '0 0 30px rgba(212, 175, 55, 0.5)',
+      },
+      ornament: {
+        fontSize: '2rem',
+        color: '#D4AF37',
+        marginTop: '20px',
+      },
+      tagline: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+        lineHeight: 1.8,
+        color: '#F4C2C2',
+        marginBottom: '20px',
+        animation: 'fadeInUp 1.5s ease-out 0.3s both',
+        fontWeight: 600,
+      },
+      subTagline: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
+        color: '#D4AF37',
+        marginBottom: '50px',
+        animation: 'fadeInUp 1.5s ease-out 0.4s both',
+        fontStyle: 'italic',
+      },
+      scrollHint: {
+        animation: 'fadeInUp 1.5s ease-out 0.6s both',
+      },
+      scrollHintText: {
+        fontSize: '1rem',
+        color: '#a9a9a9',
+        letterSpacing: '0.2em',
+      },
+      
+      // ========== DOOR SECTION ==========
+      doorSection: {
+        position: 'relative',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)',
+      },
+      doorBackground: {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      doorBackgroundImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        opacity: 0.3,
+        filter: 'blur(5px)',
+      },
+      door: {
+        position: 'absolute',
+        width: '50%',
+        height: '100%',
+        overflow: 'hidden',
+        transition: 'transform 2s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        transformStyle: 'preserve-3d',
+        willChange: 'transform',
+      },
+      doorLeft: {
+        left: 0,
+        transformOrigin: 'left center',
+      },
+      doorRight: {
+        right: 0,
+        transformOrigin: 'right center',
+      },
+      doorImage: {
+        width: '200%',
+        height: '100%',
+        objectFit: 'cover',
+        objectPosition: 'left',
+      },
+      behindDoor: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 1,
+        textAlign: 'center',
+        width: '90%',
+        maxWidth: '800px',
+      },
+      welcomeBox: {
+        marginBottom: '40px',
+        animation: 'butlerAppear 1s ease-out 0.5s both',
+      },
+      welcomeTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+        color: '#D4AF37',
+        marginBottom: '20px',
+        letterSpacing: '0.2em',
+        textShadow: '0 0 20px rgba(212, 175, 55, 0.6)',
+      },
+      welcomeText: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        color: '#F4C2C2',
+        lineHeight: 1.8,
+        fontStyle: 'italic',
+      },
+      choicesContainer: {
+        display: 'flex',
+        gap: '30px',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        animation: 'choicesFadeIn 1s ease-out 1.5s both',
+      },
+      choiceButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+        padding: '25px 50px',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #C9A27E 100%)',
+        color: '#0a0a0a',
+        border: 'none',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 10px 30px rgba(212, 175, 55, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '15px',
+      },
+      choiceButtonSecondary: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+        padding: '25px 50px',
+        background: 'transparent',
+        color: '#D4AF37',
+        border: '2px solid #D4AF37',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '15px',
+      },
+      choiceIcon: {
+        fontSize: '2rem',
+      },
+      choiceText: {
+        fontSize: 'inherit',
+      },
+      doorDecoration: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 10,
+        textAlign: 'center',
+      },
+      doorEmblem: {
+        width: '200px',
+        height: 'auto',
+        marginBottom: '30px',
+        animation: 'doorGlow 3s ease-in-out infinite',
+        filter: 'drop-shadow(0 0 20px rgba(212, 175, 55, 0.6))',
+      },
+      doorHint: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.5rem',
+        color: '#D4AF37',
+        fontStyle: 'italic',
+        letterSpacing: '0.1em',
+      },
+      
+      // ========== PRODUCT SECTION ==========
+      productSection: {
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5E8 100%)',
+        padding: '100px 20px',
+      },
+      productSectionContent: {
+        maxWidth: '1400px',
+        margin: '0 auto',
+      },
+      ornamentalDivider: {
+        textAlign: 'center',
+        color: '#C9A27E',
+        fontSize: '1.5rem',
+        marginBottom: '40px',
+        letterSpacing: '0.3em',
+      },
+      productTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        textAlign: 'center',
+        letterSpacing: '0.2em',
+        marginBottom: '20px',
+        color: '#8B6F47',
+      },
+      productSubtitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        textAlign: 'center',
+        color: '#A67C52',
+        marginBottom: '80px',
+        fontStyle: 'italic',
+      },
+      productGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+        gap: '50px',
+        marginTop: '60px',
+      },
+      productCard: {
+        background: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        boxShadow: '0 10px 40px rgba(139, 111, 71, 0.2)',
+        transition: 'all 0.4s ease',
+        cursor: 'pointer',
+        animation: 'productFadeIn 0.8s ease-out both',
+      },
+      productImageContainer: {
+        width: '100%',
+        height: '300px',
+        overflow: 'hidden',
+      },
+      productImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        transition: 'transform 0.4s ease',
+      },
+      productInfo: {
+        padding: '30px',
+      },
+      productName: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '2rem',
+        color: '#8B6F47',
+        marginBottom: '15px',
+      },
+      productDescription: {
+        fontSize: '1.1rem',
+        color: '#6B5447',
+        lineHeight: 1.8,
+        marginBottom: '20px',
+      },
+      productPrice: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '2.5rem',
+        color: '#C9A27E',
+        marginBottom: '25px',
+        fontWeight: 700,
+      },
+      productButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1.1rem',
+        padding: '15px 40px',
+        background: 'linear-gradient(135deg, #C9A27E 0%, #A67C52 100%)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        width: '100%',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 5px 15px rgba(201, 162, 126, 0.3)',
+      },
+      
+      // ========== STORY SECTIONS ==========
+      section: {
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '100px 20px',
+        position: 'relative',
+      },
+      lightSection: {
+        background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5E8 100%)',
+      },
+      valueSection: {
+        background: 'linear-gradient(180deg, #FFF0F0 0%, #FFE8E8 100%)',
+      },
+      sectionContent: {
+        maxWidth: '1200px',
+        width: '100%',
+        margin: '0 auto',
+        position: 'relative',
+        zIndex: 2,
+      },
+      sectionTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        textAlign: 'center',
+        letterSpacing: '0.3em',
+        marginBottom: '20px',
+        color: '#8B6F47',
+      },
+      subtitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        textAlign: 'center',
+        color: '#A67C52',
+        marginBottom: '80px',
+        fontStyle: 'italic',
+      },
+      valueMainTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+        textAlign: 'center',
+        color: '#8B6F47',
+        marginBottom: '80px',
+        lineHeight: 1.6,
+        fontWeight: 600,
+      },
+      valueCards: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '40px',
+        maxWidth: '1000px',
+        margin: '0 auto',
+      },
+      miniValueCard: {
+        textAlign: 'center',
+        padding: '40px 20px',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '20px',
+        border: '2px solid rgba(201, 162, 126, 0.3)',
+        transition: 'all 0.4s ease',
+        cursor: 'pointer',
+        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+      },
+      miniValueIcon: {
+        fontSize: '3rem',
+        marginBottom: '20px',
+      },
+      miniValueTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.5rem',
+        color: '#8B6F47',
+        marginBottom: '15px',
+      },
+      miniValueText: {
+        fontSize: '1.1rem',
+        lineHeight: 1.8,
+        color: '#6B5447',
+      },
+      storyGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '40px',
+        marginTop: '60px',
+      },
+      storyCard: {
+        background: 'rgba(255, 255, 255, 0.8)',
+        border: '2px solid rgba(201, 162, 126, 0.3)',
+        padding: '40px',
+        borderRadius: '20px',
+        textAlign: 'center',
+        transition: 'all 0.4s ease',
+        cursor: 'pointer',
+        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+      },
+      cardIcon: {
+        fontSize: '3rem',
+        marginBottom: '20px',
+      },
+      cardTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.5rem',
+        marginBottom: '20px',
+        color: '#A67C52',
+      },
+      cardText: {
+        fontSize: '1.1rem',
+        lineHeight: 1.8,
+        color: '#6B5447',
+      },
+      backToShopContainer: {
+        textAlign: 'center',
+        marginTop: '80px',
+      },
+      backToShopButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1.2rem',
+        padding: '20px 60px',
+        background: 'linear-gradient(135deg, #C9A27E 0%, #A67C52 100%)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 8px 25px rgba(201, 162, 126, 0.4)',
+      },
+      
+      // ========== CTA SECTION ==========
+      ctaSection: {
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #2a1a2a 0%, #1a0a1a 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '100px 20px',
+      },
+      ctaSectionContent: {
+        textAlign: 'center',
+        maxWidth: '800px',
+        margin: '0 auto',
+      },
+      ctaTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+        letterSpacing: '0.3em',
+        marginBottom: '20px',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #F4C2C2 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      },
+      ctaSubtitle: {
+        fontSize: '1.2rem',
+        color: '#a9a9a9',
+        letterSpacing: '0.2em',
+        marginBottom: '60px',
+      },
+      priceBox: {
+        padding: '40px',
+        background: 'rgba(74, 14, 78, 0.2)',
+        borderRadius: '8px',
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+        marginBottom: '50px',
+      },
+      priceLabel: {
+        fontSize: '1rem',
+        color: '#a9a9a9',
+        marginBottom: '10px',
+        letterSpacing: '0.1em',
+      },
+      priceAmount: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '3.5rem',
+        color: '#D4AF37',
+        fontWeight: 700,
+        marginBottom: '10px',
+      },
+      priceNote: {
+        fontSize: '1rem',
+        color: '#c0c0c0',
+      },
+      ctaButtons: {
+        display: 'flex',
+        gap: '30px',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        marginBottom: '40px',
+      },
+      ctaButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1.2rem',
+        padding: '22px 70px',
+        background: 'linear-gradient(135deg, #4A0E4E 0%, #D4AF37 100%)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 10px 30px rgba(74, 14, 78, 0.4)',
+      },
+      ctaNote: {
+        marginBottom: '80px',
+      },
+      ctaNoteText: {
+        fontSize: '0.9rem',
+        color: '#a9a9a9',
+        lineHeight: 1.8,
+      },
+      footer: {
+        paddingTop: '60px',
+        borderTop: '1px solid rgba(169, 169, 169, 0.2)',
+      },
+      footerText: {
+        fontSize: '1.2rem',
+        lineHeight: 2,
+        color: '#a9a9a9',
+        fontStyle: 'italic',
+        marginBottom: '30px',
+      },
+      copyright: {
+        fontSize: '0.8rem',
+        color: '#a9a9a9',
+        marginTop: '20px',
+      },
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MajorinSweetsLP />);
+  </script>
+</body>
+</html>

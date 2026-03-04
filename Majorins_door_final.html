@@ -471,11 +471,41 @@
             </section>
           )}
 
-          {/* ========== STORY SECTION ========== */}
+          {/* ========== STORY SECTION (豊富なストーリー) ========== */}
           {doorState === 'story' && (
             <>
+              {/* Workshop Image Section */}
               <section 
                 id="story"
+                ref={el => sectionRefs.current['workshop'] = el}
+                style={{
+                  ...styles.section,
+                  ...styles.workshopSection,
+                  opacity: isVisible['workshop'] ? 1 : 0,
+                  transform: isVisible['workshop'] ? 'translateY(0)' : 'translateY(50px)',
+                  transition: 'all 1s ease-out'
+                }}
+              >
+                <div style={styles.sectionContent}>
+                  <div style={styles.workshopImageContainer}>
+                    <img 
+                      src="images/image02.JPG" 
+                      alt="Majorin's Workshop" 
+                      style={styles.workshopImage}
+                    />
+                    <div style={styles.workshopTextOverlay}>
+                      <h2 style={styles.workshopTitle}>マジョリンの工房</h2>
+                      <p style={styles.workshopText}>
+                        ここで、魔法ではなく心を込めて<br />
+                        一つひとつ、お菓子を作っています
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Value Proposition */}
+              <section 
                 ref={el => sectionRefs.current['value'] = el}
                 style={{
                   ...styles.section,
@@ -517,6 +547,7 @@
                 </div>
               </section>
 
+              {/* Story Cards */}
               <section 
                 ref={el => sectionRefs.current['story'] = el}
                 style={{
@@ -563,23 +594,101 @@
                       </p>
                     </div>
                   </div>
+                </div>
+              </section>
+
+              {/* Crafting Image */}
+              <section 
+                ref={el => sectionRefs.current['crafting'] = el}
+                style={{
+                  ...styles.section,
+                  ...styles.craftingSection,
+                  opacity: isVisible['crafting'] ? 1 : 0,
+                  transform: isVisible['crafting'] ? 'translateY(0)' : 'translateY(50px)',
+                  transition: 'all 1s ease-out'
+                }}
+              >
+                <div style={styles.sectionContent}>
+                  <div style={styles.craftingImageContainer}>
+                    <img 
+                      src="images/image03.JPG" 
+                      alt="Majorin crafting sweets" 
+                      style={styles.craftingImage}
+                    />
+                    <div style={styles.craftingTextOverlay}>
+                      <h3 style={styles.craftingTitle}>
+                        「魔法で作ったものは、魔法で壊れる。<br />
+                        でも、手で作ったものは、心に残る」
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* The Moment */}
+              <section 
+                ref={el => sectionRefs.current['turning'] = el}
+                style={{
+                  ...styles.section,
+                  ...styles.roseSection,
+                  opacity: isVisible['turning'] ? 1 : 0,
+                  transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
+                  transition: 'all 1s ease-out 0.2s'
+                }}
+              >
+                <div style={styles.sectionContent}>
+                  <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+                  <h2 style={styles.sectionTitle}>THE MOMENT</h2>
+                  <h3 style={styles.subtitle}>すべてが変わった、ある雨の日</h3>
                   
-                  <div style={styles.backToShopContainer}>
-                    <button 
-                      style={styles.backToShopButton}
-                      onClick={() => {
-                        setDoorState('shopping');
+                  <div style={styles.turningContent}>
+                    <div style={styles.epiphanyBox}>
+                      <p style={styles.epiphanyQuote}>
+                        「これ、亡くなった母が作ってくれたケーキと<br />
+                        同じ味なんです。<br />
+                        不器用で、形は歪だったけど...温かくて」
+                      </p>
+                      <p style={styles.epiphanyAuthor}>― エレナ、街のカフェにて</p>
+                    </div>
+                    
+                    <div style={styles.epiphany}>
+                      <p style={styles.epiphanyText}>
+                        その瞬間、私は理解した。
+                      </p>
+                      <p style={styles.epiphanyHighlight}>
+                        お菓子は、痛みを消さない。<br />
+                        でも、痛みと一緒に生きる力をくれる。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* 「スイーツを選ぶ」ボタン */}
+              <section style={{...styles.section, minHeight: 'auto', padding: '60px 20px'}}>
+                <div style={styles.backToShopContainer}>
+                  <button 
+                    style={styles.backToShopButton}
+                    onClick={() => {
+                      setDoorState('shopping');
+                      setTimeout(() => {
                         const productSection = document.getElementById('products');
                         if (productSection) {
                           productSection.scrollIntoView({ behavior: 'smooth' });
                         }
-                      }}
-                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                    >
-                      🛍️ スイーツを選ぶ
-                    </button>
-                  </div>
+                      }, 100);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'scale(1.05)';
+                      e.target.style.boxShadow = '0 12px 35px rgba(201, 162, 126, 0.5)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'scale(1)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(201, 162, 126, 0.4)';
+                    }}
+                  >
+                    🛍️ スイーツを選ぶ
+                  </button>
                 </div>
               </section>
             </>
@@ -1139,6 +1248,134 @@
         letterSpacing: '0.2em',
         transition: 'all 0.4s ease',
         boxShadow: '0 8px 25px rgba(201, 162, 126, 0.4)',
+      },
+      
+      // ========== WORKSHOP SECTION ==========
+      workshopSection: {
+        padding: '0',
+        minHeight: '70vh',
+      },
+      workshopImageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: '70vh',
+        overflow: 'hidden',
+      },
+      workshopImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      workshopTextOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'linear-gradient(to top, rgba(255, 248, 240, 0.95) 0%, transparent 100%)',
+        padding: '60px 40px 40px',
+        textAlign: 'center',
+      },
+      workshopTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(2rem, 5vw, 3rem)',
+        color: '#8B6F47',
+        marginBottom: '20px',
+        fontStyle: 'italic',
+      },
+      workshopText: {
+        fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+        color: '#6B5447',
+        lineHeight: 1.8,
+      },
+      
+      // ========== CRAFTING SECTION ==========
+      craftingSection: {
+        padding: '0',
+        minHeight: '70vh',
+      },
+      craftingImageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: '70vh',
+        overflow: 'hidden',
+      },
+      craftingImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      craftingTextOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'linear-gradient(to top, rgba(244, 194, 194, 0.95) 0%, transparent 100%)',
+        padding: '60px 40px 40px',
+        textAlign: 'center',
+      },
+      craftingTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 2rem)',
+        color: '#8B6F47',
+        fontStyle: 'italic',
+        lineHeight: 1.8,
+      },
+      
+      // ========== ROSE/TURNING POINT SECTION ==========
+      roseSection: {
+        background: 'linear-gradient(135deg, #FFE8E8 0%, #FFF0F0 50%, #FFE8F5 100%)',
+      },
+      turningContent: {
+        maxWidth: '900px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '60px',
+      },
+      epiphanyBox: {
+        padding: '50px 40px',
+        background: 'rgba(255, 255, 255, 0.8)',
+        borderLeft: '4px solid #C9A27E',
+        borderRadius: '15px',
+        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+      },
+      epiphanyQuote: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 1.8rem)',
+        fontStyle: 'italic',
+        color: '#A67C52',
+        lineHeight: 1.8,
+        marginBottom: '20px',
+      },
+      epiphanyAuthor: {
+        fontSize: '1rem',
+        color: '#8B6F47',
+        textAlign: 'right',
+      },
+      epiphany: {
+        textAlign: 'center',
+        padding: '50px 40px',
+        background: 'rgba(244, 194, 194, 0.3)',
+        borderRadius: '20px',
+        border: '2px solid rgba(201, 162, 126, 0.3)',
+        boxShadow: '0 4px 15px rgba(244, 194, 194, 0.3)',
+      },
+      epiphanyText: {
+        fontSize: '1.2rem',
+        lineHeight: 2,
+        color: '#6B5447',
+        marginBottom: '30px',
+      },
+      epiphanyHighlight: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.6rem',
+        lineHeight: 2,
+        color: '#A67C52',
+        fontStyle: 'italic',
+        padding: '30px 0',
+        margin: '30px 0',
+        borderTop: '1px solid rgba(201, 162, 126, 0.3)',
+        borderBottom: '1px solid rgba(201, 162, 126, 0.3)',
       },
       
       // ========== CTA ==========

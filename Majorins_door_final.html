@@ -232,11 +232,16 @@
           {/* Hero Section */}
           <section style={styles.hero}>
             <div style={styles.heroImageOverlay}>
-              <img 
-                src="images/image01.JPG" 
-                alt="Majorin Sweets" 
-                style={styles.heroImage}
-              />
+              <video
+                style={styles.heroVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                aria-label="ブランドイメージ動画"
+              >
+                <source src="videos/0429.mov" type="video/quicktime" />
+              </video>
               <div style={styles.heroGradientOverlay} />
             </div>
             
@@ -784,10 +789,15 @@
         right: 0,
         bottom: 0,
       },
-      heroImage: {
+      heroVideo: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
         width: '100%',
         height: '100%',
         objectFit: 'cover',
+        objectPosition: 'center',
+        zIndex: 0,
       },
       heroGradientOverlay: {
         position: 'absolute',
@@ -795,6 +805,7 @@
         left: 0,
         right: 0,
         bottom: 0,
+        zIndex: 1,
         background: 'linear-gradient(to bottom, rgba(10, 10, 10, 0.4) 0%, rgba(10, 10, 10, 0.8) 100%)',
       },
       heroContent: {

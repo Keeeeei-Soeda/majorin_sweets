@@ -73,10 +73,10 @@
     
     @keyframes doorGlow {
       0%, 100% {
-        filter: drop-shadow(0 0 20px rgba(244, 194, 194, 0.4));
+        filter: drop-shadow(0 0 20px rgba(224, 122, 132, 0.5));
       }
       50% {
-        filter: drop-shadow(0 0 40px rgba(244, 194, 194, 0.7));
+        filter: drop-shadow(0 0 40px rgba(224, 122, 132, 0.8));
       }
     }
     
@@ -104,7 +104,7 @@
       position: absolute;
       width: 10px;
       height: 10px;
-      background: radial-gradient(circle, #F4C2C2, transparent);
+      background: radial-gradient(circle, #E07A84, transparent);
       border-radius: 50%;
       pointer-events: none;
       animation: petalFall 10s linear infinite;
@@ -680,11 +680,11 @@
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.transform = 'scale(1.05)';
-                      e.target.style.boxShadow = '0 12px 35px rgba(201, 162, 126, 0.5)';
+                      e.target.style.boxShadow = '0 12px 35px rgba(224, 122, 132, 0.6)';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.transform = 'scale(1)';
-                      e.target.style.boxShadow = '0 8px 25px rgba(201, 162, 126, 0.4)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(224, 122, 132, 0.45)';
                     }}
                   >
                     🛍️ スイーツを選ぶ
@@ -813,7 +813,7 @@
         fontWeight: 700,
         letterSpacing: '0.3em',
         margin: 0,
-        background: 'linear-gradient(135deg, #D4AF37 0%, #F4C2C2 100%)',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #E07A84 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         textShadow: '0 0 30px rgba(212, 175, 55, 0.5)',
@@ -827,7 +827,7 @@
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
         lineHeight: 1.8,
-        color: '#F4C2C2',
+        color: '#F2B0B8',
         marginBottom: '20px',
         animation: 'fadeInUp 1.5s ease-out 0.3s both',
         fontWeight: 600,
@@ -945,7 +945,7 @@
       welcomeText: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-        color: '#F4C2C2',
+        color: '#F2B0B8',
         lineHeight: 1.8,
         fontStyle: 'italic',
       },
@@ -961,7 +961,7 @@
         fontFamily: "'Cinzel', serif",
         fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
         padding: '25px 50px',
-        background: 'linear-gradient(135deg, #D4AF37 0%, #C9A27E 100%)',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #E07A84 100%)',
         color: '#0a0a0a',
         border: 'none',
         borderRadius: '50px',
@@ -1008,10 +1008,10 @@
       doorHint: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-        color: '#F4C2C2',
+        color: '#F2B0B8',
         fontStyle: 'italic',
         marginBottom: '20px',
-        textShadow: '0 0 20px rgba(244, 194, 194, 0.6)',
+        textShadow: '0 0 20px rgba(224, 122, 132, 0.7)',
       },
       doorHintArrow: {
         fontSize: '3rem',
@@ -1029,7 +1029,7 @@
       // ========== PRODUCT ==========
       productSection: {
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5E8 100%)',
+        background: 'linear-gradient(180deg, #FFF4F5 0%, #FDE8EA 100%)',
         padding: '100px 20px',
       },
       productSectionContent: {
@@ -1038,7 +1038,7 @@
       },
       ornamentalDivider: {
         textAlign: 'center',
-        color: '#C9A27E',
+        color: '#E07A84',
         fontSize: '1.5rem',
         marginBottom: '40px',
         letterSpacing: '0.3em',
@@ -1049,13 +1049,13 @@
         textAlign: 'center',
         letterSpacing: '0.2em',
         marginBottom: '20px',
-        color: '#8B6F47',
+        color: '#A0505A',
       },
       productSubtitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
         textAlign: 'center',
-        color: '#A67C52',
+        color: '#C06070',
         marginBottom: '80px',
         fontStyle: 'italic',
       },
@@ -1069,7 +1069,7 @@
         background: 'rgba(255, 255, 255, 0.9)',
         borderRadius: '20px',
         overflow: 'hidden',
-        boxShadow: '0 10px 40px rgba(139, 111, 71, 0.2)',
+        boxShadow: '0 10px 40px rgba(201, 75, 104, 0.15)',
         transition: 'all 0.4s ease',
         cursor: 'pointer',
         animation: 'productFadeIn 0.8s ease-out both',
@@ -1091,19 +1091,19 @@
       productName: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '2rem',
-        color: '#8B6F47',
+        color: '#A0505A',
         marginBottom: '15px',
       },
       productDescription: {
         fontSize: '1.1rem',
-        color: '#6B5447',
+        color: '#6B4550',
         lineHeight: 1.8,
         marginBottom: '20px',
       },
       productPrice: {
         fontFamily: "'Cinzel', serif",
         fontSize: '2.5rem',
-        color: '#C9A27E',
+        color: '#E07A84',
         marginBottom: '25px',
         fontWeight: 700,
       },
@@ -1111,7 +1111,7 @@
         fontFamily: "'Cinzel', serif",
         fontSize: '1.1rem',
         padding: '15px 40px',
-        background: 'linear-gradient(135deg, #C9A27E 0%, #A67C52 100%)',
+        background: 'linear-gradient(135deg, #E07A84 0%, #C94B68 100%)',
         color: '#fff',
         border: 'none',
         borderRadius: '50px',
@@ -1119,7 +1119,7 @@
         letterSpacing: '0.2em',
         width: '100%',
         transition: 'all 0.4s ease',
-        boxShadow: '0 5px 15px rgba(201, 162, 126, 0.3)',
+        boxShadow: '0 5px 15px rgba(224, 122, 132, 0.35)',
       },
       
       // ========== STORY ==========
@@ -1132,10 +1132,10 @@
         position: 'relative',
       },
       lightSection: {
-        background: 'linear-gradient(180deg, #FFF8F0 0%, #FFF5E8 100%)',
+        background: 'linear-gradient(180deg, #FFF4F5 0%, #FDE8EA 100%)',
       },
       valueSection: {
-        background: 'linear-gradient(180deg, #FFF0F0 0%, #FFE8E8 100%)',
+        background: 'linear-gradient(180deg, #FFF2F3 0%, #FDE8EA 100%)',
       },
       sectionContent: {
         maxWidth: '1200px',
@@ -1150,13 +1150,13 @@
         textAlign: 'center',
         letterSpacing: '0.3em',
         marginBottom: '20px',
-        color: '#8B6F47',
+        color: '#A0505A',
       },
       subtitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
         textAlign: 'center',
-        color: '#A67C52',
+        color: '#C06070',
         marginBottom: '80px',
         fontStyle: 'italic',
       },
@@ -1164,7 +1164,7 @@
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(2rem, 5vw, 3.5rem)',
         textAlign: 'center',
-        color: '#8B6F47',
+        color: '#A0505A',
         marginBottom: '80px',
         lineHeight: 1.6,
         fontWeight: 600,
@@ -1181,10 +1181,10 @@
         padding: '40px 20px',
         background: 'rgba(255, 255, 255, 0.7)',
         borderRadius: '20px',
-        border: '2px solid rgba(201, 162, 126, 0.3)',
+        border: '2px solid rgba(224, 122, 132, 0.3)',
         transition: 'all 0.4s ease',
         cursor: 'pointer',
-        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
       },
       miniValueIcon: {
         fontSize: '3rem',
@@ -1193,13 +1193,13 @@
       miniValueTitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.5rem',
-        color: '#8B6F47',
+        color: '#A0505A',
         marginBottom: '15px',
       },
       miniValueText: {
         fontSize: '1.1rem',
         lineHeight: 1.8,
-        color: '#6B5447',
+        color: '#6B4550',
       },
       storyGrid: {
         display: 'grid',
@@ -1209,13 +1209,13 @@
       },
       storyCard: {
         background: 'rgba(255, 255, 255, 0.8)',
-        border: '2px solid rgba(201, 162, 126, 0.3)',
+        border: '2px solid rgba(224, 122, 132, 0.3)',
         padding: '40px',
         borderRadius: '20px',
         textAlign: 'center',
         transition: 'all 0.4s ease',
         cursor: 'pointer',
-        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
       },
       cardIcon: {
         fontSize: '3rem',
@@ -1225,12 +1225,12 @@
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.5rem',
         marginBottom: '20px',
-        color: '#A67C52',
+        color: '#C06070',
       },
       cardText: {
         fontSize: '1.1rem',
         lineHeight: 1.8,
-        color: '#6B5447',
+        color: '#6B4550',
       },
       backToShopContainer: {
         textAlign: 'center',
@@ -1240,14 +1240,14 @@
         fontFamily: "'Cinzel', serif",
         fontSize: '1.2rem',
         padding: '20px 60px',
-        background: 'linear-gradient(135deg, #C9A27E 0%, #A67C52 100%)',
+        background: 'linear-gradient(135deg, #E07A84 0%, #C94B68 100%)',
         color: '#fff',
         border: 'none',
         borderRadius: '50px',
         cursor: 'pointer',
         letterSpacing: '0.2em',
         transition: 'all 0.4s ease',
-        boxShadow: '0 8px 25px rgba(201, 162, 126, 0.4)',
+        boxShadow: '0 8px 25px rgba(224, 122, 132, 0.45)',
       },
       
       // ========== WORKSHOP SECTION ==========
@@ -1271,20 +1271,20 @@
         bottom: 0,
         left: 0,
         right: 0,
-        background: 'linear-gradient(to top, rgba(255, 248, 240, 0.95) 0%, transparent 100%)',
+        background: 'linear-gradient(to top, rgba(253, 232, 234, 0.97) 0%, transparent 100%)',
         padding: '60px 40px 40px',
         textAlign: 'center',
       },
       workshopTitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(2rem, 5vw, 3rem)',
-        color: '#8B6F47',
+        color: '#A0505A',
         marginBottom: '20px',
         fontStyle: 'italic',
       },
       workshopText: {
         fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
-        color: '#6B5447',
+        color: '#6B4550',
         lineHeight: 1.8,
       },
       
@@ -1309,21 +1309,22 @@
         bottom: 0,
         left: 0,
         right: 0,
-        background: 'linear-gradient(to top, rgba(244, 194, 194, 0.95) 0%, transparent 100%)',
+        background: 'linear-gradient(to top, rgba(224, 130, 140, 0.95) 0%, transparent 100%)',
         padding: '60px 40px 40px',
         textAlign: 'center',
       },
       craftingTitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.3rem, 3vw, 2rem)',
-        color: '#8B6F47',
+        color: '#fff',
         fontStyle: 'italic',
         lineHeight: 1.8,
+        textShadow: '0 2px 8px rgba(0,0,0,0.3)',
       },
       
       // ========== ROSE/TURNING POINT SECTION ==========
       roseSection: {
-        background: 'linear-gradient(135deg, #FFE8E8 0%, #FFF0F0 50%, #FFE8F5 100%)',
+        background: 'linear-gradient(135deg, #FDE8EA 0%, #FFF2F3 50%, #FAE0EC 100%)',
       },
       turningContent: {
         maxWidth: '900px',
@@ -1335,47 +1336,47 @@
       epiphanyBox: {
         padding: '50px 40px',
         background: 'rgba(255, 255, 255, 0.8)',
-        borderLeft: '4px solid #C9A27E',
+        borderLeft: '4px solid #E07A84',
         borderRadius: '15px',
-        boxShadow: '0 4px 15px rgba(201, 162, 126, 0.2)',
+        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
       },
       epiphanyQuote: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.3rem, 3vw, 1.8rem)',
         fontStyle: 'italic',
-        color: '#A67C52',
+        color: '#C06070',
         lineHeight: 1.8,
         marginBottom: '20px',
       },
       epiphanyAuthor: {
         fontSize: '1rem',
-        color: '#8B6F47',
+        color: '#A0505A',
         textAlign: 'right',
       },
       epiphany: {
         textAlign: 'center',
         padding: '50px 40px',
-        background: 'rgba(244, 194, 194, 0.3)',
+        background: 'rgba(224, 122, 132, 0.12)',
         borderRadius: '20px',
-        border: '2px solid rgba(201, 162, 126, 0.3)',
-        boxShadow: '0 4px 15px rgba(244, 194, 194, 0.3)',
+        border: '2px solid rgba(201, 106, 116, 0.3)',
+        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
       },
       epiphanyText: {
         fontSize: '1.2rem',
         lineHeight: 2,
-        color: '#6B5447',
+        color: '#6B4550',
         marginBottom: '30px',
       },
       epiphanyHighlight: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.6rem',
         lineHeight: 2,
-        color: '#A67C52',
+        color: '#C06070',
         fontStyle: 'italic',
         padding: '30px 0',
         margin: '30px 0',
-        borderTop: '1px solid rgba(201, 162, 126, 0.3)',
-        borderBottom: '1px solid rgba(201, 162, 126, 0.3)',
+        borderTop: '1px solid rgba(224, 122, 132, 0.35)',
+        borderBottom: '1px solid rgba(224, 122, 132, 0.35)',
       },
       
       // ========== CTA ==========
@@ -1397,7 +1398,7 @@
         fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
         letterSpacing: '0.3em',
         marginBottom: '20px',
-        background: 'linear-gradient(135deg, #D4AF37 0%, #F4C2C2 100%)',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #E07A84 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
       },

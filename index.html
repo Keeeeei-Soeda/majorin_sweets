@@ -113,16 +113,6 @@
         <div style={styles.container}>
           {/* Hero Section */}
           <section style={styles.hero}>
-            <video
-              style={styles.heroVideo}
-              autoPlay
-              muted
-              loop
-              playsInline
-              aria-label="ブランドイメージ動画"
-            >
-              <source src="videos/0429.mov" type="video/quicktime" />
-            </video>
             <div style={styles.heroBackground}>
               <div style={styles.magicParticle1} />
               <div style={styles.magicParticle2} />
@@ -142,6 +132,26 @@
                 <div style={styles.scrollLine} />
                 <span style={styles.scrollText}>Scroll</span>
               </div>
+            </div>
+          </section>
+
+          {/* Movie — 自動再生なし（ユーザーが再生ボタンで視聴） */}
+          <section style={styles.movieSection} aria-label="ブランドムービー">
+            <div style={styles.movieSectionInner}>
+              <div style={styles.ornamentalDivider}>━━━━━ ✦ ━━━━━</div>
+              <h2 style={styles.movieTitle}>MOVIE</h2>
+              <p style={styles.movieLead}>
+                再生ボタンからご覧ください（自動では再生されません）
+              </p>
+              <video
+                style={styles.movieVideo}
+                controls
+                playsInline
+                preload="metadata"
+                poster="images/image01.JPG"
+              >
+                <source src="videos/0429.mov" type="video/quicktime" />
+              </video>
             </div>
           </section>
 
@@ -506,16 +516,6 @@
         overflow: 'hidden',
         background: 'linear-gradient(180deg, #1a1a1a 0%, #2a1a2a 100%)',
       },
-      heroVideo: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        objectPosition: 'center',
-        zIndex: 0,
-      },
       heroOverlay: {
         position: 'absolute',
         top: 0,
@@ -639,6 +639,39 @@
       },
       pinkSection: {
         background: 'linear-gradient(135deg, #2a1a1a 0%, #1a1a2a 50%, #2a1520 100%)',
+      },
+      movieSection: {
+        padding: '72px 20px 88px',
+        background: 'linear-gradient(180deg, #0a0a0a 0%, #121212 100%)',
+        borderTop: '1px solid rgba(212, 175, 55, 0.12)',
+        minHeight: 'auto',
+      },
+      movieSectionInner: {
+        maxWidth: '920px',
+        margin: '0 auto',
+        textAlign: 'center',
+      },
+      movieTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+        letterSpacing: '0.35em',
+        color: '#D4AF37',
+        marginBottom: '16px',
+        fontWeight: 700,
+      },
+      movieLead: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(0.95rem, 2vw, 1.05rem)',
+        color: '#a9a9a9',
+        marginBottom: '28px',
+        lineHeight: 1.7,
+      },
+      movieVideo: {
+        width: '100%',
+        maxHeight: 'min(70vh, 540px)',
+        borderRadius: '10px',
+        boxShadow: '0 16px 48px rgba(0, 0, 0, 0.55)',
+        backgroundColor: '#000',
       },
       sectionContent: {
         maxWidth: '1200px',

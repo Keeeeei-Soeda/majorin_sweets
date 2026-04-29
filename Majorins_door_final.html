@@ -267,15 +267,17 @@
               <p style={styles.movieLead}>
                 下の再生ボタンからご覧ください（自動では再生されません）
               </p>
-              <video
-                style={styles.movieVideo}
-                controls
-                playsInline
-                preload="metadata"
-                poster="images/image01.JPG"
-              >
-                <source src="videos/0429.mov" type="video/quicktime" />
-              </video>
+              <div style={styles.movieVideoWrap}>
+                <video
+                  style={styles.movieVideo}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster="images/image01.JPG"
+                >
+                  <source src="videos/0429.mov" type="video/quicktime" />
+                </video>
+              </div>
             </div>
           </section>
 
@@ -901,12 +903,29 @@
         marginBottom: '28px',
         lineHeight: 1.7,
       },
-      movieVideo: {
-        width: '100%',
+      movieVideoWrap: {
+        position: 'relative',
+        width: 'min(100%, calc(min(70vh, 540px) * 9 / 16))',
+        aspectRatio: '9 / 16',
         maxHeight: 'min(70vh, 540px)',
+        margin: '0 auto',
         borderRadius: '10px',
-        boxShadow: '0 16px 48px rgba(0, 0, 0, 0.55)',
+        overflow: 'hidden',
         backgroundColor: '#000',
+        boxShadow: '0 16px 48px rgba(0, 0, 0, 0.55)',
+      },
+      movieVideo: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        objectPosition: 'center',
+        display: 'block',
+        verticalAlign: 'top',
+        border: 'none',
+        outline: 'none',
       },
       
       // ========== DOOR ==========

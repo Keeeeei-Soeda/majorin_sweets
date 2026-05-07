@@ -148,6 +148,60 @@
         max-height: none !important;
       }
     }
+
+    /* ===== STORY ALTERNATING ROWS ===== */
+    .story-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 64px;
+      margin-bottom: 88px;
+    }
+    .story-row.reverse {
+      flex-direction: row-reverse;
+    }
+    .story-row-img {
+      width: 46%;
+      flex-shrink: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.18);
+    }
+    .story-row-img img {
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+      display: block;
+    }
+    .story-row-text {
+      flex: 1;
+    }
+
+    /* ===== CHOICE BUTTONS: 右から左へスライドイン ===== */
+    @keyframes slideInFromRight {
+      from { opacity: 0; transform: translateX(140px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .choice-btn-0 { animation: slideInFromRight 0.55s ease-out 0.10s both; }
+    .choice-btn-1 { animation: slideInFromRight 0.55s ease-out 0.35s both; }
+    .choice-btn-2 { animation: slideInFromRight 0.55s ease-out 0.60s both; }
+    .choice-btn-3 { animation: slideInFromRight 0.55s ease-out 0.85s both; }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      .story-row,
+      .story-row.reverse {
+        flex-direction: column !important;
+        gap: 24px;
+        margin-bottom: 56px;
+      }
+      .story-row-img {
+        width: 100%;
+      }
+      .story-row-img img {
+        height: 260px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -209,17 +263,13 @@
         if (choice === 'buy') {
           setDoorState('shopping');
           setTimeout(() => {
-            const productSection = document.getElementById('products');
-            if (productSection) {
-              productSection.scrollIntoView({ behavior: 'smooth' });
-            }
+            const el = document.getElementById('products');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
           }, 500);
         } else if (choice === 'story') {
-          setDoorState('story');
-          const storySection = document.getElementById('story');
-          if (storySection) {
-            storySection.scrollIntoView({ behavior: 'smooth' });
-          }
+          // ストーリーは常時表示 — そのままスクロール
+          const el = document.getElementById('story');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
         }
       };
 
@@ -351,33 +401,35 @@
                   
                   {showChoices && doorState === 'open' && (
                     <div style={styles.choicesContainer}>
-                      <button 
-                        style={styles.choiceButton}
-                        className="choice-button"
-                        onClick={() => handleChoice('buy')}
-                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                      >
-                        <span style={styles.choiceIcon}>🛍️</span>
-                        <span style={styles.choiceText}>マジョリンスイーツを買う</span>
-                      </button>
-                      
-                      <button 
-                        style={styles.choiceButtonSecondary}
-                        className="choice-button"
-                        onClick={() => handleChoice('story')}
-                        onMouseEnter={(e) => {
-                          e.target.style.background = 'rgba(212, 175, 55, 0.2)';
-                          e.target.style.transform = 'scale(1.05)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.background = 'transparent';
-                          e.target.style.transform = 'scale(1)';
-                        }}
-                      >
-                        <span style={styles.choiceIcon}>📖</span>
-                        <span style={styles.choiceText}>ストーリーをみる</span>
-                      </button>
+                      {[
+                        { key: 'buy',   icon: '🛍️', label: 'スイーツを買う',   primary: true,  disabled: false },
+                        { key: 'story', icon: '📖', label: 'ストーリーをみる', primary: false, disabled: false },
+                        { key: 'tbd1',  icon: '🌹', label: '準備中',           primary: false, disabled: true  },
+                        { key: 'tbd2',  icon: '✦',  label: '準備中',           primary: false, disabled: true  },
+                      ].map((item, i) => (
+                        <button
+                          key={item.key}
+                          className={`choice-button choice-btn-${i}`}
+                          style={{
+                            ...(item.primary ? styles.choiceButton : styles.choiceButtonSecondary),
+                            ...(item.disabled ? { opacity: 0.4, cursor: 'default' } : {}),
+                          }}
+                          onClick={() => { if (!item.disabled) handleChoice(item.key); }}
+                          onMouseEnter={(e) => {
+                            if (item.disabled) return;
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            if (!item.primary) e.currentTarget.style.background = 'rgba(212, 175, 55, 0.2)';
+                          }}
+                          onMouseLeave={(e) => {
+                            if (item.disabled) return;
+                            e.currentTarget.style.transform = 'scale(1)';
+                            if (!item.primary) e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          <span style={styles.choiceIcon}>{item.icon}</span>
+                          <span style={styles.choiceText}>{item.label}</span>
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -510,228 +562,244 @@
             </section>
           )}
 
-          {/* ========== STORY SECTION (豊富なストーリー) ========== */}
-          {doorState === 'story' && (
-            <>
-              {/* Workshop Image Section */}
-              <section 
-                id="story"
-                ref={el => sectionRefs.current['workshop'] = el}
-                style={{
-                  ...styles.section,
-                  ...styles.workshopSection,
-                  opacity: isVisible['workshop'] ? 1 : 0,
-                  transform: isVisible['workshop'] ? 'translateY(0)' : 'translateY(50px)',
-                  transition: 'all 1s ease-out'
-                }}
-              >
-                <div style={styles.sectionContent}>
-                  <div style={styles.workshopImageContainer}>
-                    <img 
-                      src="images/image02.JPG" 
-                      alt="Majorin's Workshop" 
-                      style={styles.workshopImage}
-                    />
-                    <div style={styles.workshopTextOverlay}>
-                      <h2 style={styles.workshopTitle}>マジョリンの工房</h2>
-                      <p style={styles.workshopText}>
-                        ここで、魔法ではなく心を込めて<br />
-                        一つひとつ、お菓子を作っています
-                      </p>
-                    </div>
+          {/* ========== STORY SECTION — 常時表示 ========== */}
+          {/* Workshop Image Section */}
+          <section 
+            id="story"
+            ref={el => sectionRefs.current['workshop'] = el}
+            style={{
+              ...styles.section,
+              ...styles.workshopSection,
+              opacity: isVisible['workshop'] ? 1 : 0,
+              transform: isVisible['workshop'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.workshopImageContainer}>
+                <img 
+                  src="images/image02.JPG" 
+                  alt="Majorin's Workshop" 
+                  style={styles.workshopImage}
+                />
+                <div style={styles.workshopTextOverlay}>
+                  <h2 style={styles.workshopTitle}>マジョリンの工房</h2>
+                  <p style={styles.workshopText}>
+                    ここで、魔法ではなく心を込めて<br />
+                    一つひとつ、お菓子を作っています
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Value Proposition */}
+          <section 
+            ref={el => sectionRefs.current['value'] = el}
+            style={{
+              ...styles.section,
+              ...styles.valueSection,
+              opacity: isVisible['value'] ? 1 : 0,
+              transform: isVisible['value'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.valueMainTitle}>
+                痛みを消さない。<br />
+                痛みと生きる力をくれる。
+              </h2>
+              <div style={styles.valueCards} data-grid>
+                {/* value card 1 */}
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueCardImgWrap}>
+                    <img src="images/image04.png" alt="魔法は、置いた" style={styles.miniValueCardImg} />
+                  </div>
+                  <div style={styles.miniValueCardBody}>
+                    <h4 style={styles.miniValueTitle}>魔法は、置いた</h4>
+                    <p style={styles.miniValueText}>問題を消すのではなく、<br />向き合う力を</p>
                   </div>
                 </div>
-              </section>
-
-              {/* Value Proposition */}
-              <section 
-                ref={el => sectionRefs.current['value'] = el}
-                style={{
-                  ...styles.section,
-                  ...styles.valueSection,
-                  opacity: isVisible['value'] ? 1 : 0,
-                  transform: isVisible['value'] ? 'translateY(0)' : 'translateY(50px)',
-                  transition: 'all 1s ease-out'
-                }}
-              >
-                <div style={styles.sectionContent}>
-                  <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
-                  <h2 style={styles.valueMainTitle}>
-                    痛みを消さない。<br />
-                    痛みと生きる力をくれる。
-                  </h2>
-                  <div style={styles.valueCards} data-grid>
-                    <div style={styles.miniValueCard}>
-                      <div style={styles.miniValueIcon}>🪄</div>
-                      <h4 style={styles.miniValueTitle}>魔法は、置いた</h4>
-                      <p style={styles.miniValueText}>
-                        問題を消すのではなく、<br />向き合う力を
-                      </p>
-                    </div>
-                    <div style={styles.miniValueCard}>
-                      <div style={styles.miniValueIcon}>🍰</div>
-                      <h4 style={styles.miniValueTitle}>不完全でいい</h4>
-                      <p style={styles.miniValueText}>
-                        完璧より、<br />心がこもっている方が強い
-                      </p>
-                    </div>
-                    <div style={styles.miniValueCard}>
-                      <div style={styles.miniValueIcon}>💌</div>
-                      <h4 style={styles.miniValueTitle}>真実の一言</h4>
-                      <p style={styles.miniValueText}>
-                        50種類のカード。<br />あなたに必要な言葉
-                      </p>
-                    </div>
+                {/* value card 2 */}
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueCardImgWrap}>
+                    <img src="images/image06.png" alt="不完全でいい" style={styles.miniValueCardImg} />
+                  </div>
+                  <div style={styles.miniValueCardBody}>
+                    <h4 style={styles.miniValueTitle}>不完全でいい</h4>
+                    <p style={styles.miniValueText}>完璧より、<br />心がこもっている方が強い</p>
                   </div>
                 </div>
-              </section>
-
-              {/* Story Cards */}
-              <section 
-                ref={el => sectionRefs.current['story'] = el}
-                style={{
-                  ...styles.section,
-                  ...styles.lightSection,
-                  opacity: isVisible['story'] ? 1 : 0,
-                  transform: isVisible['story'] ? 'translateY(0)' : 'translateY(50px)',
-                  transition: 'all 1s ease-out'
-                }}
-              >
-                <div style={styles.sectionContent}>
-                  <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
-                  <h2 style={styles.sectionTitle}>STORY</h2>
-                  <h3 style={styles.subtitle}>なぜ、魔女はお菓子を作るのか</h3>
-                  
-                  <div style={styles.storyGrid} data-grid>
-                    <div style={styles.storyCard}>
-                      <div style={styles.cardIcon}>🔮</div>
-                      <h4 style={styles.cardTitle}>完璧だった、過去</h4>
-                      <p style={styles.cardText}>
-                        数百年間、私は「解決の魔女」。<br />
-                        病気も、失恋も、貧困も。<br />
-                        魔法で、すべてを消してきた。
-                      </p>
-                    </div>
-                    
-                    <div style={styles.storyCard}>
-                      <div style={styles.cardIcon}>💔</div>
-                      <h4 style={styles.cardTitle}>気づいた、真実</h4>
-                      <p style={styles.cardText}>
-                        痛みを消すことと、人を救うことは違う。<br />
-                        痛みこそが、人を育てる。<br />
-                        私は、人を弱くしていた。
-                      </p>
-                    </div>
-                    
-                    <div style={styles.storyCard}>
-                      <div style={styles.cardIcon}>🍰</div>
-                      <h4 style={styles.cardTitle}>選んだ、道</h4>
-                      <p style={styles.cardText}>
-                        だから、杖を置いた。<br />
-                        お菓子は痛みを消さない。<br />
-                        でも、痛みと生きる力をくれる。
-                      </p>
-                    </div>
+                {/* value card 3 */}
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueCardImgWrap}>
+                    <img src="images/image05.png" alt="真実の一言" style={styles.miniValueCardImg} />
+                  </div>
+                  <div style={styles.miniValueCardBody}>
+                    <h4 style={styles.miniValueTitle}>真実の一言</h4>
+                    <p style={styles.miniValueText}>50種類のカード。<br />あなたに必要な言葉</p>
                   </div>
                 </div>
-              </section>
+              </div>
+            </div>
+          </section>
 
-              {/* Crafting Image */}
-              <section 
-                ref={el => sectionRefs.current['crafting'] = el}
-                style={{
-                  ...styles.section,
-                  ...styles.craftingSection,
-                  opacity: isVisible['crafting'] ? 1 : 0,
-                  transform: isVisible['crafting'] ? 'translateY(0)' : 'translateY(50px)',
-                  transition: 'all 1s ease-out'
+          {/* Story — 交互レイアウト（画像＋テキスト） */}
+          <section 
+            ref={el => sectionRefs.current['story'] = el}
+            style={{
+              ...styles.section,
+              ...styles.lightSection,
+              opacity: isVisible['story'] ? 1 : 0,
+              transform: isVisible['story'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.sectionTitle}>STORY</h2>
+              <h3 style={styles.subtitle}>なぜ、魔女はお菓子を作るのか</h3>
+
+              {/* Row 1: 画像左 ／ テキスト右 */}
+              <div className="story-row">
+                <div className="story-row-img">
+                  <img src="images/image09.png" alt="完璧だった、過去" />
+                </div>
+                <div className="story-row-text">
+                  <h2 style={styles.storyRowTitle}>完璧だった、過去</h2>
+                  <p style={styles.storyRowText}>
+                    数百年間、私は「解決の魔女」。<br />
+                    病気も、失恋も、貧困も。<br />
+                    魔法で、すべてを消してきた。
+                  </p>
+                </div>
+              </div>
+
+              {/* Row 2: テキスト左 ／ 画像右 */}
+              <div className="story-row reverse">
+                <div className="story-row-img">
+                  <img src="images/image11.png" alt="気づいた、真実" />
+                </div>
+                <div className="story-row-text">
+                  <h2 style={styles.storyRowTitle}>気づいた、真実</h2>
+                  <p style={styles.storyRowText}>
+                    痛みを消すことと、人を救うことは違う。<br />
+                    痛みこそが、人を育てる。<br />
+                    私は、人を弱くしていた。
+                  </p>
+                </div>
+              </div>
+
+              {/* Row 3: 画像左 ／ テキスト右 */}
+              <div className="story-row">
+                <div className="story-row-img">
+                  <img src="images/image10.png" alt="選んだ、道" />
+                </div>
+                <div className="story-row-text">
+                  <h2 style={styles.storyRowTitle}>選んだ、道</h2>
+                  <p style={styles.storyRowText}>
+                    だから、杖を置いた。<br />
+                    お菓子は痛みを消さない。<br />
+                    でも、痛みと生きる力をくれる。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Crafting Image */}
+          <section 
+            ref={el => sectionRefs.current['crafting'] = el}
+            style={{
+              ...styles.section,
+              ...styles.craftingSection,
+              opacity: isVisible['crafting'] ? 1 : 0,
+              transform: isVisible['crafting'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.craftingImageContainer}>
+                <img 
+                  src="images/image03.JPG" 
+                  alt="Majorin crafting sweets" 
+                  style={styles.craftingImage}
+                />
+                <div style={styles.craftingTextOverlay}>
+                  <h3 style={styles.craftingTitle}>
+                    「魔法で作ったものは、魔法で壊れる。<br />
+                    でも、手で作ったものは、心に残る」
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* The Moment */}
+          <section 
+            ref={el => sectionRefs.current['turning'] = el}
+            style={{
+              ...styles.section,
+              ...styles.roseSection,
+              opacity: isVisible['turning'] ? 1 : 0,
+              transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out 0.2s'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.sectionTitle}>THE MOMENT</h2>
+              <h3 style={styles.subtitle}>すべてが変わった、ある雨の日</h3>
+              
+              <div style={styles.turningContent}>
+                <div style={styles.epiphanyBox}>
+                  <p style={styles.epiphanyQuote}>
+                    「これ、亡くなった母が作ってくれたケーキと<br />
+                    同じ味なんです。<br />
+                    不器用で、形は歪だったけど...温かくて」
+                  </p>
+                  <p style={styles.epiphanyAuthor}>― エレナ、街のカフェにて</p>
+                </div>
+                
+                <div style={styles.epiphany}>
+                  <p style={styles.epiphanyText}>
+                    その瞬間、私は理解した。
+                  </p>
+                  <p style={styles.epiphanyHighlight}>
+                    お菓子は、痛みを消さない。<br />
+                    でも、痛みと一緒に生きる力をくれる。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* スイーツを選ぶボタン */}
+          <section style={{...styles.section, minHeight: 'auto', padding: '60px 20px'}}>
+            <div style={styles.backToShopContainer}>
+              <button 
+                style={styles.backToShopButton}
+                onClick={() => {
+                  setDoorState('shopping');
+                  setTimeout(() => {
+                    const el = document.getElementById('products');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.05)';
+                  e.target.style.boxShadow = '0 12px 35px rgba(222, 134, 163, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(222, 134, 163, 0.45)';
                 }}
               >
-                <div style={styles.sectionContent}>
-                  <div style={styles.craftingImageContainer}>
-                    <img 
-                      src="images/image03.JPG" 
-                      alt="Majorin crafting sweets" 
-                      style={styles.craftingImage}
-                    />
-                    <div style={styles.craftingTextOverlay}>
-                      <h3 style={styles.craftingTitle}>
-                        「魔法で作ったものは、魔法で壊れる。<br />
-                        でも、手で作ったものは、心に残る」
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* The Moment */}
-              <section 
-                ref={el => sectionRefs.current['turning'] = el}
-                style={{
-                  ...styles.section,
-                  ...styles.roseSection,
-                  opacity: isVisible['turning'] ? 1 : 0,
-                  transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
-                  transition: 'all 1s ease-out 0.2s'
-                }}
-              >
-                <div style={styles.sectionContent}>
-                  <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
-                  <h2 style={styles.sectionTitle}>THE MOMENT</h2>
-                  <h3 style={styles.subtitle}>すべてが変わった、ある雨の日</h3>
-                  
-                  <div style={styles.turningContent}>
-                    <div style={styles.epiphanyBox}>
-                      <p style={styles.epiphanyQuote}>
-                        「これ、亡くなった母が作ってくれたケーキと<br />
-                        同じ味なんです。<br />
-                        不器用で、形は歪だったけど...温かくて」
-                      </p>
-                      <p style={styles.epiphanyAuthor}>― エレナ、街のカフェにて</p>
-                    </div>
-                    
-                    <div style={styles.epiphany}>
-                      <p style={styles.epiphanyText}>
-                        その瞬間、私は理解した。
-                      </p>
-                      <p style={styles.epiphanyHighlight}>
-                        お菓子は、痛みを消さない。<br />
-                        でも、痛みと一緒に生きる力をくれる。
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* 「スイーツを選ぶ」ボタン */}
-              <section style={{...styles.section, minHeight: 'auto', padding: '60px 20px'}}>
-                <div style={styles.backToShopContainer}>
-                  <button 
-                    style={styles.backToShopButton}
-                    onClick={() => {
-                      setDoorState('shopping');
-                      setTimeout(() => {
-                        const productSection = document.getElementById('products');
-                        if (productSection) {
-                          productSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.transform = 'scale(1.05)';
-                      e.target.style.boxShadow = '0 12px 35px rgba(222, 134, 163, 0.6)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.transform = 'scale(1)';
-                      e.target.style.boxShadow = '0 8px 25px rgba(222, 134, 163, 0.45)';
-                    }}
-                  >
-                    🛍️ スイーツを選ぶ
-                  </button>
-                </div>
-              </section>
-            </>
-          )}
+                🛍️ スイーツを選ぶ
+              </button>
+            </div>
+          </section>
 
           {/* ========== CTA SECTION ========== */}
           <section 
@@ -1046,11 +1114,10 @@
         fontStyle: 'italic',
       },
       choicesContainer: {
-        display: 'flex',
-        gap: '30px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, auto)',
+        gap: '20px',
         justifyContent: 'center',
-        flexWrap: 'wrap',
-        animation: 'choicesFadeIn 1s ease-out 1.5s both',
         pointerEvents: 'auto',
       },
       choiceButton: {
@@ -1274,7 +1341,6 @@
       },
       miniValueCard: {
         textAlign: 'center',
-        padding: '40px 20px',
         background: 'rgba(255, 255, 255, 0.7)',
         borderRadius: '20px',
         border: '2px solid rgba(222, 134, 163, 0.3)',
@@ -1282,45 +1348,45 @@
         cursor: 'pointer',
         boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
       },
-      miniValueIcon: {
-        fontSize: '3rem',
-        marginBottom: '20px',
+      // value card image
+      miniValueCardImgWrap: {
+        width: '100%',
+        height: '220px',
+        overflow: 'hidden',
+        borderRadius: '18px 18px 0 0',
+      },
+      miniValueCardImg: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block',
+      },
+      miniValueCardBody: {
+        padding: '28px 20px 32px',
       },
       miniValueTitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.5rem',
         color: '#605F5F',
-        marginBottom: '15px',
+        marginBottom: '12px',
       },
       miniValueText: {
-        fontSize: '1.1rem',
+        fontSize: '1.05rem',
         lineHeight: 1.8,
         color: '#605F5F',
       },
-      storyGrid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '40px',
-        marginTop: '60px',
-      },
-      storyCard: {
-        background: 'rgba(255, 255, 255, 0.8)',
-        border: '2px solid rgba(222, 134, 163, 0.3)',
-        padding: '40px',
-        borderRadius: '20px',
-        textAlign: 'center',
-        transition: 'all 0.4s ease',
-        cursor: 'pointer',
-        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
-      },
-      cardIcon: {
-        fontSize: '3rem',
-        marginBottom: '20px',
-      },
-      cardTitle: {
+      // story alternating rows (CSS classes used, these are fallbacks)
+      storyRowTitle: {
         fontFamily: "'Playfair Display', serif",
-        fontSize: '1.5rem',
+        fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
+        color: '#605F5F',
         marginBottom: '20px',
+        fontWeight: 600,
+        lineHeight: 1.35,
+      },
+      storyRowText: {
+        fontSize: 'clamp(1rem, 1.6vw, 1.2rem)',
+        lineHeight: 2,
         color: '#605F5F',
       },
       cardText: {

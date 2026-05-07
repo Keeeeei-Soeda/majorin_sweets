@@ -73,10 +73,10 @@
     
     @keyframes doorGlow {
       0%, 100% {
-        filter: drop-shadow(0 0 20px rgba(224, 122, 132, 0.5));
+        filter: drop-shadow(0 0 20px rgba(222, 134, 163, 0.5));
       }
       50% {
-        filter: drop-shadow(0 0 40px rgba(224, 122, 132, 0.8));
+        filter: drop-shadow(0 0 40px rgba(222, 134, 163, 0.85));
       }
     }
     
@@ -104,7 +104,7 @@
       position: absolute;
       width: 10px;
       height: 10px;
-      background: radial-gradient(circle, #E07A84, transparent);
+      background: radial-gradient(circle, #DE86A3, transparent);
       border-radius: 50%;
       pointer-events: none;
       animation: petalFall 10s linear infinite;
@@ -137,6 +137,15 @@
       .choice-button {
         padding: 20px 35px !important;
         font-size: 1rem !important;
+      }
+    }
+
+    /* MOVIE: 769px 以上は 16:9。768px 以下はインラインの縦長（9:16）のまま */
+    @media (min-width: 769px) {
+      .movie-video-frame {
+        width: min(100%, 920px) !important;
+        aspect-ratio: 16 / 9 !important;
+        max-height: none !important;
       }
     }
   </style>
@@ -259,28 +268,14 @@
             </div>
           </section>
 
-          {/* Movie — 自動再生せず、ユーザーが再生ボタンで視聴 */}
-          <section style={styles.movieSection} aria-label="ブランドムービー">
-            <div style={styles.movieSectionInner}>
-              <div style={styles.movieOrnament}>🌹 ━━━ ✦ ━━━ 🌹</div>
-              <h2 style={styles.movieTitle}>MOVIE</h2>
-              <p style={styles.movieLead}>
-                下の再生ボタンからご覧ください（自動では再生されません）
-              </p>
-              <div style={styles.movieVideoWrap}>
-                <video
-                  style={styles.movieVideo}
-                  controls
-                  playsInline
-                  preload="metadata"
-                  poster="images/image01.JPG"
-                >
-                  <source src="videos/0429.mov" type="video/quicktime" />
-                </video>
-              </div>
-            </div>
-          </section>
-
+          {/*
+            ========== 扉演出の画像設定（差し替え時はここを参照）==========
+            images/background.jpg … 扉の奥の外観（全面背景・ぼかし＋薄く重ねる）
+            images/door-left.png  … 左扉（透過PNG）。左端を軸に rotateY で開く
+            images/door-right.png … 右扉（透過PNG）。右端を軸に開く
+            images/doorman.png    … 扉が開いた後に表示する執事（奥レイヤー）
+            ヒーロー画像: images/image01.JPG（別セクション）
+          */}
           {/* ========== DOOR SECTION ========== */}
           <section 
             ref={doorSectionRef}
@@ -399,6 +394,28 @@
                   </div>
                 </div>
               )}
+            </div>
+          </section>
+
+          {/* Movie — 自動再生せず、ユーザーが再生ボタンで視聴（769px以上は .movie-video-frame で16:9） */}
+          <section style={styles.movieSection} aria-label="ブランドムービー">
+            <div style={styles.movieSectionInner}>
+              <div style={styles.movieOrnament}>🌹 ━━━ ✦ ━━━ 🌹</div>
+              <h2 style={styles.movieTitle}>MOVIE</h2>
+              <p style={styles.movieLead}>
+                下の再生ボタンからご覧ください（自動では再生されません）
+              </p>
+              <div className="movie-video-frame" style={styles.movieVideoWrap}>
+                <video
+                  style={styles.movieVideo}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster="images/image01.JPG"
+                >
+                  <source src="videos/0429.mov" type="video/quicktime" />
+                </video>
+              </div>
             </div>
           </section>
 
@@ -702,11 +719,11 @@
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.transform = 'scale(1.05)';
-                      e.target.style.boxShadow = '0 12px 35px rgba(224, 122, 132, 0.6)';
+                      e.target.style.boxShadow = '0 12px 35px rgba(222, 134, 163, 0.6)';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.transform = 'scale(1)';
-                      e.target.style.boxShadow = '0 8px 25px rgba(224, 122, 132, 0.45)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(222, 134, 163, 0.45)';
                     }}
                   >
                     🛍️ スイーツを選ぶ
@@ -836,7 +853,7 @@
         fontWeight: 700,
         letterSpacing: '0.3em',
         margin: 0,
-        background: 'linear-gradient(135deg, #D4AF37 0%, #E07A84 100%)',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #DE86A3 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         textShadow: '0 0 30px rgba(212, 175, 55, 0.5)',
@@ -850,7 +867,7 @@
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
         lineHeight: 1.8,
-        color: '#F2B0B8',
+        color: '#DE86A3',
         marginBottom: '20px',
         animation: 'fadeInUp 1.5s ease-out 0.3s both',
         fontWeight: 600,
@@ -868,7 +885,7 @@
       },
       scrollHintText: {
         fontSize: '1rem',
-        color: '#a9a9a9',
+        color: 'rgba(222, 214, 216, 0.92)',
         letterSpacing: '0.2em',
       },
       
@@ -883,7 +900,7 @@
         textAlign: 'center',
       },
       movieOrnament: {
-        color: '#E07A84',
+        color: '#DE86A3',
         fontSize: 'clamp(0.9rem, 2vw, 1.2rem)',
         letterSpacing: '0.25em',
         marginBottom: '16px',
@@ -899,7 +916,7 @@
       movieLead: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(0.95rem, 2vw, 1.05rem)',
-        color: '#a9a9a9',
+        color: 'rgba(245, 240, 242, 0.88)',
         marginBottom: '28px',
         lineHeight: 1.7,
       },
@@ -1024,7 +1041,7 @@
       welcomeText: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-        color: '#F2B0B8',
+        color: '#DE86A3',
         lineHeight: 1.8,
         fontStyle: 'italic',
       },
@@ -1040,7 +1057,7 @@
         fontFamily: "'Cinzel', serif",
         fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
         padding: '25px 50px',
-        background: 'linear-gradient(135deg, #D4AF37 0%, #E07A84 100%)',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #DE86A3 100%)',
         color: '#0a0a0a',
         border: 'none',
         borderRadius: '50px',
@@ -1087,10 +1104,10 @@
       doorHint: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-        color: '#F2B0B8',
+        color: '#DE86A3',
         fontStyle: 'italic',
         marginBottom: '20px',
-        textShadow: '0 0 20px rgba(224, 122, 132, 0.7)',
+        textShadow: '0 0 20px rgba(222, 134, 163, 0.75)',
       },
       doorHintArrow: {
         fontSize: '3rem',
@@ -1117,7 +1134,7 @@
       },
       ornamentalDivider: {
         textAlign: 'center',
-        color: '#E07A84',
+        color: '#DE86A3',
         fontSize: '1.5rem',
         marginBottom: '40px',
         letterSpacing: '0.3em',
@@ -1128,13 +1145,13 @@
         textAlign: 'center',
         letterSpacing: '0.2em',
         marginBottom: '20px',
-        color: '#A0505A',
+        color: '#605F5F',
       },
       productSubtitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
         textAlign: 'center',
-        color: '#C06070',
+        color: '#605F5F',
         marginBottom: '80px',
         fontStyle: 'italic',
       },
@@ -1148,7 +1165,7 @@
         background: 'rgba(255, 255, 255, 0.9)',
         borderRadius: '20px',
         overflow: 'hidden',
-        boxShadow: '0 10px 40px rgba(201, 75, 104, 0.15)',
+        boxShadow: '0 10px 40px rgba(222, 134, 163, 0.15)',
         transition: 'all 0.4s ease',
         cursor: 'pointer',
         animation: 'productFadeIn 0.8s ease-out both',
@@ -1170,19 +1187,19 @@
       productName: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '2rem',
-        color: '#A0505A',
+        color: '#605F5F',
         marginBottom: '15px',
       },
       productDescription: {
         fontSize: '1.1rem',
-        color: '#6B4550',
+        color: '#605F5F',
         lineHeight: 1.8,
         marginBottom: '20px',
       },
       productPrice: {
         fontFamily: "'Cinzel', serif",
         fontSize: '2.5rem',
-        color: '#E07A84',
+        color: '#DE86A3',
         marginBottom: '25px',
         fontWeight: 700,
       },
@@ -1190,7 +1207,7 @@
         fontFamily: "'Cinzel', serif",
         fontSize: '1.1rem',
         padding: '15px 40px',
-        background: 'linear-gradient(135deg, #E07A84 0%, #C94B68 100%)',
+        background: 'linear-gradient(135deg, #DE86A3 0%, #b56d85 100%)',
         color: '#fff',
         border: 'none',
         borderRadius: '50px',
@@ -1198,7 +1215,7 @@
         letterSpacing: '0.2em',
         width: '100%',
         transition: 'all 0.4s ease',
-        boxShadow: '0 5px 15px rgba(224, 122, 132, 0.35)',
+        boxShadow: '0 5px 15px rgba(222, 134, 163, 0.35)',
       },
       
       // ========== STORY ==========
@@ -1229,13 +1246,13 @@
         textAlign: 'center',
         letterSpacing: '0.3em',
         marginBottom: '20px',
-        color: '#A0505A',
+        color: '#605F5F',
       },
       subtitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
         textAlign: 'center',
-        color: '#C06070',
+        color: '#605F5F',
         marginBottom: '80px',
         fontStyle: 'italic',
       },
@@ -1243,7 +1260,7 @@
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(2rem, 5vw, 3.5rem)',
         textAlign: 'center',
-        color: '#A0505A',
+        color: '#605F5F',
         marginBottom: '80px',
         lineHeight: 1.6,
         fontWeight: 600,
@@ -1260,10 +1277,10 @@
         padding: '40px 20px',
         background: 'rgba(255, 255, 255, 0.7)',
         borderRadius: '20px',
-        border: '2px solid rgba(224, 122, 132, 0.3)',
+        border: '2px solid rgba(222, 134, 163, 0.3)',
         transition: 'all 0.4s ease',
         cursor: 'pointer',
-        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
+        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
       },
       miniValueIcon: {
         fontSize: '3rem',
@@ -1272,13 +1289,13 @@
       miniValueTitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.5rem',
-        color: '#A0505A',
+        color: '#605F5F',
         marginBottom: '15px',
       },
       miniValueText: {
         fontSize: '1.1rem',
         lineHeight: 1.8,
-        color: '#6B4550',
+        color: '#605F5F',
       },
       storyGrid: {
         display: 'grid',
@@ -1288,13 +1305,13 @@
       },
       storyCard: {
         background: 'rgba(255, 255, 255, 0.8)',
-        border: '2px solid rgba(224, 122, 132, 0.3)',
+        border: '2px solid rgba(222, 134, 163, 0.3)',
         padding: '40px',
         borderRadius: '20px',
         textAlign: 'center',
         transition: 'all 0.4s ease',
         cursor: 'pointer',
-        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
+        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
       },
       cardIcon: {
         fontSize: '3rem',
@@ -1304,12 +1321,12 @@
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.5rem',
         marginBottom: '20px',
-        color: '#C06070',
+        color: '#605F5F',
       },
       cardText: {
         fontSize: '1.1rem',
         lineHeight: 1.8,
-        color: '#6B4550',
+        color: '#605F5F',
       },
       backToShopContainer: {
         textAlign: 'center',
@@ -1319,14 +1336,14 @@
         fontFamily: "'Cinzel', serif",
         fontSize: '1.2rem',
         padding: '20px 60px',
-        background: 'linear-gradient(135deg, #E07A84 0%, #C94B68 100%)',
+        background: 'linear-gradient(135deg, #DE86A3 0%, #b56d85 100%)',
         color: '#fff',
         border: 'none',
         borderRadius: '50px',
         cursor: 'pointer',
         letterSpacing: '0.2em',
         transition: 'all 0.4s ease',
-        boxShadow: '0 8px 25px rgba(224, 122, 132, 0.45)',
+        boxShadow: '0 8px 25px rgba(222, 134, 163, 0.45)',
       },
       
       // ========== WORKSHOP SECTION ==========
@@ -1357,13 +1374,13 @@
       workshopTitle: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(2rem, 5vw, 3rem)',
-        color: '#A0505A',
+        color: '#605F5F',
         marginBottom: '20px',
         fontStyle: 'italic',
       },
       workshopText: {
         fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
-        color: '#6B4550',
+        color: '#605F5F',
         lineHeight: 1.8,
       },
       
@@ -1388,7 +1405,7 @@
         bottom: 0,
         left: 0,
         right: 0,
-        background: 'linear-gradient(to top, rgba(224, 130, 140, 0.95) 0%, transparent 100%)',
+        background: 'linear-gradient(to top, rgba(222, 134, 163, 0.95) 0%, transparent 100%)',
         padding: '60px 40px 40px',
         textAlign: 'center',
       },
@@ -1415,47 +1432,47 @@
       epiphanyBox: {
         padding: '50px 40px',
         background: 'rgba(255, 255, 255, 0.8)',
-        borderLeft: '4px solid #E07A84',
+        borderLeft: '4px solid #DE86A3',
         borderRadius: '15px',
-        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
+        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
       },
       epiphanyQuote: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.3rem, 3vw, 1.8rem)',
         fontStyle: 'italic',
-        color: '#C06070',
+        color: '#605F5F',
         lineHeight: 1.8,
         marginBottom: '20px',
       },
       epiphanyAuthor: {
         fontSize: '1rem',
-        color: '#A0505A',
+        color: '#605F5F',
         textAlign: 'right',
       },
       epiphany: {
         textAlign: 'center',
         padding: '50px 40px',
-        background: 'rgba(224, 122, 132, 0.12)',
+        background: 'rgba(222, 134, 163, 0.12)',
         borderRadius: '20px',
-        border: '2px solid rgba(201, 106, 116, 0.3)',
-        boxShadow: '0 4px 15px rgba(224, 122, 132, 0.2)',
+        border: '2px solid rgba(222, 134, 163, 0.35)',
+        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
       },
       epiphanyText: {
         fontSize: '1.2rem',
         lineHeight: 2,
-        color: '#6B4550',
+        color: '#605F5F',
         marginBottom: '30px',
       },
       epiphanyHighlight: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.6rem',
         lineHeight: 2,
-        color: '#C06070',
+        color: '#605F5F',
         fontStyle: 'italic',
         padding: '30px 0',
         margin: '30px 0',
-        borderTop: '1px solid rgba(224, 122, 132, 0.35)',
-        borderBottom: '1px solid rgba(224, 122, 132, 0.35)',
+        borderTop: '1px solid rgba(222, 134, 163, 0.35)',
+        borderBottom: '1px solid rgba(222, 134, 163, 0.35)',
       },
       
       // ========== CTA ==========
@@ -1477,13 +1494,13 @@
         fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
         letterSpacing: '0.3em',
         marginBottom: '20px',
-        background: 'linear-gradient(135deg, #D4AF37 0%, #E07A84 100%)',
+        background: 'linear-gradient(135deg, #D4AF37 0%, #DE86A3 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
       },
       ctaSubtitle: {
         fontSize: '1.2rem',
-        color: '#a9a9a9',
+        color: 'rgba(245, 240, 242, 0.88)',
         letterSpacing: '0.2em',
         marginBottom: '60px',
       },
@@ -1496,7 +1513,7 @@
       },
       priceLabel: {
         fontSize: '1rem',
-        color: '#a9a9a9',
+        color: 'rgba(245, 240, 242, 0.85)',
         marginBottom: '10px',
         letterSpacing: '0.1em',
       },
@@ -1536,7 +1553,7 @@
       },
       ctaNoteText: {
         fontSize: '0.9rem',
-        color: '#a9a9a9',
+        color: 'rgba(245, 240, 242, 0.82)',
         lineHeight: 1.8,
       },
       footer: {
@@ -1546,13 +1563,13 @@
       footerText: {
         fontSize: '1.2rem',
         lineHeight: 2,
-        color: '#a9a9a9',
+        color: 'rgba(245, 240, 242, 0.85)',
         fontStyle: 'italic',
         marginBottom: '30px',
       },
       copyright: {
         fontSize: '0.8rem',
-        color: '#a9a9a9',
+        color: 'rgba(245, 240, 242, 0.72)',
         marginTop: '20px',
       },
     };

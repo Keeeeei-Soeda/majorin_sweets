@@ -177,6 +177,17 @@
       flex: 1;
     }
 
+    /* ===== WITCH MASCOT ===== */
+    @keyframes witchFloat {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50%       { transform: translateY(-14px) rotate(2deg); }
+    }
+    @keyframes witchBurst {
+      0%   { transform: scale(1)   rotate(0deg);   opacity: 1; }
+      20%  { transform: scale(1.3) rotate(30deg);  opacity: 0.9; }
+      100% { transform: scale(0)   rotate(720deg); opacity: 0; }
+    }
+
     /* ===== CHOICE BUTTONS: 右から左へスライドイン ===== */
     @keyframes slideInFromRight {
       from { opacity: 0; transform: translateX(140px); }
@@ -213,6 +224,97 @@
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
+
+    /* ===== パーティクル1粒 ===== */
+    function ParticleDot({ angle, distance, size, emoji }) {
+      const [gone, setGone] = React.useState(false);
+      React.useEffect(() => {
+        const id = requestAnimationFrame(() => setGone(true));
+        return () => cancelAnimationFrame(id);
+      }, []);
+      const rad = (angle * Math.PI) / 180;
+      const tx = Math.cos(rad) * distance;
+      const ty = Math.sin(rad) * distance;
+      return (
+        <div style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          fontSize: size + 'px',
+          lineHeight: 1,
+          marginLeft: '-0.5em', marginTop: '-0.5em',
+          pointerEvents: 'none',
+          transform: gone
+            ? `translate(${tx}px, ${ty}px) scale(0)`
+            : 'translate(0,0) scale(1)',
+          opacity: gone ? 0 : 1,
+          transition: 'transform 0.75s cubic-bezier(0.15,0.85,0.25,1), opacity 0.75s ease-out',
+          zIndex: 30,
+        }}>{emoji}</div>
+      );
+    }
+
+    /* ===== 魔女マスコット ===== */
+    function WitchMascot({ src, side, topPx }) {
+      const [phase, setPhase] = React.useState('idle'); // idle | exploding | hidden
+      const [particles, setParticles] = React.useState([]);
+      const reviveRef = React.useRef(null);
+      const EMOJIS = ['🌸', '🌺', '✦', '✿', '★', '🌟', '✧', '❀'];
+      const REVIVE_MS = 30000;
+
+      const handleClick = () => {
+        if (phase !== 'idle') return;
+        const pts = Array.from({ length: 20 }, (_, i) => ({
+          id: i,
+          angle: (i / 20) * 360 + (Math.random() * 18 - 9),
+          distance: 55 + Math.random() * 95,
+          size: 12 + Math.floor(Math.random() * 13),
+          emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+        }));
+        setParticles(pts);
+        setPhase('exploding');
+        setTimeout(() => {
+          setPhase('hidden');
+          setParticles([]);
+          reviveRef.current = setTimeout(() => setPhase('idle'), REVIVE_MS);
+        }, 750);
+      };
+
+      React.useEffect(() => () => clearTimeout(reviveRef.current), []);
+
+      if (phase === 'hidden') return null;
+
+      return (
+        <div
+          title="クリックしてみて"
+          style={{
+            position: 'absolute',
+            [side]: '16px',
+            top: topPx + 'px',
+            zIndex: 5,
+            cursor: phase === 'idle' ? 'pointer' : 'default',
+          }}
+        >
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <img
+              src={src}
+              alt="Majorin"
+              draggable={false}
+              onClick={handleClick}
+              style={{
+                width: '140px',
+                display: 'block',
+                userSelect: 'none',
+                animation: phase === 'idle'
+                  ? 'witchFloat 3.2s ease-in-out infinite'
+                  : 'witchBurst 0.75s ease-in forwards',
+                filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.22))',
+              }}
+            />
+            {particles.map(p => <ParticleDot key={p.id} {...p} />)}
+          </div>
+        </div>
+      );
+    }
 
     function MajorinSweetsLP() {
       const [scrollY, setScrollY] = useState(0);
@@ -651,6 +753,7 @@
             style={{
               ...styles.section,
               ...styles.lightSection,
+              overflow: 'visible',
               opacity: isVisible['story'] ? 1 : 0,
               transform: isVisible['story'] ? 'translateY(0)' : 'translateY(50px)',
               transition: 'all 1s ease-out'
@@ -706,6 +809,17 @@
                 </div>
               </div>
             </div>
+
+            {/*
+              ===== 魔女マスコット =====
+              右 → 左 → 右の順で配置。
+              topPx は各 story-row の中間付近に合わせた値。
+              viewport 高さより大きく間隔をあけて同時表示を抑制。
+              topPx を調整すれば位置を変更可能。
+            */}
+            <WitchMascot src="images/image12.png" side="right" topPx={320}  />
+            <WitchMascot src="images/image14.png" side="left"  topPx={1150} />
+            <WitchMascot src="images/image13.png" side="right" topPx={1950} />
           </section>
 
           {/* Crafting Image */}

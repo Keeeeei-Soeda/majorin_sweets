@@ -291,25 +291,37 @@
             [side]: '16px',
             top: topPx + 'px',
             zIndex: 5,
-            cursor: phase === 'idle' ? 'pointer' : 'default',
           }}
         >
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <img
-              src={src}
-              alt="Majorin"
-              draggable={false}
+          {/* パーティクル用の相対コンテナ（丸の中心基準） */}
+          <div style={{ position: 'relative', width: '140px', height: '140px' }}>
+
+            {/* 丸型フレーム */}
+            <div
               onClick={handleClick}
               style={{
                 width: '140px',
-                display: 'block',
+                height: '140px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                border: '3px solid rgba(222, 134, 163, 0.55)',
+                boxShadow: '0 6px 22px rgba(0,0,0,0.22)',
+                cursor: phase === 'idle' ? 'pointer' : 'default',
                 userSelect: 'none',
                 animation: phase === 'idle'
                   ? 'witchFloat 3.2s ease-in-out infinite'
                   : 'witchBurst 0.75s ease-in forwards',
-                filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.22))',
               }}
-            />
+            >
+              <img
+                src={src}
+                alt="Majorin"
+                draggable={false}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </div>
+
+            {/* パーティクル（丸の外へ飛び出す） */}
             {particles.map(p => <ParticleDot key={p.id} {...p} />)}
           </div>
         </div>
@@ -856,6 +868,7 @@
             style={{
               ...styles.section,
               ...styles.roseSection,
+              overflow: 'visible',
               opacity: isVisible['turning'] ? 1 : 0,
               transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
               transition: 'all 1s ease-out 0.2s'
@@ -887,6 +900,12 @@
                 </div>
               </div>
             </div>
+
+            {/* 丸型魔女 ×4（右・左・右・左）topPx は各コンテンツ行の中間付近 */}
+            <WitchMascot src="images/image15.png" side="right" topPx={140}  />
+            <WitchMascot src="images/image16.png" side="left"  topPx={480}  />
+            <WitchMascot src="images/image17.png" side="right" topPx={780}  />
+            <WitchMascot src="images/image18.png" side="left"  topPx={1080} />
           </section>
 
           {/* スイーツを選ぶボタン */}

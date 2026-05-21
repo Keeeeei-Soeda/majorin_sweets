@@ -93,11 +93,97 @@
     
     @keyframes pulseGlow {
       0%, 100% {
-        box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        box-shadow: 0 0 30px rgba(192, 64, 96, 0.25);
       }
       50% {
-        box-shadow: 0 0 60px rgba(212, 175, 55, 0.6);
+        box-shadow: 0 0 60px rgba(192, 64, 96, 0.45);
       }
+    }
+
+    /* ===== HERO SLIDER ===== */
+    .hero-slide {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      pointer-events: none;
+    }
+    .hero-slide.active { opacity: 1; }
+    .hero-slider-dots {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 2;
+    }
+    .hero-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.7);
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .hero-dot.active { background: #fff; }
+
+    .hero-caption-body {
+      color: #FFFFFF;
+      -webkit-text-stroke: 1px #000000;
+      paint-order: stroke fill;
+      text-shadow: 0 0 2px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ===== LETTER POPUP (占い) ===== */
+    @keyframes letterPopIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.88); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .letter-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.55);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .letter-card {
+      animation: letterPopIn 0.45s ease-out both;
+      max-width: 420px;
+      width: 100%;
+      background: linear-gradient(165deg, #faf6f0 0%, #f0e8dc 100%);
+      border: 2px solid rgba(26, 26, 26, 0.15);
+      border-radius: 4px;
+      padding: 40px 36px 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      position: relative;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .letter-card::before {
+      content: '';
+      position: absolute;
+      top: 12px; left: 12px; right: 12px; bottom: 12px;
+      border: 1px solid rgba(192, 64, 96, 0.25);
+      pointer-events: none;
+    }
+    .story-chapter-label {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      color: #1A1A1A;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+    .story-chapter-divider {
+      text-align: center;
+      color: #C04060;
+      letter-spacing: 0.4em;
+      margin: 48px 0 40px;
+      font-size: 0.85rem;
     }
     
     .petal {
@@ -225,6 +311,122 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
+    // TODO: T1 — ロゴ基準ピンク確定後に置換
+    const PINK_LOGO_COLOR = '#C04060';
+
+    const HERO_SLIDES = [
+      'images/spring2026/hero_spring_01.png',
+      'images/spring2026/hero_spring_02.png',
+    ];
+
+    // TODO: T2 — 平石さんから10件受領後に差し替え
+    const MARJORIN_MESSAGES = [
+      { id: 1, body: '完璧な人生などない。でも、その一瞬を輝かせることは、あなたにもできる。' },
+      { id: 2, body: '痛みを消すのではなく、痛みと共に歩む力を、そっと渡したい。' },
+      { id: 3, body: '夢は遠くにあるのではない。今日の一口の甘さの中にある。' },
+      { id: 4, body: '勝者でなくていい。心があるものの方が、ずっと強い。' },
+      { id: 5, body: '手で作ったものだけが、心に残る。魔法ではなく、あなたの時間を。' },
+      { id: 6, body: '不器用な形のケーキほど、温かいことがある。' },
+      { id: 7, body: '真実の一言は、50枚のカードの中に、一枚だけある。' },
+      { id: 8, body: 'お菓子は、あなたを癒す魔法。杖は、もう置いた。' },
+      { id: 9, body: 'MAJORINS の扉を開けたあなたへ——ようこそ、甘さの世界へ。' },
+      { id: 10, body: '輝くパッションを、心に響くスイーツで届けたい。' },
+    ];
+
+    /* ===== ヒーロー クロスフェードスライダー ===== */
+    function HeroSlider() {
+      const [active, setActive] = useState(0);
+      const touchStartX = useRef(null);
+
+      useEffect(() => {
+        const t = setInterval(() => {
+          setActive((i) => (i + 1) % HERO_SLIDES.length);
+        }, 5000);
+        return () => clearInterval(t);
+      }, []);
+
+      const go = (dir) => {
+        setActive((i) => (i + dir + HERO_SLIDES.length) % HERO_SLIDES.length);
+      };
+
+      const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+      const onTouchEnd = (e) => {
+        if (touchStartX.current == null) return;
+        const dx = e.changedTouches[0].clientX - touchStartX.current;
+        if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+        touchStartX.current = null;
+      };
+
+      return (
+        <div
+          style={{ position: 'absolute', inset: 0 }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          {HERO_SLIDES.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              className={'hero-slide' + (i === active ? ' active' : '')}
+            />
+          ))}
+          <div className="hero-slider-dots">
+            {HERO_SLIDES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={'hero-dot' + (i === active ? ' active' : '')}
+                aria-label={`スライド ${i + 1}`}
+                onClick={() => setActive(i)}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* ===== 手紙ポップアップ（占いメッセージ） ===== */
+    function LetterPopup({ message, onClose }) {
+      useEffect(() => {
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [onClose]);
+
+      if (!message) return null;
+
+      return (
+        <div className="letter-overlay" onClick={onClose} role="dialog" aria-modal="true">
+          <div className="letter-card" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                position: 'absolute', top: 12, right: 14,
+                background: 'none', border: 'none', fontSize: '1.4rem',
+                cursor: 'pointer', color: '#333', lineHeight: 1,
+              }}
+              aria-label="閉じる"
+            >✕</button>
+            <p style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: '0.85rem',
+              color: PINK_LOGO_COLOR,
+              letterSpacing: '0.2em',
+              marginBottom: 16,
+            }}>— MAJORIN —</p>
+            <p style={{
+              fontSize: '1.25rem',
+              lineHeight: 1.9,
+              color: '#1A1A1A',
+              fontStyle: 'italic',
+            }}>{message.body}</p>
+          </div>
+        </div>
+      );
+    }
+
     /* ===== パーティクル1粒 ===== */
     function ParticleDot({ angle, distance, size, emoji }) {
       const [gone, setGone] = React.useState(false);
@@ -253,13 +455,32 @@
       );
     }
 
-    /* ===== 魔女マスコット ===== */
+    /* ===== 魔女マスコット（クリック → バブル爆発 → 手紙ポップアップ） ===== */
     function WitchMascot({ src, side, topPx }) {
-      const [phase, setPhase] = React.useState('idle'); // idle | exploding | hidden
+      const [phase, setPhase] = React.useState('idle');
       const [particles, setParticles] = React.useState([]);
+      const [letterMsg, setLetterMsg] = React.useState(null);
       const reviveRef = React.useRef(null);
+      const usedIdsRef = React.useRef(new Set());
       const EMOJIS = ['🌸', '🌺', '✦', '✿', '★', '🌟', '✧', '❀'];
       const REVIVE_MS = 30000;
+
+      const pickMessage = () => {
+        const pool = MARJORIN_MESSAGES.filter((m) => !usedIdsRef.current.has(m.id));
+        const list = pool.length ? pool : MARJORIN_MESSAGES;
+        if (pool.length === 0) usedIdsRef.current.clear();
+        const msg = list[Math.floor(Math.random() * list.length)];
+        usedIdsRef.current.add(msg.id);
+        return msg;
+      };
+
+      const scheduleRevive = () => {
+        clearTimeout(reviveRef.current);
+        reviveRef.current = setTimeout(() => {
+          setPhase('idle');
+          setLetterMsg(null);
+        }, REVIVE_MS);
+      };
 
       const handleClick = () => {
         if (phase !== 'idle') return;
@@ -273,58 +494,61 @@
         setParticles(pts);
         setPhase('exploding');
         setTimeout(() => {
-          setPhase('hidden');
           setParticles([]);
-          reviveRef.current = setTimeout(() => setPhase('idle'), REVIVE_MS);
-        }, 750);
+          setPhase('hidden');
+          setLetterMsg(pickMessage());
+        }, 650);
+      };
+
+      const closeLetter = () => {
+        setLetterMsg(null);
+        scheduleRevive();
       };
 
       React.useEffect(() => () => clearTimeout(reviveRef.current), []);
 
-      if (phase === 'hidden') return null;
-
       return (
-        <div
-          title="クリックしてみて"
-          style={{
-            position: 'absolute',
-            [side]: '16px',
-            top: topPx + 'px',
-            zIndex: 5,
-          }}
-        >
-          {/* パーティクル用の相対コンテナ（丸の中心基準） */}
-          <div style={{ position: 'relative', width: '140px', height: '140px' }}>
-
-            {/* 丸型フレーム */}
+        <>
+          {phase !== 'hidden' && (
             <div
-              onClick={handleClick}
+              title="クリックしてみて"
               style={{
-                width: '140px',
-                height: '140px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                border: '3px solid rgba(222, 134, 163, 0.55)',
-                boxShadow: '0 6px 22px rgba(0,0,0,0.22)',
-                cursor: phase === 'idle' ? 'pointer' : 'default',
-                userSelect: 'none',
-                animation: phase === 'idle'
-                  ? 'witchFloat 3.2s ease-in-out infinite'
-                  : 'witchBurst 0.75s ease-in forwards',
+                position: 'absolute',
+                [side]: '16px',
+                top: topPx + 'px',
+                zIndex: 5,
               }}
             >
-              <img
-                src={src}
-                alt="Majorin"
-                draggable={false}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              />
+              <div style={{ position: 'relative', width: '140px', height: '140px' }}>
+                <div
+                  onClick={handleClick}
+                  style={{
+                    width: '140px',
+                    height: '140px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    border: `3px solid ${PINK_LOGO_COLOR}88`,
+                    boxShadow: '0 6px 22px rgba(0,0,0,0.22)',
+                    cursor: phase === 'idle' ? 'pointer' : 'default',
+                    userSelect: 'none',
+                    animation: phase === 'idle'
+                      ? 'witchFloat 3.2s ease-in-out infinite'
+                      : 'witchBurst 0.75s ease-in forwards',
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt="Majorin"
+                    draggable={false}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                </div>
+                {particles.map((p) => <ParticleDot key={p.id} {...p} />)}
+              </div>
             </div>
-
-            {/* パーティクル（丸の外へ飛び出す） */}
-            {particles.map(p => <ParticleDot key={p.id} {...p} />)}
-          </div>
-        </div>
+          )}
+          <LetterPopup message={letterMsg} onClose={closeLetter} />
+        </>
       );
     }
 
@@ -402,14 +626,10 @@
             ))}
           </div>
 
-          {/* Hero Section */}
+          {/* Hero Section — 春用2枚クロスフェード */}
           <section style={styles.hero}>
             <div style={styles.heroImageOverlay}>
-              <img 
-                src="images/image01.JPG" 
-                alt="Majorin Sweets" 
-                style={styles.heroImage}
-              />
+              <HeroSlider />
               <div style={styles.heroGradientOverlay} />
             </div>
             
@@ -418,12 +638,12 @@
                 <h1 style={styles.logo}>MAJORIN SWEETS</h1>
                 <div style={styles.ornament}>🌹 ✦ 🌹</div>
               </div>
-              <p style={styles.tagline}>
-                完璧な人生なんて、ない。<br />
-                でも、完璧な一瞬は、ある。
+              <p className="hero-caption-body" style={styles.tagline}>
+                完璧な人生などない、<br />
+                でもその一瞬を輝かせるマジョリンスイーツ
               </p>
-              <p style={styles.subTagline}>
-                魔法の扉を開けて、マジョリンの世界へ
+              <p className="hero-caption-body" style={styles.subTagline}>
+                魔法の扉を開けて、MAJORINS の世界へ
               </p>
               
               <div style={styles.scrollHint}>
@@ -505,10 +725,10 @@
                   <div style={styles.behindDoor}>
                     {showButler && (
                       <div style={styles.welcomeBox}>
-                        <h2 style={styles.welcomeTitle} className="welcome-title">ようこそ、マジョリンの世界へ</h2>
+                        <h2 style={styles.welcomeTitle} className="welcome-title">ようこそ MAJORINS の世界へ</h2>
                         <p style={styles.welcomeText}>
-                          執事がお迎えいたします。<br />
-                          どちらをお選びになりますか？
+                          私がご案内いたします<br />
+                          どちらをお選びになりますか?
                         </p>
                       </div>
                     )}
@@ -532,7 +752,7 @@
                           onMouseEnter={(e) => {
                             if (item.disabled) return;
                             e.currentTarget.style.transform = 'scale(1.05)';
-                            if (!item.primary) e.currentTarget.style.background = 'rgba(212, 175, 55, 0.2)';
+                            if (!item.primary) e.currentTarget.style.background = 'rgba(26, 26, 26, 0.08)';
                           }}
                           onMouseLeave={(e) => {
                             if (item.disabled) return;
@@ -592,6 +812,15 @@
                 <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
                 <h2 style={styles.productTitle}>お好きなスイーツをお選びください</h2>
                 <p style={styles.productSubtitle}>すべて手作り、心を込めて</p>
+
+                {/* 暫定画像。本物商品画像と後日差し替え予定 (TODO: T6) */}
+                <div style={styles.poundCakeShowcase}>
+                  <img
+                    src="images/spring2026/pound_cake_showcase_temp.png"
+                    alt="マジョリンパウンドケーキ(イメージ)"
+                    style={styles.poundCakeShowcaseImg}
+                  />
+                </div>
                 
                 <div style={styles.productGrid}>
                   <div style={{...styles.productCard, animationDelay: '0s'}}>
@@ -731,31 +960,36 @@
                     <img src="images/image04.png" alt="魔法は、置いた" style={styles.miniValueCardImg} />
                   </div>
                   <div style={styles.miniValueCardBody}>
-                    <h4 style={styles.miniValueTitle}>魔法は、置いた</h4>
-                    <p style={styles.miniValueText}>問題を消すのではなく、<br />向き合う力を</p>
+                    <h4 style={styles.miniValueTitle}>魔法は夢</h4>
+                    <p style={styles.miniValueText}>貴方の夢はなんですか?</p>
                   </div>
                 </div>
                 {/* value card 2 */}
                 <div style={styles.miniValueCard}>
                   <div style={styles.miniValueCardImgWrap}>
-                    <img src="images/image06.png" alt="不完全でいい" style={styles.miniValueCardImg} />
+                    <img src="images/image06.png" alt="勝者でなくてもいい" style={styles.miniValueCardImg} />
                   </div>
                   <div style={styles.miniValueCardBody}>
-                    <h4 style={styles.miniValueTitle}>不完全でいい</h4>
-                    <p style={styles.miniValueText}>完璧より、<br />心がこもっている方が強い</p>
+                    <h4 style={styles.miniValueTitle}>勝者でなくてもいい</h4>
+                    <p style={styles.miniValueText}>勝負ではなく<br />心があるものの方が強い</p>
                   </div>
                 </div>
-                {/* value card 3 */}
+                {/* value card 3 — 現状維持 */}
                 <div style={styles.miniValueCard}>
                   <div style={styles.miniValueCardImgWrap}>
                     <img src="images/image05.png" alt="真実の一言" style={styles.miniValueCardImg} />
                   </div>
                   <div style={styles.miniValueCardBody}>
                     <h4 style={styles.miniValueTitle}>真実の一言</h4>
-                    <p style={styles.miniValueText}>50種類のカード。<br />あなたに必要な言葉</p>
+                    <p style={styles.miniValueText}>10種類のカード。<br />あなたに必要な言葉</p>
                   </div>
                 </div>
               </div>
+              {/* TODO: T3 — 「痛みを消さない〜」を残すか置換するか要確認。暫定: 既存維持 + 下に追加 */}
+              <p style={styles.valueLeadNew}>
+                心に響くスイーツ。<br />
+                あなたが輝くパッションを届けたい。
+              </p>
             </div>
           </section>
 
@@ -774,15 +1008,17 @@
             <div style={styles.sectionContent}>
               <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
               <h2 style={styles.sectionTitle}>STORY</h2>
-              <h3 style={styles.subtitle}>なぜ、魔女はお菓子を作るのか</h3>
+              <h3 style={styles.subtitle}>なぜマジョリンはお菓子を作ったのか</h3>
 
-              {/* Row 1: 画像左 ／ テキスト右 */}
+              <p className="story-chapter-divider">━━━━━━━━━━━━━━━━━━━━</p>
+
+              {/* 第1章 */}
               <div className="story-row">
                 <div className="story-row-img">
-                  <img src="images/image09.png" alt="完璧だった、過去" />
+                  <img src="images/image09.png" alt="完璧だった過去" />
                 </div>
                 <div className="story-row-text">
-                  <h2 style={styles.storyRowTitle}>完璧だった、過去</h2>
+                  <p className="story-chapter-label">【第1章】完璧だった過去</p>
                   <p style={styles.storyRowText}>
                     数百年間、私は「解決の魔女」。<br />
                     病気も、失恋も、貧困も。<br />
@@ -791,32 +1027,36 @@
                 </div>
               </div>
 
-              {/* Row 2: テキスト左 ／ 画像右 */}
+              <p className="story-chapter-divider">━━━━━━━━━━━━━━━━━━━━</p>
+
+              {/* 第2章 — TODO: T4 本文は平石さんから後日 */}
               <div className="story-row reverse">
                 <div className="story-row-img">
                   <img src="images/image11.png" alt="気づいた、真実" />
                 </div>
                 <div className="story-row-text">
-                  <h2 style={styles.storyRowTitle}>気づいた、真実</h2>
-                  <p style={styles.storyRowText}>
-                    痛みを消すことと、人を救うことは違う。<br />
-                    痛みこそが、人を育てる。<br />
-                    私は、人を弱くしていた。
+                  <p className="story-chapter-label">【第2章】気づいた、真実</p>
+                  <h2 style={styles.storyRowTitle}>私の魔法の使い方は間違いだった</h2>
+                  <p style={{ ...styles.storyRowText, fontStyle: 'italic', opacity: 0.75 }}>
+                    {/* TODO: T4 — 第2章本文を平石さんから受領後に追記 */}
+                    （本文は追って掲載予定です）
                   </p>
                 </div>
               </div>
 
-              {/* Row 3: 画像左 ／ テキスト右 */}
+              <p className="story-chapter-divider">━━━━━━━━━━━━━━━━━━━━</p>
+
+              {/* 第3章 */}
               <div className="story-row">
                 <div className="story-row-img">
                   <img src="images/image10.png" alt="選んだ、道" />
                 </div>
                 <div className="story-row-text">
-                  <h2 style={styles.storyRowTitle}>選んだ、道</h2>
+                  <p className="story-chapter-label">【第3章】選んだ、道</p>
                   <p style={styles.storyRowText}>
-                    だから、杖を置いた。<br />
-                    お菓子は痛みを消さない。<br />
-                    でも、痛みと生きる力をくれる。
+                    だから、魔法の使い方を変えた<br />
+                    お菓子の魔法で<br />
+                    人の心を癒そうと。
                   </p>
                 </div>
               </div>
@@ -847,9 +1087,10 @@
           >
             <div style={styles.sectionContent}>
               <div style={styles.craftingImageContainer}>
+                {/* TODO: T5 — ヒーロースライド2と同一画像で運用 */}
                 <img 
-                  src="images/image03.JPG" 
-                  alt="Majorin crafting sweets" 
+                  src="images/spring2026/hero_spring_02.png" 
+                  alt="魔法で作ったものは、魔法で壊れる" 
                   style={styles.craftingImage}
                 />
                 <div style={styles.craftingTextOverlay}>
@@ -1061,14 +1302,13 @@
       },
       ornament: {
         fontSize: '2rem',
-        color: '#D4AF37',
+        color: '#C04060', /* PINK_LOGO_COLOR — TODO: T1 */
         marginTop: '20px',
       },
       tagline: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
         lineHeight: 1.8,
-        color: '#DE86A3',
         marginBottom: '20px',
         animation: 'fadeInUp 1.5s ease-out 0.3s both',
         fontWeight: 600,
@@ -1076,7 +1316,6 @@
       subTagline: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
-        color: '#D4AF37',
         marginBottom: '50px',
         animation: 'fadeInUp 1.5s ease-out 0.4s both',
         fontStyle: 'italic',
@@ -1093,7 +1332,7 @@
       movieSection: {
         padding: '72px 20px 88px',
         background: 'linear-gradient(180deg, #0a0a0a 0%, #121212 100%)',
-        borderTop: '1px solid rgba(212, 175, 55, 0.12)',
+        borderTop: '1px solid rgba(192, 64, 96, 0.2)',
       },
       movieSectionInner: {
         maxWidth: '920px',
@@ -1110,7 +1349,7 @@
         fontFamily: "'Cinzel', serif",
         fontSize: 'clamp(1.5rem, 4vw, 2rem)',
         letterSpacing: '0.35em',
-        color: '#D4AF37',
+        color: '#C04060',
         marginBottom: '16px',
         fontWeight: 700,
       },
@@ -1234,15 +1473,15 @@
       welcomeTitle: {
         fontFamily: "'Cinzel', serif",
         fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-        color: '#D4AF37',
+        color: '#1A1A1A',
         marginBottom: '20px',
         letterSpacing: '0.2em',
-        textShadow: '0 0 20px rgba(212, 175, 55, 0.6)',
+        textShadow: '0 2px 12px rgba(255, 255, 255, 0.5)',
       },
       welcomeText: {
         fontFamily: "'Playfair Display', serif",
         fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-        color: '#DE86A3',
+        color: '#C04060',
         lineHeight: 1.8,
         fontStyle: 'italic',
       },
@@ -1257,14 +1496,14 @@
         fontFamily: "'Cinzel', serif",
         fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
         padding: '25px 50px',
-        background: 'linear-gradient(135deg, #D4AF37 0%, #DE86A3 100%)',
-        color: '#0a0a0a',
-        border: 'none',
+        background: 'rgba(255, 255, 255, 0.92)',
+        color: '#1A1A1A',
+        border: '2px solid #333333',
         borderRadius: '50px',
         cursor: 'pointer',
         letterSpacing: '0.2em',
         transition: 'all 0.4s ease',
-        boxShadow: '0 10px 30px rgba(212, 175, 55, 0.5)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
         display: 'flex',
         alignItems: 'center',
         gap: '15px',
@@ -1274,8 +1513,8 @@
         fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
         padding: '25px 50px',
         background: 'transparent',
-        color: '#D4AF37',
-        border: '2px solid #D4AF37',
+        color: '#333333',
+        border: '2px solid #333333',
         borderRadius: '50px',
         cursor: 'pointer',
         letterSpacing: '0.2em',
@@ -1311,18 +1550,31 @@
       },
       doorHintArrow: {
         fontSize: '3rem',
-        color: '#D4AF37',
+        color: '#333333',
         marginBottom: '10px',
       },
       doorHintAction: {
         fontFamily: "'Cinzel', serif",
         fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-        color: '#D4AF37',
+        color: '#1A1A1A',
         letterSpacing: '0.2em',
-        textShadow: '0 0 15px rgba(212, 175, 55, 0.5)',
+        textShadow: '0 0 12px rgba(255, 255, 255, 0.4)',
       },
       
       // ========== PRODUCT ==========
+      poundCakeShowcase: {
+        maxWidth: '900px',
+        margin: '0 auto 48px',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        boxShadow: '0 12px 40px rgba(222, 134, 163, 0.2)',
+      },
+      poundCakeShowcaseImg: {
+        width: '100%',
+        height: 'auto',
+        display: 'block',
+        verticalAlign: 'top',
+      },
       productSection: {
         minHeight: '100vh',
         background: 'linear-gradient(180deg, #FFF4F5 0%, #FDE8EA 100%)',
@@ -1461,9 +1713,18 @@
         fontSize: 'clamp(2rem, 5vw, 3.5rem)',
         textAlign: 'center',
         color: '#605F5F',
-        marginBottom: '80px',
+        marginBottom: '48px',
         lineHeight: 1.6,
         fontWeight: 600,
+      },
+      valueLeadNew: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 1.8rem)',
+        textAlign: 'center',
+        color: '#605F5F',
+        marginTop: '56px',
+        lineHeight: 1.9,
+        fontStyle: 'italic',
       },
       valueCards: {
         display: 'grid',
@@ -1693,7 +1954,7 @@
         fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
         letterSpacing: '0.3em',
         marginBottom: '20px',
-        background: 'linear-gradient(135deg, #D4AF37 0%, #DE86A3 100%)',
+        background: 'linear-gradient(135deg, #C04060 0%, #DE86A3 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
       },
@@ -1707,7 +1968,7 @@
         padding: '40px',
         background: 'rgba(74, 14, 78, 0.2)',
         borderRadius: '8px',
-        border: '1px solid rgba(212, 175, 55, 0.3)',
+        border: '1px solid rgba(192, 64, 96, 0.35)',
         marginBottom: '50px',
       },
       priceLabel: {
@@ -1719,7 +1980,7 @@
       priceAmount: {
         fontFamily: "'Cinzel', serif",
         fontSize: '3.5rem',
-        color: '#D4AF37',
+        color: '#C04060',
         fontWeight: 700,
         marginBottom: '10px',
       },
@@ -1738,7 +1999,7 @@
         fontFamily: "'Cinzel', serif",
         fontSize: '1.2rem',
         padding: '22px 70px',
-        background: 'linear-gradient(135deg, #4A0E4E 0%, #D4AF37 100%)',
+        background: 'linear-gradient(135deg, #4A0E4E 0%, #C04060 100%)',
         color: '#fff',
         border: 'none',
         borderRadius: '4px',

@@ -142,15 +142,23 @@
       from { opacity: 0; transform: translateY(20px) scale(0.88); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
+    /* 画面中央に固定（Portal で body 直下に描画） */
     .letter-overlay {
       position: fixed;
-      inset: 0;
-      background: rgba(10, 10, 10, 0.55);
-      z-index: 9999;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(10, 10, 10, 0.6);
+      z-index: 100000;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
+      box-sizing: border-box;
     }
     .letter-card {
       animation: letterPopIn 0.45s ease-out both;
@@ -495,11 +503,10 @@
       );
     }
 
-    /* ===== 魔女マスコット（クリック → バブル爆発 → 手紙ポップアップ） ===== */
-    function WitchMascot({ src, side, topPx }) {
+    /* ===== 魔女マスコット（クリック → バブル爆発 → 手紙は画面中央に1箇所表示） ===== */
+    function WitchMascot({ src, side, topPx, onOpenLetter }) {
       const [phase, setPhase] = React.useState('idle');
       const [particles, setParticles] = React.useState([]);
-      const [letterMsg, setLetterMsg] = React.useState(null);
       const reviveRef = React.useRef(null);
       const usedIdsRef = React.useRef(new Set());
       const EMOJIS = ['🌸', '🌺', '✦', '✿', '★', '🌟', '✧', '❀'];
@@ -518,7 +525,6 @@
         clearTimeout(reviveRef.current);
         reviveRef.current = setTimeout(() => {
           setPhase('idle');
-          setLetterMsg(null);
         }, REVIVE_MS);
       };
 
@@ -536,59 +542,51 @@
         setTimeout(() => {
           setParticles([]);
           setPhase('hidden');
-          setLetterMsg(pickMessage());
+          onOpenLetter(pickMessage(), scheduleRevive);
         }, 650);
-      };
-
-      const closeLetter = () => {
-        setLetterMsg(null);
-        scheduleRevive();
       };
 
       React.useEffect(() => () => clearTimeout(reviveRef.current), []);
 
+      if (phase === 'hidden') return null;
+
       return (
-        <>
-          {phase !== 'hidden' && (
+        <div
+          title="クリックしてみて"
+          style={{
+            position: 'absolute',
+            [side]: '16px',
+            top: topPx + 'px',
+            zIndex: 5,
+          }}
+        >
+          <div style={{ position: 'relative', width: '140px', height: '140px' }}>
             <div
-              title="クリックしてみて"
+              onClick={handleClick}
               style={{
-                position: 'absolute',
-                [side]: '16px',
-                top: topPx + 'px',
-                zIndex: 5,
+                width: '140px',
+                height: '140px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                border: `3px solid ${PINK_LOGO_COLOR}88`,
+                boxShadow: '0 6px 22px rgba(0,0,0,0.22)',
+                cursor: phase === 'idle' ? 'pointer' : 'default',
+                userSelect: 'none',
+                animation: phase === 'idle'
+                  ? 'witchFloat 3.2s ease-in-out infinite'
+                  : 'witchBurst 0.75s ease-in forwards',
               }}
             >
-              <div style={{ position: 'relative', width: '140px', height: '140px' }}>
-                <div
-                  onClick={handleClick}
-                  style={{
-                    width: '140px',
-                    height: '140px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    border: `3px solid ${PINK_LOGO_COLOR}88`,
-                    boxShadow: '0 6px 22px rgba(0,0,0,0.22)',
-                    cursor: phase === 'idle' ? 'pointer' : 'default',
-                    userSelect: 'none',
-                    animation: phase === 'idle'
-                      ? 'witchFloat 3.2s ease-in-out infinite'
-                      : 'witchBurst 0.75s ease-in forwards',
-                  }}
-                >
-                  <img
-                    src={src}
-                    alt="Majorin"
-                    draggable={false}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
-                </div>
-                {particles.map((p) => <ParticleDot key={p.id} {...p} />)}
-              </div>
+              <img
+                src={src}
+                alt="Majorin"
+                draggable={false}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
             </div>
-          )}
-          <LetterPopup message={letterMsg} onClose={closeLetter} />
-        </>
+            {particles.map((p) => <ParticleDot key={p.id} {...p} />)}
+          </div>
+        </div>
       );
     }
 
@@ -598,9 +596,27 @@
       const [doorState, setDoorState] = useState('closed'); 
       const [showButler, setShowButler] = useState(false);
       const [showChoices, setShowChoices] = useState(false);
+      const [globalLetter, setGlobalLetter] = useState(null);
       
       const sectionRefs = useRef({});
       const doorSectionRef = useRef(null);
+
+      const openGlobalLetter = (message, onWhenClosed) => {
+        setGlobalLetter({ message, onWhenClosed });
+        document.body.style.overflow = 'hidden';
+      };
+
+      const closeGlobalLetter = () => {
+        setGlobalLetter((prev) => {
+          if (prev?.onWhenClosed) prev.onWhenClosed();
+          return null;
+        });
+        document.body.style.overflow = '';
+      };
+
+      useEffect(() => {
+        return () => { document.body.style.overflow = ''; };
+      }, []);
 
       useEffect(() => {
         const handleScroll = () => {
@@ -1109,9 +1125,9 @@
               viewport 高さより大きく間隔をあけて同時表示を抑制。
               topPx を調整すれば位置を変更可能。
             */}
-            <WitchMascot src="images/image12.png" side="right" topPx={320}  />
-            <WitchMascot src="images/image14.png" side="left"  topPx={1150} />
-            <WitchMascot src="images/image13.png" side="right" topPx={1950} />
+            <WitchMascot src="images/image12.png" side="right" topPx={320}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image14.png" side="left"  topPx={1150} onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image13.png" side="right" topPx={1950} onOpenLetter={openGlobalLetter} />
           </section>
 
           {/* Crafting Image */}
@@ -1183,10 +1199,10 @@
             </div>
 
             {/* 丸型魔女 ×4（右・左・右・左）topPx は各コンテンツ行の中間付近 */}
-            <WitchMascot src="images/image15.png" side="right" topPx={140}  />
-            <WitchMascot src="images/image16.png" side="left"  topPx={480}  />
-            <WitchMascot src="images/image17.png" side="right" topPx={780}  />
-            <WitchMascot src="images/image18.png" side="left"  topPx={1080} />
+            <WitchMascot src="images/image15.png" side="right" topPx={140}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image16.png" side="left"  topPx={480}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image17.png" side="right" topPx={780}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image18.png" side="left"  topPx={1080} onOpenLetter={openGlobalLetter} />
           </section>
 
           {/* スイーツを選ぶボタン */}
@@ -1264,6 +1280,12 @@
               </div>
             </div>
           </section>
+
+          {/* 手紙ポップアップ: 常に画面中央（各セクション内ではなく body に Portal） */}
+          {globalLetter && ReactDOM.createPortal(
+            <LetterPopup message={globalLetter.message} onClose={closeGlobalLetter} />,
+            document.body
+          )}
         </div>
       );
     }

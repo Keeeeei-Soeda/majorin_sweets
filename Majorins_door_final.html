@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preload" href="videos/opening.mp4" as="video" type="video/mp4">
   
   <style>
     * {
@@ -100,13 +101,26 @@
       }
     }
 
-    /* ===== OPENING（ページ読み込み時・5.6秒） ===== */
-    .opening-video {
+    /* ===== OPENING（HTML直書き・Reactより先に再生） ===== */
+    #majorin-opening {
+      position: fixed;
+      inset: 0;
+      z-index: 100001;
+      background: #000;
+    }
+    #majorin-opening video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      background: #000;
+    }
+    #majorin-opening-white {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
     }
 
     .hero-caption-body {
@@ -289,7 +303,84 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <!-- オープニング: React読み込み前に即再生（v4.1 H-1） -->
+  <div id="majorin-opening" aria-hidden="true">
+    <video
+      id="majorin-opening-video"
+      src="videos/opening.mp4"
+      muted
+      autoplay
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      disablepictureinpicture
+    ></video>
+    <div id="majorin-opening-white"></div>
+  </div>
+
+  <div id="root" style="opacity:0;visibility:hidden"></div>
+
+  <script>
+    (function () {
+      var WHITE_IN_MS = 800;
+      var FADE_MS = 1000;
+      var FALLBACK_MS = 6500;
+      var shell = document.getElementById('majorin-opening');
+      var video = document.getElementById('majorin-opening-video');
+      var white = document.getElementById('majorin-opening-white');
+      var root = document.getElementById('root');
+      if (!shell || !video || !root) return;
+
+      var done = false;
+      var whiteoutStarted = false;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+
+      function tryPlay() {
+        var p = video.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      }
+
+      function finishOpening() {
+        if (done) return;
+        done = true;
+        if (shell.parentNode) shell.parentNode.removeChild(shell);
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        root.style.visibility = 'visible';
+        root.style.opacity = '1';
+        root.style.transition = 'opacity 1s ease';
+        window.__OPENING_DONE__ = true;
+        window.dispatchEvent(new Event('majorin-opening-done'));
+      }
+
+      function startWhiteout() {
+        if (done || whiteoutStarted) return;
+        whiteoutStarted = true;
+        video.pause();
+        video.style.visibility = 'hidden';
+        white.style.opacity = '0';
+        white.style.transition = 'opacity 0.8s ease';
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            white.style.opacity = '1';
+          });
+        });
+        setTimeout(function () {
+          white.style.transition = 'opacity 1s ease';
+          white.style.opacity = '0';
+          setTimeout(finishOpening, FADE_MS);
+        }, WHITE_IN_MS);
+      }
+
+      video.addEventListener('ended', startWhiteout, { once: true });
+      video.addEventListener('loadeddata', tryPlay);
+      video.addEventListener('canplay', tryPlay);
+      setTimeout(startWhiteout, FALLBACK_MS);
+
+      tryPlay();
+    })();
+  </script>
 
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -302,7 +393,6 @@
     const PINK_LOGO_COLOR = '#C04060';
 
     const HERO_IMAGE = 'images/spring2026/hero_main.jpg';
-    const OPENING_VIDEO = 'videos/opening.mp4';
 
     // マジョリンからの手紙（50件）
     const MARJORIN_MESSAGES = [
@@ -357,106 +447,6 @@
       { id: 49, tone: 'mixed', body: 'あなたの夢の重さは、あなただけが知っている。誰にも値踏みさせないで。' },
       { id: 50, tone: 'mixed', body: '扉を開けたなら、もう、戻らなくていい。そのまま、進みなさい。' },
     ];
-
-    /* ===== オープニング演出（v4.1 H-1）: 動画 → ホワイトアウト → フェードイン ===== */
-    function OpeningAnimation({ onComplete }) {
-      const [stage, setStage] = React.useState('video');
-      const [whiteOpacity, setWhiteOpacity] = React.useState(0);
-      const videoRef = React.useRef(null);
-
-      useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-          if (!document.querySelector('.letter-overlay')) {
-            document.body.style.overflow = '';
-          }
-        };
-      }, []);
-
-      useEffect(() => {
-        if (stage !== 'video') return;
-        const fallback = setTimeout(() => setStage('whiteout'), 6500);
-        return () => clearTimeout(fallback);
-      }, [stage]);
-
-      useEffect(() => {
-        const video = videoRef.current;
-        if (!video || stage !== 'video') return;
-        const tryPlay = () => { video.play().catch(() => {}); };
-        if (video.readyState >= 2) tryPlay();
-        else video.addEventListener('canplay', tryPlay, { once: true });
-      }, [stage]);
-
-      useEffect(() => {
-        if (stage === 'whiteout') {
-          setWhiteOpacity(0);
-          const raf = requestAnimationFrame(() => {
-            requestAnimationFrame(() => setWhiteOpacity(1));
-          });
-          const t = setTimeout(() => setStage('fadein'), 800);
-          return () => clearTimeout(t);
-        }
-        if (stage === 'fadein') {
-          setWhiteOpacity(0);
-          const t = setTimeout(() => {
-            setStage('done');
-            onComplete();
-          }, 1000);
-          return () => clearTimeout(t);
-        }
-      }, [stage, onComplete]);
-
-      if (stage === 'done') return null;
-
-      const whiteTransition = stage === 'fadein'
-        ? 'opacity 1s ease'
-        : 'opacity 0.8s ease';
-
-      return ReactDOM.createPortal(
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100vw',
-            height: '100vh',
-            height: '100dvh',
-            zIndex: 100001,
-            background: '#000',
-            pointerEvents: 'auto',
-          }}
-          aria-hidden="true"
-        >
-          {stage === 'video' && (
-            <video
-              ref={videoRef}
-              className="opening-video"
-              src={OPENING_VIDEO}
-              autoPlay
-              muted
-              playsInline
-              preload="auto"
-              onEnded={() => setStage('whiteout')}
-            />
-          )}
-          {(stage === 'whiteout' || stage === 'fadein') && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: '#FFFFFF',
-                opacity: whiteOpacity,
-                transition: whiteTransition,
-                pointerEvents: 'none',
-              }}
-            />
-          )}
-        </div>,
-        document.body
-      );
-    }
 
     /* ===== 手紙ポップアップ（占いメッセージ） ===== */
     function LetterPopup({ message, onClose }) {
@@ -615,7 +605,6 @@
     }
 
     function MajorinSweetsLP() {
-      const [openingDone, setOpeningDone] = useState(false);
       const [scrollY, setScrollY] = useState(0);
       const [isVisible, setIsVisible] = useState({});
       const [doorState, setDoorState] = useState('closed'); 
@@ -700,25 +689,14 @@
       };
 
       return (
-        <>
-          {!openingDone && (
-            <OpeningAnimation onComplete={() => setOpeningDone(true)} />
-          )}
-          <div
-            style={{
-              ...styles.container,
-              opacity: openingDone ? 1 : 0,
-              transition: openingDone ? 'opacity 1s ease' : 'none',
-              pointerEvents: openingDone ? 'auto' : 'none',
-            }}
-          >
+        <div style={styles.container}>
           <div style={styles.petalsContainer}>
             {[...Array(9)].map((_, i) => (
               <div key={i} className="petal" />
             ))}
           </div>
 
-          {/* Hero Section — 静止画（IMG_1315 由来） */}
+          {/* Hero Section — 静止画（オープニング後のトップ画面） */}
           <section style={styles.hero}>
             <div style={styles.heroImageOverlay}>
               <img
@@ -1325,8 +1303,7 @@
             <LetterPopup message={globalLetter.message} onClose={closeGlobalLetter} />,
             document.body
           )}
-          </div>
-        </>
+        </div>
       );
     }
 

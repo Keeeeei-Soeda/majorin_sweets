@@ -100,36 +100,6 @@
       }
     }
 
-    /* ===== HERO SLIDER ===== */
-    .hero-slide {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 1.5s ease-in-out;
-      pointer-events: none;
-    }
-    .hero-slide.active { opacity: 1; }
-    .hero-slider-dots {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 2;
-    }
-    .hero-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.7);
-      background: transparent;
-      cursor: pointer;
-      padding: 0;
-    }
-    .hero-dot.active { background: #fff; }
-
     .hero-caption-body {
       color: #FFFFFF;
       -webkit-text-stroke: 1px #000000;
@@ -322,10 +292,7 @@
     // TODO: T1 — ロゴ基準ピンク確定後に置換
     const PINK_LOGO_COLOR = '#C04060';
 
-    const HERO_SLIDES = [
-      'images/spring2026/hero_spring_01.png',
-      'images/spring2026/hero_spring_02.png',
-    ];
+    const HERO_IMAGE = 'images/spring2026/hero_main.jpg';
 
     // マジョリンからの手紙（50件）
     const MARJORIN_MESSAGES = [
@@ -380,59 +347,6 @@
       { id: 49, tone: 'mixed', body: 'あなたの夢の重さは、あなただけが知っている。誰にも値踏みさせないで。' },
       { id: 50, tone: 'mixed', body: '扉を開けたなら、もう、戻らなくていい。そのまま、進みなさい。' },
     ];
-
-    /* ===== ヒーロー クロスフェードスライダー ===== */
-    function HeroSlider() {
-      const [active, setActive] = useState(0);
-      const touchStartX = useRef(null);
-
-      useEffect(() => {
-        const t = setInterval(() => {
-          setActive((i) => (i + 1) % HERO_SLIDES.length);
-        }, 5000);
-        return () => clearInterval(t);
-      }, []);
-
-      const go = (dir) => {
-        setActive((i) => (i + dir + HERO_SLIDES.length) % HERO_SLIDES.length);
-      };
-
-      const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
-      const onTouchEnd = (e) => {
-        if (touchStartX.current == null) return;
-        const dx = e.changedTouches[0].clientX - touchStartX.current;
-        if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-        touchStartX.current = null;
-      };
-
-      return (
-        <div
-          style={{ position: 'absolute', inset: 0 }}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-        >
-          {HERO_SLIDES.map((src, i) => (
-            <img
-              key={src}
-              src={src}
-              alt=""
-              className={'hero-slide' + (i === active ? ' active' : '')}
-            />
-          ))}
-          <div className="hero-slider-dots">
-            {HERO_SLIDES.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={'hero-dot' + (i === active ? ' active' : '')}
-                aria-label={`スライド ${i + 1}`}
-                onClick={() => setActive(i)}
-              />
-            ))}
-          </div>
-        </div>
-      );
-    }
 
     /* ===== 手紙ポップアップ（占いメッセージ） ===== */
     function LetterPopup({ message, onClose }) {
@@ -682,10 +596,14 @@
             ))}
           </div>
 
-          {/* Hero Section — 春用2枚クロスフェード */}
+          {/* Hero Section — 静止画（IMG_1315 由来） */}
           <section style={styles.hero}>
             <div style={styles.heroImageOverlay}>
-              <HeroSlider />
+              <img
+                src={HERO_IMAGE}
+                alt="MAJORIN SWEETS — 薔薇のコテージ"
+                style={styles.heroImage}
+              />
               <div style={styles.heroGradientOverlay} />
             </div>
             
@@ -714,7 +632,7 @@
             images/door-left.png  … 左扉（透過PNG）。左端を軸に rotateY で開く
             images/door-right.png … 右扉（透過PNG）。右端を軸に開く
             images/doorman.png    … 扉が開いた後に表示する執事（奥レイヤー）
-            ヒーロー画像: images/image01.JPG（別セクション）
+            ヒーロー画像: images/spring2026/hero_main.jpg
           */}
           {/* ========== DOOR SECTION ========== */}
           <section 

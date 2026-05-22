@@ -100,6 +100,15 @@
       }
     }
 
+    /* ===== OPENING（ページ読み込み時・5.6秒） ===== */
+    .opening-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+
     .hero-caption-body {
       color: #FFFFFF;
       -webkit-text-stroke: 1px #000000;
@@ -293,6 +302,7 @@
     const PINK_LOGO_COLOR = '#C04060';
 
     const HERO_IMAGE = 'images/spring2026/hero_main.jpg';
+    const OPENING_VIDEO = 'videos/opening.mp4';
 
     // マジョリンからの手紙（50件）
     const MARJORIN_MESSAGES = [
@@ -347,6 +357,106 @@
       { id: 49, tone: 'mixed', body: 'あなたの夢の重さは、あなただけが知っている。誰にも値踏みさせないで。' },
       { id: 50, tone: 'mixed', body: '扉を開けたなら、もう、戻らなくていい。そのまま、進みなさい。' },
     ];
+
+    /* ===== オープニング演出（v4.1 H-1）: 動画 → ホワイトアウト → フェードイン ===== */
+    function OpeningAnimation({ onComplete }) {
+      const [stage, setStage] = React.useState('video');
+      const [whiteOpacity, setWhiteOpacity] = React.useState(0);
+      const videoRef = React.useRef(null);
+
+      useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+          if (!document.querySelector('.letter-overlay')) {
+            document.body.style.overflow = '';
+          }
+        };
+      }, []);
+
+      useEffect(() => {
+        if (stage !== 'video') return;
+        const fallback = setTimeout(() => setStage('whiteout'), 6500);
+        return () => clearTimeout(fallback);
+      }, [stage]);
+
+      useEffect(() => {
+        const video = videoRef.current;
+        if (!video || stage !== 'video') return;
+        const tryPlay = () => { video.play().catch(() => {}); };
+        if (video.readyState >= 2) tryPlay();
+        else video.addEventListener('canplay', tryPlay, { once: true });
+      }, [stage]);
+
+      useEffect(() => {
+        if (stage === 'whiteout') {
+          setWhiteOpacity(0);
+          const raf = requestAnimationFrame(() => {
+            requestAnimationFrame(() => setWhiteOpacity(1));
+          });
+          const t = setTimeout(() => setStage('fadein'), 800);
+          return () => clearTimeout(t);
+        }
+        if (stage === 'fadein') {
+          setWhiteOpacity(0);
+          const t = setTimeout(() => {
+            setStage('done');
+            onComplete();
+          }, 1000);
+          return () => clearTimeout(t);
+        }
+      }, [stage, onComplete]);
+
+      if (stage === 'done') return null;
+
+      const whiteTransition = stage === 'fadein'
+        ? 'opacity 1s ease'
+        : 'opacity 0.8s ease';
+
+      return ReactDOM.createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh',
+            height: '100dvh',
+            zIndex: 100001,
+            background: '#000',
+            pointerEvents: 'auto',
+          }}
+          aria-hidden="true"
+        >
+          {stage === 'video' && (
+            <video
+              ref={videoRef}
+              className="opening-video"
+              src={OPENING_VIDEO}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              onEnded={() => setStage('whiteout')}
+            />
+          )}
+          {(stage === 'whiteout' || stage === 'fadein') && (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: '#FFFFFF',
+                opacity: whiteOpacity,
+                transition: whiteTransition,
+                pointerEvents: 'none',
+              }}
+            />
+          )}
+        </div>,
+        document.body
+      );
+    }
 
     /* ===== 手紙ポップアップ（占いメッセージ） ===== */
     function LetterPopup({ message, onClose }) {
@@ -505,6 +615,7 @@
     }
 
     function MajorinSweetsLP() {
+      const [openingDone, setOpeningDone] = useState(false);
       const [scrollY, setScrollY] = useState(0);
       const [isVisible, setIsVisible] = useState({});
       const [doorState, setDoorState] = useState('closed'); 
@@ -589,7 +700,18 @@
       };
 
       return (
-        <div style={styles.container}>
+        <>
+          {!openingDone && (
+            <OpeningAnimation onComplete={() => setOpeningDone(true)} />
+          )}
+          <div
+            style={{
+              ...styles.container,
+              opacity: openingDone ? 1 : 0,
+              transition: openingDone ? 'opacity 1s ease' : 'none',
+              pointerEvents: openingDone ? 'auto' : 'none',
+            }}
+          >
           <div style={styles.petalsContainer}>
             {[...Array(9)].map((_, i) => (
               <div key={i} className="petal" />
@@ -1203,7 +1325,8 @@
             <LetterPopup message={globalLetter.message} onClose={closeGlobalLetter} />,
             document.body
           )}
-        </div>
+          </div>
+        </>
       );
     }
 

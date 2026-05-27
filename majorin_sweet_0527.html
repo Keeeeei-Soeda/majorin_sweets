@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Majorin Sweets - 魔法の扉を開けて</title>
+  <meta name="description" content="魔法じゃない、本物の甘さ。扉を開けて、マジョリンの世界へ。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preload" href="0525/0525.mp4" as="video" type="video/mp4">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background: #0a0a0a;
+    }
+    
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes petalFall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes butlerAppear {
+      0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    @keyframes choicesFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes doorGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(222, 134, 163, 0.5));
+      }
+      50% {
+        filter: drop-shadow(0 0 40px rgba(222, 134, 163, 0.85));
+      }
+    }
+    
+    @keyframes productFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 30px rgba(192, 64, 96, 0.25);
+      }
+      50% {
+        box-shadow: 0 0 60px rgba(192, 64, 96, 0.45);
+      }
+    }
+
+    /* ===== OPENING（HTML直書き・Reactより先に再生） ===== */
+    #majorin-opening {
+      position: fixed;
+      inset: 0;
+      z-index: 100001;
+      background: #000;
+    }
+    #majorin-opening video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #majorin-opening-white {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+    }
+    #majorin-opening-skip {
+      position: absolute;
+      right: 24px;
+      bottom: 28px;
+      z-index: 2;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      color: rgba(255, 255, 255, 0.92);
+      background: rgba(10, 10, 10, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+      padding: 12px 22px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+    #majorin-opening-skip:hover {
+      background: rgba(10, 10, 10, 0.65);
+      border-color: rgba(255, 255, 255, 0.55);
+      color: #fff;
+    }
+    #majorin-opening-skip:focus-visible {
+      outline: 2px solid rgba(222, 134, 163, 0.9);
+      outline-offset: 2px;
+    }
+
+    .hero-caption-body {
+      color: #FFFFFF;
+      -webkit-text-stroke: 1px #000000;
+      paint-order: stroke fill;
+      text-shadow: 0 0 2px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ===== LETTER POPUP (占い) ===== */
+    @keyframes letterPopIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.88); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* 画面中央に固定（Portal で body 直下に描画） */
+    .letter-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(10, 10, 10, 0.6);
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .letter-card {
+      animation: letterPopIn 0.45s ease-out both;
+      max-width: 420px;
+      width: 100%;
+      background: linear-gradient(165deg, #faf6f0 0%, #f0e8dc 100%);
+      border: 2px solid rgba(26, 26, 26, 0.15);
+      border-radius: 4px;
+      padding: 40px 36px 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      position: relative;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .letter-card::before {
+      content: '';
+      position: absolute;
+      top: 12px; left: 12px; right: 12px; bottom: 12px;
+      border: 1px solid rgba(192, 64, 96, 0.25);
+      pointer-events: none;
+    }
+    .story-chapter-label {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      color: #1A1A1A;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+    .story-chapter-divider {
+      text-align: center;
+      color: #C04060;
+      letter-spacing: 0.4em;
+      margin: 48px 0 40px;
+      font-size: 0.85rem;
+    }
+    
+    .petal {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #DE86A3, transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: petalFall 10s linear infinite;
+    }
+    
+    .petal:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .petal:nth-child(2) { left: 20%; animation-delay: 2s; }
+    .petal:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .petal:nth-child(4) { left: 40%; animation-delay: 1s; }
+    .petal:nth-child(5) { left: 50%; animation-delay: 3s; }
+    .petal:nth-child(6) { left: 60%; animation-delay: 5s; }
+    .petal:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+    .petal:nth-child(8) { left: 80%; animation-delay: 4.5s; }
+    .petal:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+    
+    @media (max-width: 768px) {
+      [data-grid] {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .butler-image {
+        height: 50vh !important;
+        max-height: 400px !important;
+      }
+      
+      .welcome-title {
+        font-size: 1.8rem !important;
+      }
+      
+      .choice-button {
+        padding: 20px 35px !important;
+        font-size: 1rem !important;
+      }
+    }
+
+    /* MOVIE: 769px 以上は 16:9。768px 以下はインラインの縦長（9:16）のまま */
+    @media (min-width: 769px) {
+      .movie-video-frame {
+        width: min(100%, 920px) !important;
+        aspect-ratio: 16 / 9 !important;
+        max-height: none !important;
+      }
+    }
+
+    /* ===== STORY ALTERNATING ROWS ===== */
+    .story-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 64px;
+      margin-bottom: 88px;
+    }
+    .story-row.reverse {
+      flex-direction: row-reverse;
+    }
+    .story-row-img {
+      width: 46%;
+      flex-shrink: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.18);
+    }
+    .story-row-img img {
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+      display: block;
+    }
+    .story-row-text {
+      flex: 1;
+    }
+
+    /* ===== WITCH MASCOT ===== */
+    @keyframes witchFloat {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50%       { transform: translateY(-14px) rotate(2deg); }
+    }
+    @keyframes witchBurst {
+      0%   { transform: scale(1)   rotate(0deg);   opacity: 1; }
+      20%  { transform: scale(1.3) rotate(30deg);  opacity: 0.9; }
+      100% { transform: scale(0)   rotate(720deg); opacity: 0; }
+    }
+
+    /* ===== CHOICE BUTTONS: 右から左へスライドイン ===== */
+    @keyframes slideInFromRight {
+      from { opacity: 0; transform: translateX(140px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .choice-btn-0 { animation: slideInFromRight 0.55s ease-out 0.10s both; }
+    .choice-btn-1 { animation: slideInFromRight 0.55s ease-out 0.35s both; }
+    .choice-btn-2 { animation: slideInFromRight 0.55s ease-out 0.60s both; }
+    .choice-btn-3 { animation: slideInFromRight 0.55s ease-out 0.85s both; }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      .story-row,
+      .story-row.reverse {
+        flex-direction: column !important;
+        gap: 24px;
+        margin-bottom: 56px;
+      }
+      .story-row-img {
+        width: 100%;
+      }
+      .story-row-img img {
+        height: 260px;
+      }
+    }
+
+    /* ========================================
+       MAJORINS Showcase Section
+       ======================================== */
+    .showcase-section {
+      --color-bg: #14080d;
+      --color-bg-deep: #0a0407;
+      --color-rose: #c47b8a;
+      --color-rose-deep: #8a4a5a;
+      --color-gold: #d4af6e;
+      --color-gold-bright: #f0d090;
+      --color-text: #f5e8d8;
+      --color-text-muted: #b8a090;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body-jp: 'Noto Serif JP', serif;
+
+      position: relative;
+      background: radial-gradient(ellipse at center top, #2a1820 0%, var(--color-bg) 40%, var(--color-bg-deep) 100%);
+      padding: 100px 20px 160px;
+      overflow: hidden;
+      color: var(--color-text);
+      font-family: var(--font-body-jp);
+    }
+
+    .showcase-section *,
+    .showcase-section *::before,
+    .showcase-section *::after {
+      box-sizing: border-box;
+    }
+
+    .showcase-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(212, 175, 110, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(196, 123, 138, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .showcase-intro {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 60px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .showcase-intro-eyebrow {
+      font-family: var(--font-display);
+      font-style: italic;
+      color: var(--color-rose);
+      letter-spacing: 0.3em;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: showcaseFadeUp 1.2s ease 0.2s forwards;
+    }
+
+    .showcase-intro-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: var(--color-gold-bright);
+      margin: 0 0 16px;
+      opacity: 0;
+      animation: showcaseFadeUp 1.2s ease 0.4s forwards;
+    }
+
+    .showcase-intro-text {
+      font-size: 0.95rem;
+      line-height: 1.9;
+      color: var(--color-text-muted);
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      margin: 0;
+      opacity: 0;
+      animation: showcaseFadeUp 1.2s ease 0.6s forwards;
+    }
+
+    @keyframes showcaseFadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .showcase-window {
+      position: relative;
+      max-width: 1400px;
+      margin: 0 auto;
+      aspect-ratio: 1700 / 850;
+      opacity: 0;
+      animation: showcaseFadeUp 1.4s ease 0.8s forwards;
+    }
+
+    .showcase-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .cake-item {
+      position: absolute;
+      bottom: 18%;
+      width: 22%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .cake-item[data-position="left"]   { left: 22%; }
+    .cake-item[data-position="center"] { left: 50%; }
+    .cake-item[data-position="right"]  { left: 78%; }
+
+    .cake-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+    }
+
+    .cake-image-wrap {
+      position: relative;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .cake-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      mix-blend-mode: multiply;
+      filter: brightness(1) contrast(1.05);
+      transition: filter 0.5s ease;
+    }
+
+    .showcase-window:has(.cake-item:hover) .cake-item:not(:hover) .cake-image {
+      filter: brightness(0.4) contrast(0.95) saturate(0.7);
+    }
+
+    .cake-item:hover .cake-image-wrap {
+      transform: translateY(-8px) scale(1.04);
+    }
+
+    .cake-item:hover .cake-image {
+      filter: brightness(1.08) contrast(1.08) drop-shadow(0 0 30px rgba(255, 200, 120, 0.5));
+    }
+
+    .spotlight-glow {
+      position: absolute;
+      left: 50%;
+      bottom: -15%;
+      width: 120%;
+      height: 30%;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(255, 210, 140, 0.6) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .cake-item:hover .spotlight-glow {
+      opacity: 1;
+    }
+
+    .cake-plate {
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%) translateY(8px);
+      width: 90%;
+      min-width: 160px;
+      background: linear-gradient(135deg, #1a0f12 0%, #2a181e 50%, #1a0f12 100%);
+      border: 1px solid var(--color-gold);
+      border-radius: 2px;
+      padding: 10px 14px;
+      text-align: center;
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(212, 175, 110, 0.3);
+      z-index: 2;
+    }
+
+    .cake-plate::before,
+    .cake-plate::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      background: var(--color-gold);
+      border-radius: 50%;
+      transform: translateY(-50%);
+      opacity: 0.6;
+    }
+    .cake-plate::before { left: 6px; }
+    .cake-plate::after  { right: 6px; }
+
+    .plate-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--color-gold-bright);
+      letter-spacing: 0.2em;
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .plate-tagline {
+      font-family: var(--font-body-jp);
+      font-size: 0.65rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+    }
+
+    .hover-card {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 80px);
+      transform: translateX(-50%) translateY(-15px);
+      width: 320px;
+      max-width: 90vw;
+      background: linear-gradient(180deg, rgba(26, 15, 18, 0.95) 0%, rgba(20, 10, 13, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(212, 175, 110, 0.4);
+      border-radius: 4px;
+      padding: 22px 24px;
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(212, 175, 110, 0.15),
+        inset 0 1px 0 rgba(212, 175, 110, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 4;
+    }
+
+    .hover-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%);
+    }
+
+    .cake-item:hover .hover-card {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .hover-card-name-jp {
+      font-family: var(--font-body-jp);
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--color-text);
+      letter-spacing: 0.15em;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .hover-card-name-en {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--color-rose);
+      letter-spacing: 0.2em;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .hover-card-divider {
+      width: 30px;
+      height: 1px;
+      background: var(--color-gold);
+      margin: 0 auto 16px;
+      opacity: 0.6;
+    }
+
+    .hover-card-description {
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      margin: 0 0 18px;
+      text-align: center;
+    }
+
+    .hover-card-price {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--color-gold-bright);
+      text-align: center;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    .hover-card-price-unit {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-left: 6px;
+      letter-spacing: 0.1em;
+    }
+
+    .hover-card-cta {
+      display: block;
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      color: var(--color-gold);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 10px 0;
+      border-top: 1px solid rgba(212, 175, 110, 0.25);
+      transition: color 0.3s ease, letter-spacing 0.3s ease;
+    }
+
+    .cake-item:hover .hover-card-cta {
+      color: var(--color-gold-bright);
+      letter-spacing: 0.35em;
+    }
+
+    .showcase-mobile {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .showcase-section {
+        padding: 60px 16px 80px;
+      }
+
+      .showcase-window {
+        display: none;
+      }
+
+      .showcase-mobile {
+        display: block;
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      .mobile-cake-card {
+        position: relative;
+        margin-bottom: 50px;
+        background: linear-gradient(180deg, #2a1820 0%, #14080d 100%);
+        border: 1px solid rgba(212, 175, 110, 0.3);
+        border-radius: 4px;
+        padding: 30px 20px 24px;
+        box-shadow:
+          0 12px 40px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(212, 175, 110, 0.2);
+        overflow: hidden;
+      }
+
+      .mobile-cake-card::before {
+        content: 'MAJORINS';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--font-display);
+        font-size: 0.6rem;
+        letter-spacing: 0.4em;
+        color: var(--color-gold);
+        opacity: 0.6;
+      }
+
+      .mobile-cake-card::after {
+        content: '';
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 70%;
+        background: radial-gradient(ellipse at center, rgba(255, 210, 140, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .mobile-cake-link {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+        z-index: 2;
+      }
+
+      .mobile-cake-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        mix-blend-mode: multiply;
+        filter: brightness(1.05) contrast(1.05);
+      }
+
+      .mobile-cake-plate {
+        margin-top: -10px;
+        background: linear-gradient(135deg, #1a0f12 0%, #2a181e 50%, #1a0f12 100%);
+        border: 1px solid var(--color-gold);
+        padding: 10px 14px;
+        text-align: center;
+        position: relative;
+        z-index: 3;
+      }
+
+      .mobile-cake-plate .plate-name {
+        font-size: 0.95rem;
+      }
+
+      .mobile-cake-plate .plate-tagline {
+        font-size: 0.62rem;
+      }
+
+      .mobile-cake-details {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(212, 175, 110, 0.2);
+        position: relative;
+        z-index: 2;
+      }
+
+      .mobile-cake-details .hover-card-description {
+        font-size: 0.78rem;
+        margin-bottom: 14px;
+      }
+
+      .mobile-cake-details .hover-card-price {
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+      }
+
+      .mobile-cake-details .hover-card-cta {
+        font-size: 0.78rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- オープニング: React読み込み前に即再生（v4.1 H-1） -->
+  <div id="majorin-opening">
+    <video
+      id="majorin-opening-video"
+      src="0525/0525.mp4"
+      muted
+      autoplay
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      disablepictureinpicture
+    ></video>
+    <div id="majorin-opening-white"></div>
+    <button type="button" id="majorin-opening-skip" aria-label="オープニング動画をスキップ">スキップ</button>
+  </div>
+
+  <div id="root" style="opacity:0;visibility:hidden"></div>
+
+  <script>
+    (function () {
+      var WHITE_IN_MS = 800;
+      var FADE_MS = 1000;
+      var FALLBACK_MS = 42000;
+      var shell = document.getElementById('majorin-opening');
+      var video = document.getElementById('majorin-opening-video');
+      var white = document.getElementById('majorin-opening-white');
+      var skipBtn = document.getElementById('majorin-opening-skip');
+      var root = document.getElementById('root');
+      if (!shell || !video || !root) return;
+
+      var done = false;
+      var whiteoutStarted = false;
+      var fallbackTimer = null;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+
+      function tryPlay() {
+        var p = video.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      }
+
+      function finishOpening() {
+        if (done) return;
+        done = true;
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        if (shell.parentNode) shell.parentNode.removeChild(shell);
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        root.style.visibility = 'visible';
+        root.style.opacity = '1';
+        root.style.transition = 'opacity 1s ease';
+        window.__OPENING_DONE__ = true;
+        window.dispatchEvent(new Event('majorin-opening-done'));
+      }
+
+      function startWhiteout() {
+        if (done || whiteoutStarted) return;
+        whiteoutStarted = true;
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        if (skipBtn) skipBtn.style.display = 'none';
+        video.pause();
+        video.style.visibility = 'hidden';
+        white.style.opacity = '0';
+        white.style.transition = 'opacity 0.8s ease';
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            white.style.opacity = '1';
+          });
+        });
+        setTimeout(function () {
+          white.style.transition = 'opacity 1s ease';
+          white.style.opacity = '0';
+          setTimeout(finishOpening, FADE_MS);
+        }, WHITE_IN_MS);
+      }
+
+      function skipOpening() {
+        if (done) return;
+        finishOpening();
+      }
+
+      video.addEventListener('ended', startWhiteout, { once: true });
+      video.addEventListener('loadeddata', tryPlay);
+      video.addEventListener('canplay', tryPlay);
+      fallbackTimer = setTimeout(startWhiteout, FALLBACK_MS);
+
+      if (skipBtn) {
+        skipBtn.addEventListener('click', skipOpening);
+      }
+
+      tryPlay();
+    })();
+  </script>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // TODO: T1 — ロゴ基準ピンク確定後に置換
+    const PINK_LOGO_COLOR = '#C04060';
+
+    const HERO_IMAGE = 'images/spring2026/hero_main.jpg';
+
+    // マジョリンからの手紙（50件）
+    const MARJORIN_MESSAGES = [
+      { id: 1, tone: 'mixed', body: '完璧な人生などない。でも、その一瞬を輝かせることは、あなたにもできる。' },
+      { id: 2, tone: 'mixed', body: '痛みを消すのではなく、痛みと共に歩む力を、そっと渡したい。' },
+      { id: 3, tone: 'mixed', body: '夢は遠くにあるのではない。今日の一口の甘さの中にある。' },
+      { id: 4, tone: 'mixed', body: '勝者でなくていい。心があるものの方が、ずっと強い。' },
+      { id: 5, tone: 'mixed', body: '手で作ったものだけが、心に残る。魔法ではなく、あなたの時間を。' },
+      { id: 6, tone: 'mixed', body: '不器用な形のケーキほど、温かいことがある。' },
+      { id: 7, tone: 'mixed', body: '真実の一言は、50枚のカードの中に、一枚だけある。' },
+      { id: 8, tone: 'mixed', body: 'お菓子は、あなたを癒す魔法。杖は、もう置いた。' },
+      { id: 9, tone: 'mixed', body: 'MAJORINS の扉を開けたあなたへ——ようこそ、甘さの世界へ。' },
+      { id: 10, tone: 'mixed', body: '輝くパッションを、心に響くスイーツで届けたい。' },
+      { id: 11, tone: 'devil', body: '言い訳の数だけ、あなたから自由が遠ざかる。' },
+      { id: 12, tone: 'devil', body: '迷っている時点で、答えはもう出ている。それを認める勇気だけが、足りないの。' },
+      { id: 13, tone: 'devil', body: '「できない」は、たいてい「やりたくない」の上品な言い換え。' },
+      { id: 14, tone: 'devil', body: '完璧を装うのは、もう、おやめなさい。' },
+      { id: 15, tone: 'devil', body: '期待された通りに生きて、それで満足? ——本当に?' },
+      { id: 16, tone: 'devil', body: '「忙しい」という言葉に、私はもう騙されない。あなたも、騙されないで。' },
+      { id: 17, tone: 'devil', body: '強がりは美しくない。素直さの方が、ずっと品がある。' },
+      { id: 18, tone: 'devil', body: '諦める理由を、他人に求めないで。' },
+      { id: 19, tone: 'devil', body: '自分に嘘をついた数だけ、夜が長くなる。' },
+      { id: 20, tone: 'devil', body: 'あなたのベストは、本当にそれ?' },
+      { id: 21, tone: 'devil', body: '痛みを抱えたまま、歩いていい。消さなくていい。' },
+      { id: 22, tone: 'philosopher', body: '完璧な選択など、どこにもない。選んだ道を、完璧にしていくだけ。' },
+      { id: 23, tone: 'philosopher', body: '強さとは、弱さを許すこと。50年生きて、やっとわかった。' },
+      { id: 24, tone: 'philosopher', body: '沈黙は、時に最も雄弁な答えになる。' },
+      { id: 25, tone: 'philosopher', body: '失敗を恥じる時間で、もう一度、やり直せる。' },
+      { id: 26, tone: 'philosopher', body: '過去を消したくなる夜こそ、未来を作る材料になる。' },
+      { id: 27, tone: 'philosopher', body: '自分を救えるのは、結局、自分の手だけ。誰の魔法でもない。' },
+      { id: 28, tone: 'philosopher', body: '完璧な誰かより、不器用な本物のあなたの方が、ずっと尊い。' },
+      { id: 29, tone: 'philosopher', body: '「今のままじゃダメ」と思ったその瞬間に、もう、変わり始めている。' },
+      { id: 30, tone: 'philosopher', body: '真実は、優しくない。でも、嘘よりずっと、あなたを生かす。' },
+      { id: 31, tone: 'philosopher', body: '私だって、生地を何度もダメにする。それでも、もう一度、混ぜ始めるの。' },
+      { id: 32, tone: 'human', body: '顔にチョコをつけたまま、笑える日が、いちばん尊い。' },
+      { id: 33, tone: 'human', body: '「まぁ、いっか」と呟ける夜が、本当の強さの始まり。' },
+      { id: 34, tone: 'human', body: '不器用な指でも、誰かの心に、温かさは届く。' },
+      { id: 35, tone: 'human', body: '一人の夜のお茶は、誰かを思う時間でもある。' },
+      { id: 36, tone: 'human', body: '弱さを見せていい場所が、人生に一つあれば、それで十分。' },
+      { id: 37, tone: 'human', body: '泣いた跡のあるあなたの顔を、私は美しいと思う。' },
+      { id: 38, tone: 'human', body: '立ち止まっていい。立ち止まった人にしか、見えない景色がある。' },
+      { id: 39, tone: 'human', body: '急がなくていい。お菓子も、人生も、待つ時間が美味しさを作る。' },
+      { id: 40, tone: 'human', body: '「もう、無理」と言える勇気の方が、頑張る勇気より、ずっと難しい。' },
+      { id: 41, tone: 'human', body: '一口のケーキが、明日を生きる理由になることがある。それで、十分。' },
+      { id: 42, tone: 'mixed', body: '「いつか」じゃない。今日、味わいなさい。' },
+      { id: 43, tone: 'mixed', body: '甘さは、逃げ場ではない。立ち直る前の、深呼吸。' },
+      { id: 44, tone: 'mixed', body: '手で混ぜる粉の重さの中に、魔法より確かなものがある。' },
+      { id: 45, tone: 'mixed', body: 'ケーキの形が崩れても、込めた想いは崩れない。' },
+      { id: 46, tone: 'mixed', body: '願いを叶える魔法はもう、ない。でも、願いを抱き続ける力は、ここにある。' },
+      { id: 47, tone: 'mixed', body: '焦がした砂糖の苦さも、人生の調味料。捨てなくていい。' },
+      { id: 48, tone: 'mixed', body: '完璧なケーキを目指して、不完全に焼けたケーキを愛おしむ。それでいいのよ。' },
+      { id: 49, tone: 'mixed', body: 'あなたの夢の重さは、あなただけが知っている。誰にも値踏みさせないで。' },
+      { id: 50, tone: 'mixed', body: '扉を開けたなら、もう、戻らなくていい。そのまま、進みなさい。' },
+    ];
+
+    /* ===== 手紙ポップアップ（占いメッセージ） ===== */
+    function LetterPopup({ message, onClose }) {
+      useEffect(() => {
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [onClose]);
+
+      if (!message) return null;
+
+      return (
+        <div className="letter-overlay" onClick={onClose} role="dialog" aria-modal="true">
+          <div className="letter-card" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                position: 'absolute', top: 12, right: 14,
+                background: 'none', border: 'none', fontSize: '1.4rem',
+                cursor: 'pointer', color: '#333', lineHeight: 1,
+              }}
+              aria-label="閉じる"
+            >✕</button>
+            <p style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: '0.85rem',
+              color: PINK_LOGO_COLOR,
+              letterSpacing: '0.2em',
+              marginBottom: 16,
+            }}>— MAJORIN —</p>
+            <p style={{
+              fontSize: '1.25rem',
+              lineHeight: 1.9,
+              color: '#1A1A1A',
+              fontStyle: 'italic',
+            }}>{message.body}</p>
+          </div>
+        </div>
+      );
+    }
+
+    /* ===== パーティクル1粒 ===== */
+    function ParticleDot({ angle, distance, size, emoji }) {
+      const [gone, setGone] = React.useState(false);
+      React.useEffect(() => {
+        const id = requestAnimationFrame(() => setGone(true));
+        return () => cancelAnimationFrame(id);
+      }, []);
+      const rad = (angle * Math.PI) / 180;
+      const tx = Math.cos(rad) * distance;
+      const ty = Math.sin(rad) * distance;
+      return (
+        <div style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          fontSize: size + 'px',
+          lineHeight: 1,
+          marginLeft: '-0.5em', marginTop: '-0.5em',
+          pointerEvents: 'none',
+          transform: gone
+            ? `translate(${tx}px, ${ty}px) scale(0)`
+            : 'translate(0,0) scale(1)',
+          opacity: gone ? 0 : 1,
+          transition: 'transform 0.75s cubic-bezier(0.15,0.85,0.25,1), opacity 0.75s ease-out',
+          zIndex: 30,
+        }}>{emoji}</div>
+      );
+    }
+
+    /* ===== 魔女マスコット（クリック → バブル爆発 → 手紙は画面中央に1箇所表示） ===== */
+    function WitchMascot({ src, side, topPx, onOpenLetter }) {
+      const [phase, setPhase] = React.useState('idle');
+      const [particles, setParticles] = React.useState([]);
+      const reviveRef = React.useRef(null);
+      const usedIdsRef = React.useRef(new Set());
+      const EMOJIS = ['🌸', '🌺', '✦', '✿', '★', '🌟', '✧', '❀'];
+      const REVIVE_MS = 30000;
+
+      const pickMessage = () => {
+        const pool = MARJORIN_MESSAGES.filter((m) => !usedIdsRef.current.has(m.id));
+        const list = pool.length ? pool : MARJORIN_MESSAGES;
+        if (pool.length === 0) usedIdsRef.current.clear();
+        const msg = list[Math.floor(Math.random() * list.length)];
+        usedIdsRef.current.add(msg.id);
+        return msg;
+      };
+
+      const scheduleRevive = () => {
+        clearTimeout(reviveRef.current);
+        reviveRef.current = setTimeout(() => {
+          setPhase('idle');
+        }, REVIVE_MS);
+      };
+
+      const handleClick = () => {
+        if (phase !== 'idle') return;
+        const pts = Array.from({ length: 20 }, (_, i) => ({
+          id: i,
+          angle: (i / 20) * 360 + (Math.random() * 18 - 9),
+          distance: 55 + Math.random() * 95,
+          size: 12 + Math.floor(Math.random() * 13),
+          emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+        }));
+        setParticles(pts);
+        setPhase('exploding');
+        setTimeout(() => {
+          setParticles([]);
+          setPhase('hidden');
+          onOpenLetter(pickMessage(), scheduleRevive);
+        }, 650);
+      };
+
+      React.useEffect(() => () => clearTimeout(reviveRef.current), []);
+
+      if (phase === 'hidden') return null;
+
+      return (
+        <div
+          title="クリックしてみて"
+          style={{
+            position: 'absolute',
+            [side]: '16px',
+            top: topPx + 'px',
+            zIndex: 5,
+          }}
+        >
+          <div style={{ position: 'relative', width: '140px', height: '140px' }}>
+            <div
+              onClick={handleClick}
+              style={{
+                width: '140px',
+                height: '140px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                border: `3px solid ${PINK_LOGO_COLOR}88`,
+                boxShadow: '0 6px 22px rgba(0,0,0,0.22)',
+                cursor: phase === 'idle' ? 'pointer' : 'default',
+                userSelect: 'none',
+                animation: phase === 'idle'
+                  ? 'witchFloat 3.2s ease-in-out infinite'
+                  : 'witchBurst 0.75s ease-in forwards',
+              }}
+            >
+              <img
+                src={src}
+                alt="Majorin"
+                draggable={false}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </div>
+            {particles.map((p) => <ParticleDot key={p.id} {...p} />)}
+          </div>
+        </div>
+      );
+    }
+
+    function MajorinSweetsLP() {
+      const [scrollY, setScrollY] = useState(0);
+      const [isVisible, setIsVisible] = useState({});
+      const [doorState, setDoorState] = useState('closed'); 
+      const [showButler, setShowButler] = useState(false);
+      const [showChoices, setShowChoices] = useState(false);
+      const [globalLetter, setGlobalLetter] = useState(null);
+      
+      const sectionRefs = useRef({});
+      const doorSectionRef = useRef(null);
+
+      const openGlobalLetter = (message, onWhenClosed) => {
+        setGlobalLetter({ message, onWhenClosed });
+        document.body.style.overflow = 'hidden';
+      };
+
+      const closeGlobalLetter = () => {
+        setGlobalLetter((prev) => {
+          if (prev?.onWhenClosed) prev.onWhenClosed();
+          return null;
+        });
+        document.body.style.overflow = '';
+      };
+
+      useEffect(() => {
+        return () => { document.body.style.overflow = ''; };
+      }, []);
+
+      useEffect(() => {
+        const handleScroll = () => {
+          setScrollY(window.scrollY);
+          
+          Object.keys(sectionRefs.current).forEach(key => {
+            const element = sectionRefs.current[key];
+            if (element) {
+              const rect = element.getBoundingClientRect();
+              const isInView = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+              setIsVisible(prev => ({ ...prev, [key]: isInView }));
+            }
+          });
+          
+          if (doorSectionRef.current && doorState === 'closed') {
+            const rect = doorSectionRef.current.getBoundingClientRect();
+            if (rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2) {
+              setDoorState('opening');
+              
+              setTimeout(() => {
+                setDoorState('open');
+                setShowButler(true);
+                
+                setTimeout(() => {
+                  setShowChoices(true);
+                }, 1000);
+              }, 2000);
+            }
+          }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, [doorState]);
+
+      const scrollToShowcase = () => {
+        const el = document.getElementById('showcase');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      const handleChoice = (choice) => {
+        if (choice === 'buy') {
+          setTimeout(scrollToShowcase, 300);
+        } else if (choice === 'story') {
+          // ストーリーは常時表示 — そのままスクロール
+          const el = document.getElementById('story');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+
+      return (
+        <div style={styles.container}>
+          <div style={styles.petalsContainer}>
+            {[...Array(9)].map((_, i) => (
+              <div key={i} className="petal" />
+            ))}
+          </div>
+
+          {/* Hero Section — 静止画（オープニング後のトップ画面） */}
+          <section style={styles.hero}>
+            <div style={styles.heroImageOverlay}>
+              <img
+                src={HERO_IMAGE}
+                alt="MAJORIN SWEETS — 薔薇のコテージ"
+                style={styles.heroImage}
+              />
+              <div style={styles.heroGradientOverlay} />
+            </div>
+            
+            <div style={styles.heroContent}>
+              <div style={styles.logoContainer}>
+                <h1 style={styles.logo}>MAJORIN SWEETS</h1>
+                <div style={styles.ornament}>🌹 ✦ 🌹</div>
+              </div>
+              <p className="hero-caption-body" style={styles.tagline}>
+                完璧な人生などない、<br />
+                でもその一瞬を輝かせるマジョリンスイーツ
+              </p>
+              <p className="hero-caption-body" style={styles.subTagline}>
+                魔法の扉を開けて、MAJORINS の世界へ
+              </p>
+              
+              <div style={styles.scrollHint}>
+                <p style={styles.scrollHintText}>↓ スクロールして扉を開ける ↓</p>
+              </div>
+            </div>
+          </section>
+
+          {/*
+            ========== 扉演出の画像設定（差し替え時はここを参照）==========
+            images/background.jpg … 扉の奥の外観（全面背景・ぼかし＋薄く重ねる）
+            images/door-left.png  … 左扉（透過PNG）。左端を軸に rotateY で開く
+            images/door-right.png … 右扉（透過PNG）。右端を軸に開く
+            images/doorman.png    … 扉が開いた後に表示する執事（奥レイヤー）
+            ヒーロー画像: images/spring2026/hero_main.jpg
+          */}
+          {/* ========== DOOR SECTION ========== */}
+          <section 
+            ref={doorSectionRef}
+            style={styles.doorSection}
+          >
+            <div style={styles.doorBackground}>
+              {/* 背景画像（店舗外観） */}
+              <img 
+                src="images/background.jpg" 
+                alt="Majorins Shop" 
+                style={styles.doorBackgroundImage}
+              />
+              
+              {/* 左扉（透過PNG） */}
+              <div 
+                style={{
+                  ...styles.door,
+                  ...styles.doorLeft,
+                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'story'
+                    ? 'perspective(1200px) rotateY(-105deg)'
+                    : 'rotateY(0deg)',
+                }}
+              >
+                <img 
+                  src="images/door-left.png" 
+                  alt="Left Door" 
+                  style={styles.doorImage}
+                />
+              </div>
+              
+              {/* 右扉（透過PNG） */}
+              <div 
+                style={{
+                  ...styles.door,
+                  ...styles.doorRight,
+                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'story'
+                    ? 'perspective(1200px) rotateY(105deg)'
+                    : 'rotateY(0deg)',
+                }}
+              >
+                <img 
+                  src="images/door-right.png" 
+                  alt="Right Door" 
+                  style={styles.doorImage}
+                />
+              </div>
+              
+              {/* 扉の奥の世界 */}
+              {(doorState === 'open' || doorState === 'story') && (
+                <>
+                  {/* 執事の登場 */}
+                  {showButler && (
+                    <div style={styles.butlerContainer}>
+                      <img 
+                        src="images/doorman.png" 
+                        alt="Butler" 
+                        style={styles.butlerImage}
+                        className="butler-image"
+                      />
+                    </div>
+                  )}
+                  
+                  <div style={styles.behindDoor}>
+                    {showButler && (
+                      <div style={styles.welcomeBox}>
+                        <h2 style={styles.welcomeTitle} className="welcome-title">ようこそ MAJORINS の世界へ</h2>
+                        <p style={styles.welcomeText}>
+                          私がご案内いたします<br />
+                          どちらをお選びになりますか?
+                        </p>
+                      </div>
+                    )}
+                  
+                  {showChoices && doorState === 'open' && (
+                    <div style={styles.choicesContainer}>
+                      {[
+                        { key: 'buy',   icon: '🛍️', label: 'スイーツを買う',   primary: true,  disabled: false },
+                        { key: 'story', icon: '📖', label: 'ストーリーをみる', primary: false, disabled: false },
+                        { key: 'tbd1',  icon: '🌹', label: '準備中',           primary: false, disabled: true  },
+                        { key: 'tbd2',  icon: '✦',  label: '準備中',           primary: false, disabled: true  },
+                      ].map((item, i) => (
+                        <button
+                          key={item.key}
+                          className={`choice-button choice-btn-${i}`}
+                          style={{
+                            ...(item.primary ? styles.choiceButton : styles.choiceButtonSecondary),
+                            ...(item.disabled ? { opacity: 0.4, cursor: 'default' } : {}),
+                          }}
+                          onClick={() => { if (!item.disabled) handleChoice(item.key); }}
+                          onMouseEnter={(e) => {
+                            if (item.disabled) return;
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            if (!item.primary) e.currentTarget.style.background = 'rgba(26, 26, 26, 0.08)';
+                          }}
+                          onMouseLeave={(e) => {
+                            if (item.disabled) return;
+                            e.currentTarget.style.transform = 'scale(1)';
+                            if (!item.primary) e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          <span style={styles.choiceIcon}>{item.icon}</span>
+                          <span style={styles.choiceText}>{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                </>
+              )}
+              
+              {/* 閉じた扉の装飾 */}
+              {doorState === 'closed' && (
+                <div style={styles.doorDecoration}>
+                  <div style={styles.doorHintBox}>
+                    <p style={styles.doorHint}>扉の奥に、マジョリンの世界が待っています</p>
+                    <p style={styles.doorHintArrow}>↓</p>
+                    <p style={styles.doorHintAction}>スクロールして扉を開く</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Movie — 自動再生せず、ユーザーが再生ボタンで視聴（769px以上は .movie-video-frame で16:9） */}
+          <section style={styles.movieSection} aria-label="ブランドムービー">
+            <div style={styles.movieSectionInner}>
+              <div style={styles.movieOrnament}>🌹 ━━━ ✦ ━━━ 🌹</div>
+              <h2 style={styles.movieTitle}>MOVIE</h2>
+              <p style={styles.movieLead}>
+                下の再生ボタンからご覧ください（自動では再生されません）
+              </p>
+              <div className="movie-video-frame" style={styles.movieVideoWrap}>
+                <video
+                  style={styles.movieVideo}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster="images/image01.JPG"
+                >
+                  <source src="videos/0429.mov" type="video/quicktime" />
+                </video>
+              </div>
+            </div>
+          </section>
+
+          {/* ========== SHOWCASE SECTION ========== */}
+          <section className="showcase-section" id="showcase">
+            <div className="showcase-intro">
+              <div className="showcase-intro-eyebrow">Signature Collection</div>
+              <h2 className="showcase-intro-title">本日のショーケース</h2>
+              <p className="showcase-intro-text">扉の向こうに並ぶ、三つの魔法。<br />マジョリンが今宵お届けする逸品をどうぞ。</p>
+            </div>
+
+            <div className="showcase-window">
+              <img src="images/showcase/showcase-empty.png" alt="MAJORINS Showcase" className="showcase-bg" />
+
+              <div className="cake-item" data-position="left">
+                <a href="#stripe-noir-melt" className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="cake-image" />
+                    <div className="spotlight-glow"></div>
+                  </div>
+                  <div className="cake-plate">
+                    <div className="plate-name">Noir Melt</div>
+                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
+                  </div>
+                  <div className="hover-card">
+                    <div className="hover-card-name-jp">ノワール メルト</div>
+                    <div className="hover-card-name-en">Noir Melt</div>
+                    <div className="hover-card-divider"></div>
+                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="cake-item" data-position="center">
+                <a href="#stripe-verdant-veil" className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="cake-image" />
+                    <div className="spotlight-glow"></div>
+                  </div>
+                  <div className="cake-plate">
+                    <div className="plate-name">Verdant Veil</div>
+                    <div className="plate-tagline">貴方の心が芽生える新緑茶に包まれて</div>
+                  </div>
+                  <div className="hover-card">
+                    <div className="hover-card-name-jp">ヴァーダント ベール</div>
+                    <div className="hover-card-name-en">Verdant Veil</div>
+                    <div className="hover-card-divider"></div>
+                    <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="cake-item" data-position="right">
+                <a href="#stripe-passion-orange" className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="cake-image" />
+                    <div className="spotlight-glow"></div>
+                  </div>
+                  <div className="cake-plate">
+                    <div className="plate-name">Passion Orange</div>
+                    <div className="plate-tagline">気分も弾けるフレッシュオレンジ C'est trop bon!</div>
+                  </div>
+                  <div className="hover-card">
+                    <div className="hover-card-name-jp">パッションオレンジヴェール</div>
+                    <div className="hover-card-name-en">Passion Orange Vert</div>
+                    <div className="hover-card-divider"></div>
+                    <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div className="showcase-mobile">
+              <div className="mobile-cake-card">
+                <a href="#stripe-noir-melt" className="mobile-cake-link">
+                  <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="mobile-cake-image" />
+                  <div className="mobile-cake-plate">
+                    <div className="plate-name">Noir Melt</div>
+                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
+                  </div>
+                  <div className="mobile-cake-details">
+                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="mobile-cake-card">
+                <a href="#stripe-verdant-veil" className="mobile-cake-link">
+                  <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="mobile-cake-image" />
+                  <div className="mobile-cake-plate">
+                    <div className="plate-name">Verdant Veil</div>
+                    <div className="plate-tagline">貴方の心が芽生える新緑茶に包まれて</div>
+                  </div>
+                  <div className="mobile-cake-details">
+                    <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="mobile-cake-card">
+                <a href="#stripe-passion-orange" className="mobile-cake-link">
+                  <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="mobile-cake-image" />
+                  <div className="mobile-cake-plate">
+                    <div className="plate-name">Passion Orange</div>
+                    <div className="plate-tagline">気分も弾けるフレッシュオレンジ C'est trop bon!</div>
+                  </div>
+                  <div className="mobile-cake-details">
+                    <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </section>
+
+          {/* ========== STORY SECTION — 常時表示 ========== */}
+          {/* Workshop Image Section */}
+          <section 
+            id="story"
+            ref={el => sectionRefs.current['workshop'] = el}
+            style={{
+              ...styles.section,
+              ...styles.workshopSection,
+              opacity: isVisible['workshop'] ? 1 : 0,
+              transform: isVisible['workshop'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.workshopImageContainer}>
+                <img 
+                  src="images/image02.JPG" 
+                  alt="Majorin's Workshop" 
+                  style={styles.workshopImage}
+                />
+                <div style={styles.workshopTextOverlay}>
+                  <h2 style={styles.workshopTitle}>マジョリンの工房</h2>
+                  <p style={styles.workshopText}>
+                    ここで、魔法ではなく心を込めて<br />
+                    一つひとつ、お菓子を作っています
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Value Proposition */}
+          <section 
+            ref={el => sectionRefs.current['value'] = el}
+            style={{
+              ...styles.section,
+              ...styles.valueSection,
+              opacity: isVisible['value'] ? 1 : 0,
+              transform: isVisible['value'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.valueMainTitle}>
+                痛みを消さない。<br />
+                痛みと生きる力をくれる。
+              </h2>
+              <div style={styles.valueCards} data-grid>
+                {/* value card 1 */}
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueCardImgWrap}>
+                    <img src="images/image04.png" alt="魔法は、置いた" style={styles.miniValueCardImg} />
+                  </div>
+                  <div style={styles.miniValueCardBody}>
+                    <h4 style={styles.miniValueTitle}>魔法は夢</h4>
+                    <p style={styles.miniValueText}>貴方の夢はなんですか?</p>
+                  </div>
+                </div>
+                {/* value card 2 */}
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueCardImgWrap}>
+                    <img src="images/image06.png" alt="勝者でなくてもいい" style={styles.miniValueCardImg} />
+                  </div>
+                  <div style={styles.miniValueCardBody}>
+                    <h4 style={styles.miniValueTitle}>勝者でなくてもいい</h4>
+                    <p style={styles.miniValueText}>勝負ではなく<br />心があるものの方が強い</p>
+                  </div>
+                </div>
+                {/* value card 3 — 現状維持 */}
+                <div style={styles.miniValueCard}>
+                  <div style={styles.miniValueCardImgWrap}>
+                    <img src="images/image05.png" alt="真実の一言" style={styles.miniValueCardImg} />
+                  </div>
+                  <div style={styles.miniValueCardBody}>
+                    <h4 style={styles.miniValueTitle}>真実の一言</h4>
+                    <p style={styles.miniValueText}>10種類のカード。<br />あなたに必要な言葉</p>
+                  </div>
+                </div>
+              </div>
+              {/* TODO: T3 — 「痛みを消さない〜」を残すか置換するか要確認。暫定: 既存維持 + 下に追加 */}
+              <p style={styles.valueLeadNew}>
+                心に響くスイーツ。<br />
+                あなたが輝くパッションを届けたい。
+              </p>
+            </div>
+          </section>
+
+          {/* Story — 交互レイアウト（画像＋テキスト） */}
+          <section 
+            ref={el => sectionRefs.current['story'] = el}
+            style={{
+              ...styles.section,
+              ...styles.lightSection,
+              overflow: 'visible',
+              opacity: isVisible['story'] ? 1 : 0,
+              transform: isVisible['story'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.sectionTitle}>STORY</h2>
+              <h3 style={styles.subtitle}>なぜマジョリンはお菓子を作ったのか</h3>
+
+              <p className="story-chapter-divider">━━━━━━━━━━━━━━━━━━━━</p>
+
+              {/* 第1章 */}
+              <div className="story-row">
+                <div className="story-row-img">
+                  <img src="images/image09.png" alt="完璧だった過去" />
+                </div>
+                <div className="story-row-text">
+                  <p className="story-chapter-label">【第1章】完璧だった過去</p>
+                  <p style={styles.storyRowText}>
+                    数百年間、私は「解決の魔女」。<br />
+                    病気も、失恋も、貧困も。<br />
+                    魔法で、すべてを消してきた。
+                  </p>
+                </div>
+              </div>
+
+              <p className="story-chapter-divider">━━━━━━━━━━━━━━━━━━━━</p>
+
+              {/* 第2章 — TODO: T4 本文は平石さんから後日 */}
+              <div className="story-row reverse">
+                <div className="story-row-img">
+                  <img src="images/image11.png" alt="気づいた、真実" />
+                </div>
+                <div className="story-row-text">
+                  <p className="story-chapter-label">【第2章】気づいた、真実</p>
+                  <h2 style={styles.storyRowTitle}>私の魔法の使い方は間違いだった</h2>
+                </div>
+              </div>
+
+              <p className="story-chapter-divider">━━━━━━━━━━━━━━━━━━━━</p>
+
+              {/* 第3章 */}
+              <div className="story-row">
+                <div className="story-row-img">
+                  <img src="images/image10.png" alt="選んだ、道" />
+                </div>
+                <div className="story-row-text">
+                  <p className="story-chapter-label">【第3章】選んだ、道</p>
+                  <p style={styles.storyRowText}>
+                    だから、魔法の使い方を変えた<br />
+                    お菓子の魔法で<br />
+                    人の心を癒そうと。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/*
+              ===== 魔女マスコット =====
+              右 → 左 → 右の順で配置。
+              topPx は各 story-row の中間付近に合わせた値。
+              viewport 高さより大きく間隔をあけて同時表示を抑制。
+              topPx を調整すれば位置を変更可能。
+            */}
+            <WitchMascot src="images/image12.png" side="right" topPx={320}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image14.png" side="left"  topPx={1150} onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image13.png" side="right" topPx={1950} onOpenLetter={openGlobalLetter} />
+          </section>
+
+          {/* Crafting Image */}
+          <section 
+            ref={el => sectionRefs.current['crafting'] = el}
+            style={{
+              ...styles.section,
+              ...styles.craftingSection,
+              opacity: isVisible['crafting'] ? 1 : 0,
+              transform: isVisible['crafting'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.craftingImageContainer}>
+                <img 
+                  src="images/spring2026/crafting_majorin.jpg" 
+                  alt="魔法で作ったものは魔法で失う。でも心を込めたものは魂に残る" 
+                  style={styles.craftingImage}
+                />
+                <div style={styles.craftingTextOverlay}>
+                  <h3 style={styles.craftingTitle}>
+                    「魔法で作ったものは魔法で失う。<br />
+                    でも心を込めたものは魂に残る」
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* The Moment */}
+          <section 
+            ref={el => sectionRefs.current['turning'] = el}
+            style={{
+              ...styles.section,
+              ...styles.roseSection,
+              overflow: 'visible',
+              opacity: isVisible['turning'] ? 1 : 0,
+              transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out 0.2s'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.sectionTitle}>THE MOMENT</h2>
+              <h3 style={styles.subtitle}>心が温かくなったある日</h3>
+              
+              <div style={styles.turningContent}>
+                <div style={styles.epiphanyBox}>
+                  <p style={styles.epiphanyQuote}>
+                    これ、何か優しくて、懐かしくて…心がホッとする…<br />
+                    これは昔母が作ってくれたケーキと同じ温かい気持ちになる、、<br />
+                    心が美味しい、、元気がでる、、これだわ！！
+                  </p>
+                  <p style={styles.epiphanyAuthor}>マジョリン、街のカフェにて</p>
+                </div>
+                
+                <div style={styles.epiphany}>
+                  <p style={styles.epiphanyText}>
+                    その瞬間私はハッと思った
+                  </p>
+                  <p style={styles.epiphanyHighlight}>
+                    お菓子には人を癒すことができると。<br />
+                    想いも届けることができる…マジョリンの幸せな魔法がかかったお菓子を<br />
+                    貴方に届けたい。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 丸型魔女 ×4（右・左・右・左）topPx は各コンテンツ行の中間付近 */}
+            <WitchMascot src="images/image15.png" side="right" topPx={140}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image16.png" side="left"  topPx={480}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image17.png" side="right" topPx={780}  onOpenLetter={openGlobalLetter} />
+            <WitchMascot src="images/image18.png" side="left"  topPx={1080} onOpenLetter={openGlobalLetter} />
+          </section>
+
+          {/* スイーツを選ぶボタン */}
+          <section style={{...styles.section, minHeight: 'auto', padding: '60px 20px'}}>
+            <div style={styles.backToShopContainer}>
+              <button 
+                style={styles.backToShopButton}
+                onClick={scrollToShowcase}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.05)';
+                  e.target.style.boxShadow = '0 12px 35px rgba(222, 134, 163, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(222, 134, 163, 0.45)';
+                }}
+              >
+                🛍️ スイーツを選ぶ
+              </button>
+            </div>
+          </section>
+
+          {/* ========== CTA SECTION ========== */}
+          <section 
+            id="reservation"
+            style={styles.ctaSection}
+          >
+            <div style={styles.ctaSectionContent}>
+              <h2 style={styles.ctaTitle}>MAJORIN SWEETS</h2>
+              <p style={styles.ctaSubtitle}>🌹 完全予約制 | 月100個限定 🌹</p>
+              
+              <div style={styles.priceBox}>
+                <p style={styles.priceLabel}>お一人様</p>
+                <p style={styles.priceAmount}>¥3,800〜</p>
+                <p style={styles.priceNote}>（税込・送料込）</p>
+              </div>
+
+              <div style={styles.ctaButtons}>
+                <button 
+                  style={styles.ctaButton} 
+                  onClick={() => alert('予約ページへ遷移します')}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-5px)';
+                    e.target.style.boxShadow = '0 15px 40px rgba(74, 14, 78, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 10px 30px rgba(74, 14, 78, 0.4)';
+                  }}
+                >
+                  今すぐ予約する
+                </button>
+              </div>
+
+              <div style={styles.ctaNote}>
+                <p style={styles.ctaNoteText}>
+                  ※ 月初に予約を開始し、100個に達し次第締め切ります<br />
+                  ※ お届けまで2-3週間程度お時間をいただきます
+                </p>
+              </div>
+
+              <div style={styles.footer}>
+                <p style={styles.footerText}>
+                  痛みと共に生きる人々に、<br />
+                  完璧じゃない甘さを。<br />
+                  魔法じゃない、本物の支えを。
+                </p>
+                <p style={styles.copyright}>© 2026 Majorin Sweets. All rights reserved.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* 手紙ポップアップ: 常に画面中央（各セクション内ではなく body に Portal） */}
+          {globalLetter && ReactDOM.createPortal(
+            <LetterPopup message={globalLetter.message} onClose={closeGlobalLetter} />,
+            document.body
+          )}
+        </div>
+      );
+    }
+
+    const styles = {
+      container: {
+        margin: 0,
+        padding: 0,
+        backgroundColor: '#0a0a0a',
+        color: '#e0e0e0',
+        fontFamily: "'Cormorant Garamond', serif",
+        overflowX: 'hidden',
+        position: 'relative',
+      },
+      
+      petalsContainer: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 1,
+      },
+      
+      // ========== HERO ==========
+      hero: {
+        position: 'relative',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+      },
+      heroImageOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      },
+      heroImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      heroGradientOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1,
+        background: 'linear-gradient(to bottom, rgba(10, 10, 10, 0.4) 0%, rgba(10, 10, 10, 0.8) 100%)',
+      },
+      heroContent: {
+        position: 'relative',
+        zIndex: 2,
+        textAlign: 'center',
+        padding: '0 20px',
+      },
+      logoContainer: {
+        marginBottom: '40px',
+        animation: 'fadeInUp 1.5s ease-out',
+      },
+      logo: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 7vw, 5rem)',
+        fontWeight: 700,
+        letterSpacing: '0.3em',
+        margin: 0,
+        background: 'linear-gradient(135deg, #D4AF37 0%, #DE86A3 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textShadow: '0 0 30px rgba(212, 175, 55, 0.5)',
+      },
+      ornament: {
+        fontSize: '2rem',
+        color: '#C04060', /* PINK_LOGO_COLOR — TODO: T1 */
+        marginTop: '20px',
+      },
+      tagline: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+        lineHeight: 1.8,
+        marginBottom: '20px',
+        animation: 'fadeInUp 1.5s ease-out 0.3s both',
+        fontWeight: 600,
+      },
+      subTagline: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
+        marginBottom: '50px',
+        animation: 'fadeInUp 1.5s ease-out 0.4s both',
+        fontStyle: 'italic',
+      },
+      scrollHint: {
+        animation: 'fadeInUp 1.5s ease-out 0.6s both',
+      },
+      scrollHintText: {
+        fontSize: '1rem',
+        color: 'rgba(222, 214, 216, 0.92)',
+        letterSpacing: '0.2em',
+      },
+      
+      movieSection: {
+        padding: '72px 20px 88px',
+        background: 'linear-gradient(180deg, #0a0a0a 0%, #121212 100%)',
+        borderTop: '1px solid rgba(192, 64, 96, 0.2)',
+      },
+      movieSectionInner: {
+        maxWidth: '920px',
+        margin: '0 auto',
+        textAlign: 'center',
+      },
+      movieOrnament: {
+        color: '#DE86A3',
+        fontSize: 'clamp(0.9rem, 2vw, 1.2rem)',
+        letterSpacing: '0.25em',
+        marginBottom: '16px',
+      },
+      movieTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+        letterSpacing: '0.35em',
+        color: '#C04060',
+        marginBottom: '16px',
+        fontWeight: 700,
+      },
+      movieLead: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(0.95rem, 2vw, 1.05rem)',
+        color: 'rgba(245, 240, 242, 0.88)',
+        marginBottom: '28px',
+        lineHeight: 1.7,
+      },
+      movieVideoWrap: {
+        position: 'relative',
+        width: 'min(100%, calc(min(70vh, 540px) * 9 / 16))',
+        aspectRatio: '9 / 16',
+        maxHeight: 'min(70vh, 540px)',
+        margin: '0 auto',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        backgroundColor: '#000',
+        boxShadow: '0 16px 48px rgba(0, 0, 0, 0.55)',
+      },
+      movieVideo: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        objectPosition: 'center',
+        display: 'block',
+        verticalAlign: 'top',
+        border: 'none',
+        outline: 'none',
+      },
+      
+      // ========== DOOR ==========
+      doorSection: {
+        position: 'relative',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        background: 'radial-gradient(circle at center, #2a1a2a 0%, #0a0a0a 100%)',
+      },
+      doorBackground: {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      doorBackgroundImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        opacity: 0.3,
+        filter: 'blur(8px)',
+      },
+      butlerContainer: {
+        position: 'absolute',
+        bottom: '0',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 8,
+        animation: 'butlerAppear 1.5s ease-out 0.5s both',
+        pointerEvents: 'none',
+      },
+      butlerImage: {
+        height: '60vh',
+        maxHeight: '600px',
+        width: 'auto',
+        objectFit: 'contain',
+        filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))',
+      },
+      door: {
+        position: 'absolute',
+        width: '51%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'transform 2s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        transformStyle: 'preserve-3d',
+        willChange: 'transform',
+        zIndex: 10,
+      },
+      doorLeft: {
+        left: 0,
+        transformOrigin: 'left center',
+      },
+      doorRight: {
+        right: 0,
+        transformOrigin: 'right center',
+      },
+      doorImage: {
+        width: '110%',
+        height: '100%',
+        objectFit: 'cover',
+        filter: 'drop-shadow(0 0 30px rgba(0, 0, 0, 0.5))',
+      },
+      behindDoor: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 9,
+        textAlign: 'center',
+        width: '90%',
+        maxWidth: '800px',
+        pointerEvents: 'none',
+      },
+      welcomeBox: {
+        marginBottom: '40px',
+        animation: 'butlerAppear 1s ease-out 0.5s both',
+      },
+      welcomeTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+        color: '#1A1A1A',
+        marginBottom: '20px',
+        letterSpacing: '0.2em',
+        textShadow: '0 2px 12px rgba(255, 255, 255, 0.5)',
+      },
+      welcomeText: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        color: '#C04060',
+        lineHeight: 1.8,
+        fontStyle: 'italic',
+      },
+      choicesContainer: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, auto)',
+        gap: '20px',
+        justifyContent: 'center',
+        pointerEvents: 'auto',
+      },
+      choiceButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+        padding: '25px 50px',
+        background: 'rgba(255, 255, 255, 0.92)',
+        color: '#1A1A1A',
+        border: '2px solid #333333',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '15px',
+      },
+      choiceButtonSecondary: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+        padding: '25px 50px',
+        background: 'transparent',
+        color: '#333333',
+        border: '2px solid #333333',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '15px',
+      },
+      choiceIcon: {
+        fontSize: '2rem',
+      },
+      choiceText: {
+        fontSize: 'inherit',
+      },
+      doorDecoration: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 15,
+        textAlign: 'center',
+      },
+      doorHintBox: {
+        animation: 'doorGlow 3s ease-in-out infinite',
+      },
+      doorHint: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        color: '#DE86A3',
+        fontStyle: 'italic',
+        marginBottom: '20px',
+        textShadow: '0 0 20px rgba(222, 134, 163, 0.75)',
+      },
+      doorHintArrow: {
+        fontSize: '3rem',
+        color: '#333333',
+        marginBottom: '10px',
+      },
+      doorHintAction: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+        color: '#1A1A1A',
+        letterSpacing: '0.2em',
+        textShadow: '0 0 12px rgba(255, 255, 255, 0.4)',
+      },
+      
+      ornamentalDivider: {
+        textAlign: 'center',
+        color: '#DE86A3',
+        fontSize: '1.5rem',
+        marginBottom: '40px',
+        letterSpacing: '0.3em',
+      },
+      // ========== STORY ==========
+      section: {
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '100px 20px',
+        position: 'relative',
+      },
+      lightSection: {
+        background: 'linear-gradient(180deg, #FFF4F5 0%, #FDE8EA 100%)',
+      },
+      valueSection: {
+        background: 'linear-gradient(180deg, #FFF2F3 0%, #FDE8EA 100%)',
+      },
+      sectionContent: {
+        maxWidth: '1200px',
+        width: '100%',
+        margin: '0 auto',
+        position: 'relative',
+        zIndex: 2,
+      },
+      sectionTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        textAlign: 'center',
+        letterSpacing: '0.3em',
+        marginBottom: '20px',
+        color: '#605F5F',
+      },
+      subtitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+        textAlign: 'center',
+        color: '#605F5F',
+        marginBottom: '80px',
+        fontStyle: 'italic',
+      },
+      valueMainTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+        textAlign: 'center',
+        color: '#605F5F',
+        marginBottom: '48px',
+        lineHeight: 1.6,
+        fontWeight: 600,
+      },
+      valueLeadNew: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 1.8rem)',
+        textAlign: 'center',
+        color: '#605F5F',
+        marginTop: '56px',
+        lineHeight: 1.9,
+        fontStyle: 'italic',
+      },
+      valueCards: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '40px',
+        maxWidth: '1000px',
+        margin: '0 auto',
+      },
+      miniValueCard: {
+        textAlign: 'center',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '20px',
+        border: '2px solid rgba(222, 134, 163, 0.3)',
+        transition: 'all 0.4s ease',
+        cursor: 'pointer',
+        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
+      },
+      // value card image
+      miniValueCardImgWrap: {
+        width: '100%',
+        height: '220px',
+        overflow: 'hidden',
+        borderRadius: '18px 18px 0 0',
+      },
+      miniValueCardImg: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block',
+      },
+      miniValueCardBody: {
+        padding: '28px 20px 32px',
+      },
+      miniValueTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.5rem',
+        color: '#605F5F',
+        marginBottom: '12px',
+      },
+      miniValueText: {
+        fontSize: '1.05rem',
+        lineHeight: 1.8,
+        color: '#605F5F',
+      },
+      // story alternating rows (CSS classes used, these are fallbacks)
+      storyRowTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
+        color: '#605F5F',
+        marginBottom: '20px',
+        fontWeight: 600,
+        lineHeight: 1.35,
+      },
+      storyRowText: {
+        fontSize: 'clamp(1rem, 1.6vw, 1.2rem)',
+        lineHeight: 2,
+        color: '#605F5F',
+      },
+      cardText: {
+        fontSize: '1.1rem',
+        lineHeight: 1.8,
+        color: '#605F5F',
+      },
+      backToShopContainer: {
+        textAlign: 'center',
+        marginTop: '80px',
+      },
+      backToShopButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1.2rem',
+        padding: '20px 60px',
+        background: 'linear-gradient(135deg, #DE86A3 0%, #b56d85 100%)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '50px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 8px 25px rgba(222, 134, 163, 0.45)',
+      },
+      
+      // ========== WORKSHOP SECTION ==========
+      workshopSection: {
+        padding: '0',
+        minHeight: '70vh',
+      },
+      workshopImageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: '70vh',
+        overflow: 'hidden',
+      },
+      workshopImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      workshopTextOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'linear-gradient(to top, rgba(253, 232, 234, 0.97) 0%, transparent 100%)',
+        padding: '60px 40px 40px',
+        textAlign: 'center',
+      },
+      workshopTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(2rem, 5vw, 3rem)',
+        color: '#605F5F',
+        marginBottom: '20px',
+        fontStyle: 'italic',
+      },
+      workshopText: {
+        fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+        color: '#605F5F',
+        lineHeight: 1.8,
+      },
+      
+      // ========== CRAFTING SECTION ==========
+      craftingSection: {
+        padding: '0',
+        minHeight: '70vh',
+      },
+      craftingImageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: '70vh',
+        overflow: 'hidden',
+      },
+      craftingImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+      },
+      craftingTextOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'linear-gradient(to top, rgba(222, 134, 163, 0.95) 0%, transparent 100%)',
+        padding: '60px 40px 40px',
+        textAlign: 'center',
+      },
+      craftingTitle: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 2rem)',
+        color: '#fff',
+        fontStyle: 'italic',
+        lineHeight: 1.8,
+        textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+      },
+      
+      // ========== ROSE/TURNING POINT SECTION ==========
+      roseSection: {
+        background: 'linear-gradient(135deg, #FDE8EA 0%, #FFF2F3 50%, #FAE0EC 100%)',
+      },
+      turningContent: {
+        maxWidth: '900px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '60px',
+      },
+      epiphanyBox: {
+        padding: '50px 40px',
+        background: 'rgba(255, 255, 255, 0.8)',
+        borderLeft: '4px solid #DE86A3',
+        borderRadius: '15px',
+        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
+      },
+      epiphanyQuote: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(1.3rem, 3vw, 1.8rem)',
+        fontStyle: 'italic',
+        color: '#605F5F',
+        lineHeight: 1.8,
+        marginBottom: '20px',
+      },
+      epiphanyAuthor: {
+        fontSize: '1rem',
+        color: '#605F5F',
+        textAlign: 'right',
+      },
+      epiphany: {
+        textAlign: 'left',
+        padding: '50px 40px',
+        background: 'rgba(222, 134, 163, 0.12)',
+        borderRadius: '20px',
+        border: '2px solid rgba(222, 134, 163, 0.35)',
+        boxShadow: '0 4px 15px rgba(222, 134, 163, 0.2)',
+      },
+      epiphanyText: {
+        fontSize: '1.2rem',
+        lineHeight: 2,
+        color: '#605F5F',
+        marginBottom: '30px',
+      },
+      epiphanyHighlight: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '1.6rem',
+        lineHeight: 2,
+        color: '#605F5F',
+        fontStyle: 'italic',
+        padding: '30px 0',
+        margin: '30px 0',
+        borderTop: '1px solid rgba(222, 134, 163, 0.35)',
+        borderBottom: '1px solid rgba(222, 134, 163, 0.35)',
+      },
+      
+      // ========== CTA ==========
+      ctaSection: {
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #2a1a2a 0%, #1a0a1a 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '100px 20px',
+      },
+      ctaSectionContent: {
+        textAlign: 'center',
+        maxWidth: '800px',
+        margin: '0 auto',
+      },
+      ctaTitle: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+        letterSpacing: '0.3em',
+        marginBottom: '20px',
+        background: 'linear-gradient(135deg, #C04060 0%, #DE86A3 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      },
+      ctaSubtitle: {
+        fontSize: '1.2rem',
+        color: 'rgba(245, 240, 242, 0.88)',
+        letterSpacing: '0.2em',
+        marginBottom: '60px',
+      },
+      priceBox: {
+        padding: '40px',
+        background: 'rgba(74, 14, 78, 0.2)',
+        borderRadius: '8px',
+        border: '1px solid rgba(192, 64, 96, 0.35)',
+        marginBottom: '50px',
+      },
+      priceLabel: {
+        fontSize: '1rem',
+        color: 'rgba(245, 240, 242, 0.85)',
+        marginBottom: '10px',
+        letterSpacing: '0.1em',
+      },
+      priceAmount: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '3.5rem',
+        color: '#C04060',
+        fontWeight: 700,
+        marginBottom: '10px',
+      },
+      priceNote: {
+        fontSize: '1rem',
+        color: '#c0c0c0',
+      },
+      ctaButtons: {
+        display: 'flex',
+        gap: '30px',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        marginBottom: '40px',
+      },
+      ctaButton: {
+        fontFamily: "'Cinzel', serif",
+        fontSize: '1.2rem',
+        padding: '22px 70px',
+        background: 'linear-gradient(135deg, #4A0E4E 0%, #C04060 100%)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        letterSpacing: '0.2em',
+        transition: 'all 0.4s ease',
+        boxShadow: '0 10px 30px rgba(74, 14, 78, 0.4)',
+      },
+      ctaNote: {
+        marginBottom: '80px',
+      },
+      ctaNoteText: {
+        fontSize: '0.9rem',
+        color: 'rgba(245, 240, 242, 0.82)',
+        lineHeight: 1.8,
+      },
+      footer: {
+        paddingTop: '60px',
+        borderTop: '1px solid rgba(169, 169, 169, 0.2)',
+      },
+      footerText: {
+        fontSize: '1.2rem',
+        lineHeight: 2,
+        color: 'rgba(245, 240, 242, 0.85)',
+        fontStyle: 'italic',
+        marginBottom: '30px',
+      },
+      copyright: {
+        fontSize: '0.8rem',
+        color: 'rgba(245, 240, 242, 0.72)',
+        marginTop: '20px',
+      },
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MajorinSweetsLP />);
+  </script>
+</body>
+</html>

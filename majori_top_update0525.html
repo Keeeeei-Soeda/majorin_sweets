@@ -10,7 +10,7 @@
   <meta name="description" content="魔法じゃない、本物の甘さ。扉を開けて、マジョリンの世界へ。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="preload" href="videos/opening.mp4" as="video" type="video/mp4">
   
   <style>
@@ -301,6 +301,452 @@
       }
       .story-row-img img {
         height: 260px;
+      }
+    }
+
+    /* ========================================
+       MAJORINS Showcase Section
+       ======================================== */
+    .showcase-section {
+      --color-bg: #14080d;
+      --color-bg-deep: #0a0407;
+      --color-rose: #c47b8a;
+      --color-rose-deep: #8a4a5a;
+      --color-gold: #d4af6e;
+      --color-gold-bright: #f0d090;
+      --color-text: #f5e8d8;
+      --color-text-muted: #b8a090;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body-jp: 'Noto Serif JP', serif;
+
+      position: relative;
+      background: radial-gradient(ellipse at center top, #2a1820 0%, var(--color-bg) 40%, var(--color-bg-deep) 100%);
+      padding: 100px 20px 160px;
+      overflow: hidden;
+      color: var(--color-text);
+      font-family: var(--font-body-jp);
+    }
+
+    .showcase-section *,
+    .showcase-section *::before,
+    .showcase-section *::after {
+      box-sizing: border-box;
+    }
+
+    .showcase-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(212, 175, 110, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(196, 123, 138, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .showcase-intro {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 60px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .showcase-intro-eyebrow {
+      font-family: var(--font-display);
+      font-style: italic;
+      color: var(--color-rose);
+      letter-spacing: 0.3em;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: showcaseFadeUp 1.2s ease 0.2s forwards;
+    }
+
+    .showcase-intro-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: var(--color-gold-bright);
+      margin: 0 0 16px;
+      opacity: 0;
+      animation: showcaseFadeUp 1.2s ease 0.4s forwards;
+    }
+
+    .showcase-intro-text {
+      font-size: 0.95rem;
+      line-height: 1.9;
+      color: var(--color-text-muted);
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      margin: 0;
+      opacity: 0;
+      animation: showcaseFadeUp 1.2s ease 0.6s forwards;
+    }
+
+    @keyframes showcaseFadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .showcase-window {
+      position: relative;
+      max-width: 1400px;
+      margin: 0 auto;
+      aspect-ratio: 1700 / 850;
+      opacity: 0;
+      animation: showcaseFadeUp 1.4s ease 0.8s forwards;
+    }
+
+    .showcase-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .cake-item {
+      position: absolute;
+      bottom: 18%;
+      width: 22%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .cake-item[data-position="left"]   { left: 22%; }
+    .cake-item[data-position="center"] { left: 50%; }
+    .cake-item[data-position="right"]  { left: 78%; }
+
+    .cake-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+    }
+
+    .cake-image-wrap {
+      position: relative;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .cake-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      mix-blend-mode: multiply;
+      filter: brightness(1) contrast(1.05);
+      transition: filter 0.5s ease;
+    }
+
+    .showcase-window:has(.cake-item:hover) .cake-item:not(:hover) .cake-image {
+      filter: brightness(0.4) contrast(0.95) saturate(0.7);
+    }
+
+    .cake-item:hover .cake-image-wrap {
+      transform: translateY(-8px) scale(1.04);
+    }
+
+    .cake-item:hover .cake-image {
+      filter: brightness(1.08) contrast(1.08) drop-shadow(0 0 30px rgba(255, 200, 120, 0.5));
+    }
+
+    .spotlight-glow {
+      position: absolute;
+      left: 50%;
+      bottom: -15%;
+      width: 120%;
+      height: 30%;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(255, 210, 140, 0.6) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .cake-item:hover .spotlight-glow {
+      opacity: 1;
+    }
+
+    .cake-plate {
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%) translateY(8px);
+      width: 90%;
+      min-width: 160px;
+      background: linear-gradient(135deg, #1a0f12 0%, #2a181e 50%, #1a0f12 100%);
+      border: 1px solid var(--color-gold);
+      border-radius: 2px;
+      padding: 10px 14px;
+      text-align: center;
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(212, 175, 110, 0.3);
+      z-index: 2;
+    }
+
+    .cake-plate::before,
+    .cake-plate::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      background: var(--color-gold);
+      border-radius: 50%;
+      transform: translateY(-50%);
+      opacity: 0.6;
+    }
+    .cake-plate::before { left: 6px; }
+    .cake-plate::after  { right: 6px; }
+
+    .plate-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--color-gold-bright);
+      letter-spacing: 0.2em;
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .plate-tagline {
+      font-family: var(--font-body-jp);
+      font-size: 0.65rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+    }
+
+    .hover-card {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 80px);
+      transform: translateX(-50%) translateY(-15px);
+      width: 320px;
+      max-width: 90vw;
+      background: linear-gradient(180deg, rgba(26, 15, 18, 0.95) 0%, rgba(20, 10, 13, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(212, 175, 110, 0.4);
+      border-radius: 4px;
+      padding: 22px 24px;
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(212, 175, 110, 0.15),
+        inset 0 1px 0 rgba(212, 175, 110, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 4;
+    }
+
+    .hover-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%);
+    }
+
+    .cake-item:hover .hover-card {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .hover-card-name-jp {
+      font-family: var(--font-body-jp);
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--color-text);
+      letter-spacing: 0.15em;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .hover-card-name-en {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--color-rose);
+      letter-spacing: 0.2em;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .hover-card-divider {
+      width: 30px;
+      height: 1px;
+      background: var(--color-gold);
+      margin: 0 auto 16px;
+      opacity: 0.6;
+    }
+
+    .hover-card-description {
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      margin: 0 0 18px;
+      text-align: center;
+    }
+
+    .hover-card-price {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--color-gold-bright);
+      text-align: center;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    .hover-card-price-unit {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-left: 6px;
+      letter-spacing: 0.1em;
+    }
+
+    .hover-card-cta {
+      display: block;
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      color: var(--color-gold);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 10px 0;
+      border-top: 1px solid rgba(212, 175, 110, 0.25);
+      transition: color 0.3s ease, letter-spacing 0.3s ease;
+    }
+
+    .cake-item:hover .hover-card-cta {
+      color: var(--color-gold-bright);
+      letter-spacing: 0.35em;
+    }
+
+    .showcase-mobile {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .showcase-section {
+        padding: 60px 16px 80px;
+      }
+
+      .showcase-window {
+        display: none;
+      }
+
+      .showcase-mobile {
+        display: block;
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      .mobile-cake-card {
+        position: relative;
+        margin-bottom: 50px;
+        background: linear-gradient(180deg, #2a1820 0%, #14080d 100%);
+        border: 1px solid rgba(212, 175, 110, 0.3);
+        border-radius: 4px;
+        padding: 30px 20px 24px;
+        box-shadow:
+          0 12px 40px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(212, 175, 110, 0.2);
+        overflow: hidden;
+      }
+
+      .mobile-cake-card::before {
+        content: 'MAJORINS';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--font-display);
+        font-size: 0.6rem;
+        letter-spacing: 0.4em;
+        color: var(--color-gold);
+        opacity: 0.6;
+      }
+
+      .mobile-cake-card::after {
+        content: '';
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 70%;
+        background: radial-gradient(ellipse at center, rgba(255, 210, 140, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .mobile-cake-link {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+        z-index: 2;
+      }
+
+      .mobile-cake-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        mix-blend-mode: multiply;
+        filter: brightness(1.05) contrast(1.05);
+      }
+
+      .mobile-cake-plate {
+        margin-top: -10px;
+        background: linear-gradient(135deg, #1a0f12 0%, #2a181e 50%, #1a0f12 100%);
+        border: 1px solid var(--color-gold);
+        padding: 10px 14px;
+        text-align: center;
+        position: relative;
+        z-index: 3;
+      }
+
+      .mobile-cake-plate .plate-name {
+        font-size: 0.95rem;
+      }
+
+      .mobile-cake-plate .plate-tagline {
+        font-size: 0.62rem;
+      }
+
+      .mobile-cake-details {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(212, 175, 110, 0.2);
+        position: relative;
+        z-index: 2;
+      }
+
+      .mobile-cake-details .hover-card-description {
+        font-size: 0.78rem;
+        margin-bottom: 14px;
+      }
+
+      .mobile-cake-details .hover-card-price {
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+      }
+
+      .mobile-cake-details .hover-card-cta {
+        font-size: 0.78rem;
       }
     }
   </style>
@@ -878,6 +1324,129 @@
                 >
                   <source src="videos/0429.mov" type="video/quicktime" />
                 </video>
+              </div>
+            </div>
+          </section>
+
+          {/* ========== SHOWCASE SECTION ========== */}
+          <section className="showcase-section" id="showcase">
+            <div className="showcase-intro">
+              <div className="showcase-intro-eyebrow">Signature Collection</div>
+              <h2 className="showcase-intro-title">本日のショーケース</h2>
+              <p className="showcase-intro-text">扉の向こうに並ぶ、三つの魔法。<br />マジョリンが今宵お届けする逸品をどうぞ。</p>
+            </div>
+
+            <div className="showcase-window">
+              <img src="images/showcase/showcase-empty.png" alt="MAJORINS Showcase" className="showcase-bg" />
+
+              <div className="cake-item" data-position="left">
+                <a href="#stripe-noir-melt" className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="cake-image" />
+                    <div className="spotlight-glow"></div>
+                  </div>
+                  <div className="cake-plate">
+                    <div className="plate-name">Noir Melt</div>
+                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
+                  </div>
+                  <div className="hover-card">
+                    <div className="hover-card-name-jp">ノワール メルト</div>
+                    <div className="hover-card-name-en">Noir Melt</div>
+                    <div className="hover-card-divider"></div>
+                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="cake-item" data-position="center">
+                <a href="#stripe-verdant-veil" className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="cake-image" />
+                    <div className="spotlight-glow"></div>
+                  </div>
+                  <div className="cake-plate">
+                    <div className="plate-name">Verdant Veil</div>
+                    <div className="plate-tagline">貴方の心が芽生える新緑茶に包まれて</div>
+                  </div>
+                  <div className="hover-card">
+                    <div className="hover-card-name-jp">ヴァーダント ベール</div>
+                    <div className="hover-card-name-en">Verdant Veil</div>
+                    <div className="hover-card-divider"></div>
+                    <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="cake-item" data-position="right">
+                <a href="#stripe-passion-orange" className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="cake-image" />
+                    <div className="spotlight-glow"></div>
+                  </div>
+                  <div className="cake-plate">
+                    <div className="plate-name">Passion Orange</div>
+                    <div className="plate-tagline">気分も弾けるフレッシュオレンジ C'est trop bon!</div>
+                  </div>
+                  <div className="hover-card">
+                    <div className="hover-card-name-jp">パッションオレンジヴェール</div>
+                    <div className="hover-card-name-en">Passion Orange Vert</div>
+                    <div className="hover-card-divider"></div>
+                    <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div className="showcase-mobile">
+              <div className="mobile-cake-card">
+                <a href="#stripe-noir-melt" className="mobile-cake-link">
+                  <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="mobile-cake-image" />
+                  <div className="mobile-cake-plate">
+                    <div className="plate-name">Noir Melt</div>
+                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
+                  </div>
+                  <div className="mobile-cake-details">
+                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="mobile-cake-card">
+                <a href="#stripe-verdant-veil" className="mobile-cake-link">
+                  <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="mobile-cake-image" />
+                  <div className="mobile-cake-plate">
+                    <div className="plate-name">Verdant Veil</div>
+                    <div className="plate-tagline">貴方の心が芽生える新緑茶に包まれて</div>
+                  </div>
+                  <div className="mobile-cake-details">
+                    <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="mobile-cake-card">
+                <a href="#stripe-passion-orange" className="mobile-cake-link">
+                  <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="mobile-cake-image" />
+                  <div className="mobile-cake-plate">
+                    <div className="plate-name">Passion Orange</div>
+                    <div className="plate-tagline">気分も弾けるフレッシュオレンジ C'est trop bon!</div>
+                  </div>
+                  <div className="mobile-cake-details">
+                    <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
+                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
               </div>
             </div>
           </section>

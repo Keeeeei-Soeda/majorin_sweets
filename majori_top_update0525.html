@@ -125,6 +125,33 @@
       transition: opacity 0.8s ease;
       pointer-events: none;
     }
+    #majorin-opening-skip {
+      position: absolute;
+      right: 24px;
+      bottom: 28px;
+      z-index: 2;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      color: rgba(255, 255, 255, 0.92);
+      background: rgba(10, 10, 10, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+      padding: 12px 22px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+    #majorin-opening-skip:hover {
+      background: rgba(10, 10, 10, 0.65);
+      border-color: rgba(255, 255, 255, 0.55);
+      color: #fff;
+    }
+    #majorin-opening-skip:focus-visible {
+      outline: 2px solid rgba(222, 134, 163, 0.9);
+      outline-offset: 2px;
+    }
 
     .hero-caption-body {
       color: #FFFFFF;
@@ -753,7 +780,7 @@
 </head>
 <body>
   <!-- オープニング: React読み込み前に即再生（v4.1 H-1） -->
-  <div id="majorin-opening" aria-hidden="true">
+  <div id="majorin-opening">
     <video
       id="majorin-opening-video"
       src="0525/0525.mp4"
@@ -765,6 +792,7 @@
       disablepictureinpicture
     ></video>
     <div id="majorin-opening-white"></div>
+    <button type="button" id="majorin-opening-skip" aria-label="オープニング動画をスキップ">スキップ</button>
   </div>
 
   <div id="root" style="opacity:0;visibility:hidden"></div>
@@ -777,11 +805,13 @@
       var shell = document.getElementById('majorin-opening');
       var video = document.getElementById('majorin-opening-video');
       var white = document.getElementById('majorin-opening-white');
+      var skipBtn = document.getElementById('majorin-opening-skip');
       var root = document.getElementById('root');
       if (!shell || !video || !root) return;
 
       var done = false;
       var whiteoutStarted = false;
+      var fallbackTimer = null;
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
 
@@ -793,6 +823,7 @@
       function finishOpening() {
         if (done) return;
         done = true;
+        if (fallbackTimer) clearTimeout(fallbackTimer);
         if (shell.parentNode) shell.parentNode.removeChild(shell);
         document.documentElement.style.overflow = '';
         document.body.style.overflow = '';
@@ -806,6 +837,8 @@
       function startWhiteout() {
         if (done || whiteoutStarted) return;
         whiteoutStarted = true;
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        if (skipBtn) skipBtn.style.display = 'none';
         video.pause();
         video.style.visibility = 'hidden';
         white.style.opacity = '0';
@@ -822,10 +855,19 @@
         }, WHITE_IN_MS);
       }
 
+      function skipOpening() {
+        if (done) return;
+        finishOpening();
+      }
+
       video.addEventListener('ended', startWhiteout, { once: true });
       video.addEventListener('loadeddata', tryPlay);
       video.addEventListener('canplay', tryPlay);
-      setTimeout(startWhiteout, FALLBACK_MS);
+      fallbackTimer = setTimeout(startWhiteout, FALLBACK_MS);
+
+      if (skipBtn) {
+        skipBtn.addEventListener('click', skipOpening);
+      }
 
       tryPlay();
     })();

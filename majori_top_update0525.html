@@ -1116,24 +1116,18 @@
         return () => window.removeEventListener('scroll', handleScroll);
       }, [doorState]);
 
+      const scrollToShowcase = () => {
+        const el = document.getElementById('showcase');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      };
+
       const handleChoice = (choice) => {
         if (choice === 'buy') {
-          setDoorState('shopping');
-          setTimeout(() => {
-            const el = document.getElementById('products');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }, 500);
+          setTimeout(scrollToShowcase, 300);
         } else if (choice === 'story') {
           // ストーリーは常時表示 — そのままスクロール
           const el = document.getElementById('story');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }
-      };
-
-      const scrollToReservation = () => {
-        const ctaSection = document.getElementById('reservation');
-        if (ctaSection) {
-          ctaSection.scrollIntoView({ behavior: 'smooth' });
         }
       };
 
@@ -1201,7 +1195,7 @@
                 style={{
                   ...styles.door,
                   ...styles.doorLeft,
-                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'shopping' || doorState === 'story'
+                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'story'
                     ? 'perspective(1200px) rotateY(-105deg)'
                     : 'rotateY(0deg)',
                 }}
@@ -1218,7 +1212,7 @@
                 style={{
                   ...styles.door,
                   ...styles.doorRight,
-                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'shopping' || doorState === 'story'
+                  transform: doorState === 'opening' || doorState === 'open' || doorState === 'story'
                     ? 'perspective(1200px) rotateY(105deg)'
                     : 'rotateY(0deg)',
                 }}
@@ -1231,7 +1225,7 @@
               </div>
               
               {/* 扉の奥の世界 */}
-              {(doorState === 'open' || doorState === 'shopping' || doorState === 'story') && (
+              {(doorState === 'open' || doorState === 'story') && (
                 <>
                   {/* 執事の登場 */}
                   {showButler && (
@@ -1450,106 +1444,6 @@
               </div>
             </div>
           </section>
-
-          {/* ========== PRODUCT SELECTION ========== */}
-          {doorState === 'shopping' && (
-            <section id="products" style={styles.productSection}>
-              <div style={styles.productSectionContent}>
-                <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
-                <h2 style={styles.productTitle}>お好きなスイーツをお選びください</h2>
-                <p style={styles.productSubtitle}>すべて手作り、心を込めて</p>
-
-                {/* 暫定画像。本物商品画像と後日差し替え予定 (TODO: T6) */}
-                <div style={styles.poundCakeShowcase}>
-                  <img
-                    src="images/spring2026/pound_cake_showcase_temp.png"
-                    alt="マジョリンパウンドケーキ(イメージ)"
-                    style={styles.poundCakeShowcaseImg}
-                  />
-                </div>
-                
-                <div style={styles.productGrid}>
-                  <div style={{...styles.productCard, animationDelay: '0s'}}>
-                    <div style={styles.productImageContainer}>
-                      <img 
-                        src="images/image03.JPG" 
-                        alt="定番セット" 
-                        style={styles.productImage}
-                      />
-                    </div>
-                    <div style={styles.productInfo}>
-                      <h3 style={styles.productName}>定番セット</h3>
-                      <p style={styles.productDescription}>
-                        手作りケーキ1個 + 真実のカード<br />
-                        マジョリンからのメッセージ付き
-                      </p>
-                      <p style={styles.productPrice}>¥3,800</p>
-                      <button 
-                        style={styles.productButton} 
-                        onClick={scrollToReservation}
-                        onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-                      >
-                        予約する
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div style={{...styles.productCard, animationDelay: '0.2s'}}>
-                    <div style={styles.productImageContainer}>
-                      <img 
-                        src="images/image02.JPG" 
-                        alt="プレミアムセット" 
-                        style={styles.productImage}
-                      />
-                    </div>
-                    <div style={styles.productInfo}>
-                      <h3 style={styles.productName}>プレミアムセット</h3>
-                      <p style={styles.productDescription}>
-                        手作りケーキ2個 + 真実のカード2枚<br />
-                        特別なオリジナルボックス
-                      </p>
-                      <p style={styles.productPrice}>¥7,200</p>
-                      <button 
-                        style={styles.productButton} 
-                        onClick={scrollToReservation}
-                        onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-                      >
-                        予約する
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div style={{...styles.productCard, animationDelay: '0.4s'}}>
-                    <div style={styles.productImageContainer}>
-                      <img 
-                        src="images/image01.JPG" 
-                        alt="ギフトセット" 
-                        style={styles.productImage}
-                      />
-                    </div>
-                    <div style={styles.productInfo}>
-                      <h3 style={styles.productName}>ギフトセット</h3>
-                      <p style={styles.productDescription}>
-                        大切な人への贈り物<br />
-                        ギフトラッピング + メッセージ代筆
-                      </p>
-                      <p style={styles.productPrice}>¥4,500</p>
-                      <button 
-                        style={styles.productButton} 
-                        onClick={scrollToReservation}
-                        onMouseEnter={(e) => e.target.style.transform = 'translateY(-3px)'}
-                        onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-                      >
-                        予約する
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
 
           {/* ========== STORY SECTION — 常時表示 ========== */}
           {/* Workshop Image Section */}
@@ -1796,13 +1690,7 @@
             <div style={styles.backToShopContainer}>
               <button 
                 style={styles.backToShopButton}
-                onClick={() => {
-                  setDoorState('shopping');
-                  setTimeout(() => {
-                    const el = document.getElementById('products');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }}
+                onClick={scrollToShowcase}
                 onMouseEnter={(e) => {
                   e.target.style.transform = 'scale(1.05)';
                   e.target.style.boxShadow = '0 12px 35px rgba(222, 134, 163, 0.6)';
@@ -2209,29 +2097,6 @@
         textShadow: '0 0 12px rgba(255, 255, 255, 0.4)',
       },
       
-      // ========== PRODUCT ==========
-      poundCakeShowcase: {
-        maxWidth: '900px',
-        margin: '0 auto 48px',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        boxShadow: '0 12px 40px rgba(222, 134, 163, 0.2)',
-      },
-      poundCakeShowcaseImg: {
-        width: '100%',
-        height: 'auto',
-        display: 'block',
-        verticalAlign: 'top',
-      },
-      productSection: {
-        minHeight: '100vh',
-        background: 'linear-gradient(180deg, #FFF4F5 0%, #FDE8EA 100%)',
-        padding: '100px 20px',
-      },
-      productSectionContent: {
-        maxWidth: '1400px',
-        margin: '0 auto',
-      },
       ornamentalDivider: {
         textAlign: 'center',
         color: '#DE86A3',
@@ -2239,85 +2104,6 @@
         marginBottom: '40px',
         letterSpacing: '0.3em',
       },
-      productTitle: {
-        fontFamily: "'Cinzel', serif",
-        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-        textAlign: 'center',
-        letterSpacing: '0.2em',
-        marginBottom: '20px',
-        color: '#605F5F',
-      },
-      productSubtitle: {
-        fontFamily: "'Playfair Display', serif",
-        fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-        textAlign: 'center',
-        color: '#605F5F',
-        marginBottom: '80px',
-        fontStyle: 'italic',
-      },
-      productGrid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-        gap: '50px',
-        marginTop: '60px',
-      },
-      productCard: {
-        background: 'rgba(255, 255, 255, 0.9)',
-        borderRadius: '20px',
-        overflow: 'hidden',
-        boxShadow: '0 10px 40px rgba(222, 134, 163, 0.15)',
-        transition: 'all 0.4s ease',
-        cursor: 'pointer',
-        animation: 'productFadeIn 0.8s ease-out both',
-      },
-      productImageContainer: {
-        width: '100%',
-        height: '300px',
-        overflow: 'hidden',
-      },
-      productImage: {
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        transition: 'transform 0.4s ease',
-      },
-      productInfo: {
-        padding: '30px',
-      },
-      productName: {
-        fontFamily: "'Playfair Display', serif",
-        fontSize: '2rem',
-        color: '#605F5F',
-        marginBottom: '15px',
-      },
-      productDescription: {
-        fontSize: '1.1rem',
-        color: '#605F5F',
-        lineHeight: 1.8,
-        marginBottom: '20px',
-      },
-      productPrice: {
-        fontFamily: "'Cinzel', serif",
-        fontSize: '2.5rem',
-        color: '#DE86A3',
-        marginBottom: '25px',
-        fontWeight: 700,
-      },
-      productButton: {
-        fontFamily: "'Cinzel', serif",
-        fontSize: '1.1rem',
-        padding: '15px 40px',
-        background: 'linear-gradient(135deg, #DE86A3 0%, #b56d85 100%)',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '50px',
-        cursor: 'pointer',
-        letterSpacing: '0.2em',
-        width: '100%',
-        transition: 'all 0.4s ease',
-        boxShadow: '0 5px 15px rgba(222, 134, 163, 0.35)',
-      },
-      
       // ========== STORY ==========
       section: {
         minHeight: '100vh',

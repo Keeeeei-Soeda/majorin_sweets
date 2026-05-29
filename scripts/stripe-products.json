@@ -1,0 +1,26 @@
+[
+  {
+    "name": "ノワール メルト（Noir Melt）",
+    "description": "願いが叶った夜更けに溶ける魅惑の生チョコ。カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。",
+    "priceYen": 3800,
+    "image": "images/showcase/cake-noir-melt.png",
+    "priceId": "price_1TcJXo3A10QFS30cSPEUssqH",
+    "paymentUrl": "https://buy.stripe.com/6oU3coec05tc2ekc3Ugw000"
+  },
+  {
+    "name": "ヴァーダント ベール（Verdant Veil）",
+    "description": "貴方の心が芽生える新緑茶に包まれて。香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。",
+    "priceYen": 3800,
+    "image": "images/showcase/cake-verdant-veil.png",
+    "priceId": "price_1TcJXp3A10QFS30cNKqztfOq",
+    "paymentUrl": "https://buy.stripe.com/6oU9AMd7WbRA4msd7Ygw001"
+  },
+  {
+    "name": "パッションオレンジヴェール（Passion Orange Vert）",
+    "description": "気分も弾けるフレッシュオレンジ C'est trop bon! 燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。",
+    "priceYen": 3800,
+    "image": "images/showcase/cake-passion-orange.png",
+    "priceId": "price_1TcJXp3A10QFS30cewpjaIr2",
+    "paymentUrl": "https://buy.stripe.com/cNi14g1pe2h01ag1pggw002"
+  }
+]

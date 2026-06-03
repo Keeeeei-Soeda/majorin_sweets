@@ -348,8 +348,8 @@
 
       position: relative;
       background: radial-gradient(ellipse at center top, #2a1820 0%, var(--color-bg) 40%, var(--color-bg-deep) 100%);
-      padding: 100px 20px 160px;
-      overflow: hidden;
+      padding: 100px 20px 100px;
+      overflow: visible;
       color: var(--color-text);
       font-family: var(--font-body-jp);
     }
@@ -420,7 +420,7 @@
     .showcase-window {
       position: relative;
       max-width: 1400px;
-      margin: 0 auto;
+      margin: 0 auto 200px;
       aspect-ratio: 1700 / 850;
       opacity: 0;
       animation: showcaseFadeUp 1.4s ease 0.8s forwards;
@@ -562,7 +562,7 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(212, 175, 110, 0.4);
       border-radius: 4px;
-      padding: 22px 24px;
+      padding: 24px 24px 28px;
       box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.8),
         0 0 40px rgba(212, 175, 110, 0.15),
@@ -635,7 +635,7 @@
       color: var(--color-gold-bright);
       text-align: center;
       letter-spacing: 0.05em;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
     }
 
     .hover-card-price-unit {
@@ -669,11 +669,12 @@
 
     @media (max-width: 768px) {
       .showcase-section {
-        padding: 60px 16px 80px;
+        padding: 60px 16px 48px;
       }
 
       .showcase-window {
         display: none;
+        margin-bottom: 0;
       }
 
       .showcase-mobile {
@@ -684,7 +685,7 @@
 
       .mobile-cake-card {
         position: relative;
-        margin-bottom: 50px;
+        margin-bottom: 56px;
         background: linear-gradient(180deg, #2a1820 0%, #14080d 100%);
         border: 1px solid rgba(212, 175, 110, 0.3);
         border-radius: 4px;
@@ -756,7 +757,7 @@
 
       .mobile-cake-details {
         margin-top: 18px;
-        padding-top: 18px;
+        padding: 18px 4px 8px;
         border-top: 1px solid rgba(212, 175, 110, 0.2);
         position: relative;
         z-index: 2;
@@ -2285,6 +2286,7 @@
       // ========== WORKSHOP SECTION ==========
       workshopSection: {
         padding: '0',
+        marginTop: '32px',
         minHeight: '70vh',
       },
       workshopImageContainer: {

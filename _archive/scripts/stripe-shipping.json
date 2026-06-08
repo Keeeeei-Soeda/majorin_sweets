@@ -1,0 +1,27 @@
+{
+  "allowedCountries": [
+    "JP"
+  ],
+  "zones": [
+    {
+      "key": "honshu",
+      "displayName": "本州",
+      "amountYen": 0
+    },
+    {
+      "key": "hokkaido",
+      "displayName": "北海道",
+      "amountYen": 0
+    },
+    {
+      "key": "okinawa",
+      "displayName": "沖縄",
+      "amountYen": 0
+    }
+  ],
+  "shippingRateIds": {
+    "honshu": "shr_1TfrDE3A10QFS30csI3hdaIT",
+    "hokkaido": "shr_1TfrDE3A10QFS30cX3gelSmB",
+    "okinawa": "shr_1TfrDF3A10QFS30cLCG2vXXI"
+  }
+}

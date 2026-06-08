@@ -5,7 +5,7 @@
     "priceYen": 4800,
     "image": "images/showcase/cake-noir-melt.png",
     "priceId": "price_1Tfr7c3A10QFS30cZiB51VM1",
-    "paymentUrl": "https://buy.stripe.com/9B66oAaZO6xg2ek1pggw003"
+    "paymentUrl": "https://buy.stripe.com/5kQ7sEaZOf3M8CI9VMgw006"
   },
   {
     "name": "ヴァーダント ベール（Verdant Veil）",
@@ -13,7 +13,7 @@
     "priceYen": 4800,
     "image": "images/showcase/cake-verdant-veil.png",
     "priceId": "price_1Tfr7d3A10QFS30cxsuzLgbC",
-    "paymentUrl": "https://buy.stripe.com/28EfZa1pe3l4dX28RIgw004"
+    "paymentUrl": "https://buy.stripe.com/00w14g7NCbRAcSYfg6gw007"
   },
   {
     "name": "パッションオレンジヴェール（Passion Orange Vert）",
@@ -21,6 +21,6 @@
     "priceYen": 4800,
     "image": "images/showcase/cake-passion-orange.png",
     "priceId": "price_1Tfr7f3A10QFS30c2sjr3cti",
-    "paymentUrl": "https://buy.stripe.com/aFa7sE4BqaNw1agc3Ugw005"
+    "paymentUrl": "https://buy.stripe.com/aFacMY5Fu3l46uA2tkgw008"
   }
 ]

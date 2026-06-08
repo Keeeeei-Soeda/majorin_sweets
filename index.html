@@ -114,7 +114,7 @@
     #majorin-opening video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
     #majorin-opening-white {
@@ -348,7 +348,7 @@
 
       position: relative;
       background: radial-gradient(ellipse at center top, #2a1820 0%, var(--color-bg) 40%, var(--color-bg-deep) 100%);
-      padding: 100px 20px 100px;
+      padding: 100px 20px 40px;
       overflow: visible;
       color: var(--color-text);
       font-family: var(--font-body-jp);
@@ -420,10 +420,15 @@
     .showcase-window {
       position: relative;
       max-width: 1400px;
-      margin: 0 auto 200px;
+      margin: 0 auto;
       aspect-ratio: 1700 / 850;
       opacity: 0;
       animation: showcaseFadeUp 1.4s ease 0.8s forwards;
+    }
+
+    /* ショーケースA: 値札・ホバーカード分の余白を確保 */
+    .showcase-window:not(.showcase-window--coming-soon) {
+      margin-bottom: 320px;
     }
 
     .showcase-bg {
@@ -469,16 +474,56 @@
       transition: filter 0.5s ease;
     }
 
-    .showcase-window:has(.cake-item:hover) .cake-item:not(:hover) .cake-image {
+    .showcase-window:has(.cake-item:hover) .cake-item:not(:hover):not(.coming-soon) .cake-image {
       filter: brightness(0.4) contrast(0.95) saturate(0.7);
     }
 
-    .cake-item:hover .cake-image-wrap {
+    .cake-item:not(.coming-soon):hover .cake-image-wrap {
       transform: translateY(-8px) scale(1.04);
     }
 
-    .cake-item:hover .cake-image {
+    .cake-item:not(.coming-soon):hover .cake-image {
       filter: brightness(1.08) contrast(1.08) drop-shadow(0 0 30px rgba(255, 200, 120, 0.5));
+    }
+
+    .showcase-window--coming-soon {
+      margin-top: 0;
+      margin-bottom: 16px;
+      filter: grayscale(100%) brightness(0.62) contrast(0.95) saturate(0.35);
+    }
+
+    .cake-item.coming-soon {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .showcase-window--coming-soon .cake-item.coming-soon .cake-image {
+      filter: none;
+      mix-blend-mode: multiply;
+    }
+
+    .coming-soon-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .coming-soon-label {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(0.7rem, 1.1vw, 0.95rem);
+      letter-spacing: 0.35em;
+      color: rgba(245, 232, 216, 0.9);
+      text-transform: uppercase;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(212, 175, 110, 0.45);
+      padding: 10px 18px;
+      background: rgba(20, 8, 13, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .spotlight-glow {
@@ -495,7 +540,7 @@
       mix-blend-mode: screen;
     }
 
-    .cake-item:hover .spotlight-glow {
+    .cake-item:not(.coming-soon):hover .spotlight-glow {
       opacity: 1;
     }
 
@@ -586,7 +631,7 @@
       background: linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%);
     }
 
-    .cake-item:hover .hover-card {
+    .cake-item:not(.coming-soon):hover .hover-card {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
       pointer-events: auto;
@@ -658,9 +703,34 @@
       transition: color 0.3s ease, letter-spacing 0.3s ease;
     }
 
-    .cake-item:hover .hover-card-cta {
+    .cake-item:not(.coming-soon):hover .hover-card-cta {
       color: var(--color-gold-bright);
       letter-spacing: 0.35em;
+    }
+
+    .mobile-cake-card.coming-soon {
+      pointer-events: none;
+    }
+
+    .mobile-cake-card.coming-soon .mobile-cake-image {
+      mix-blend-mode: normal;
+    }
+
+    .mobile-cake-card.coming-soon .mobile-coming-soon-overlay {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      top: 30px;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .showcase-mobile-coming-soon {
+      display: none;
     }
 
     .showcase-mobile {
@@ -675,6 +745,21 @@
       .showcase-window {
         display: none;
         margin-bottom: 0;
+      }
+
+      .showcase-mobile-coming-soon {
+        display: block;
+        max-width: 420px;
+        margin: 48px auto 0;
+        filter: grayscale(100%) brightness(0.62) contrast(0.95) saturate(0.35);
+      }
+
+      .showcase-mobile-coming-soon-frame {
+        width: 100%;
+        height: auto;
+        display: block;
+        margin-bottom: 24px;
+        opacity: 0.85;
       }
 
       .showcase-mobile {
@@ -1377,7 +1462,7 @@
               <img src="images/showcase/showcase-empty.png" alt="MAJORINS Showcase" className="showcase-bg" />
 
               <div className="cake-item" data-position="left">
-                <a href="https://buy.stripe.com/6oU3coec05tc2ekc3Ugw000" className="cake-link" target="_blank" rel="noopener noreferrer">
+                <a href="https://buy.stripe.com/5kQ7sEaZOf3M8CI9VMgw006" className="cake-link" target="_blank" rel="noopener noreferrer">
                   <div className="cake-image-wrap">
                     <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="cake-image" />
                     <div className="spotlight-glow"></div>
@@ -1391,14 +1476,14 @@
                     <div className="hover-card-name-en">Noir Melt</div>
                     <div className="hover-card-divider"></div>
                     <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
-                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
                 </a>
               </div>
 
               <div className="cake-item" data-position="center">
-                <a href="https://buy.stripe.com/6oU9AMd7WbRA4msd7Ygw001" className="cake-link" target="_blank" rel="noopener noreferrer">
+                <a href="https://buy.stripe.com/00w14g7NCbRAcSYfg6gw007" className="cake-link" target="_blank" rel="noopener noreferrer">
                   <div className="cake-image-wrap">
                     <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="cake-image" />
                     <div className="spotlight-glow"></div>
@@ -1412,14 +1497,14 @@
                     <div className="hover-card-name-en">Verdant Veil</div>
                     <div className="hover-card-divider"></div>
                     <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
-                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
                 </a>
               </div>
 
               <div className="cake-item" data-position="right">
-                <a href="https://buy.stripe.com/cNi14g1pe2h01ag1pggw002" className="cake-link" target="_blank" rel="noopener noreferrer">
+                <a href="https://buy.stripe.com/aFacMY5Fu3l46uA2tkgw008" className="cake-link" target="_blank" rel="noopener noreferrer">
                   <div className="cake-image-wrap">
                     <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="cake-image" />
                     <div className="spotlight-glow"></div>
@@ -1433,16 +1518,53 @@
                     <div className="hover-card-name-en">Passion Orange Vert</div>
                     <div className="hover-card-divider"></div>
                     <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
-                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
                 </a>
               </div>
             </div>
 
+            <div className="showcase-window showcase-window--coming-soon">
+              <img src="images/showcase/showcase-empty.png" alt="MAJORINS Showcase Coming Soon" className="showcase-bg" />
+
+              <div className="cake-item coming-soon" data-position="left">
+                <div className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="cake-image" />
+                    <div className="coming-soon-overlay">
+                      <span className="coming-soon-label">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="cake-item coming-soon" data-position="center">
+                <div className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="cake-image" />
+                    <div className="coming-soon-overlay">
+                      <span className="coming-soon-label">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="cake-item coming-soon" data-position="right">
+                <div className="cake-link">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="cake-image" />
+                    <div className="coming-soon-overlay">
+                      <span className="coming-soon-label">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="showcase-mobile">
               <div className="mobile-cake-card">
-                <a href="https://buy.stripe.com/6oU3coec05tc2ekc3Ugw000" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
+                <a href="https://buy.stripe.com/5kQ7sEaZOf3M8CI9VMgw006" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
                   <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="mobile-cake-image" />
                   <div className="mobile-cake-plate">
                     <div className="plate-name">Noir Melt</div>
@@ -1450,14 +1572,14 @@
                   </div>
                   <div className="mobile-cake-details">
                     <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
-                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
                 </a>
               </div>
 
               <div className="mobile-cake-card">
-                <a href="https://buy.stripe.com/6oU9AMd7WbRA4msd7Ygw001" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
+                <a href="https://buy.stripe.com/00w14g7NCbRAcSYfg6gw007" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
                   <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="mobile-cake-image" />
                   <div className="mobile-cake-plate">
                     <div className="plate-name">Verdant Veil</div>
@@ -1465,14 +1587,14 @@
                   </div>
                   <div className="mobile-cake-details">
                     <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
-                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
                 </a>
               </div>
 
               <div className="mobile-cake-card">
-                <a href="https://buy.stripe.com/cNi14g1pe2h01ag1pggw002" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
+                <a href="https://buy.stripe.com/aFacMY5Fu3l46uA2tkgw008" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
                   <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="mobile-cake-image" />
                   <div className="mobile-cake-plate">
                     <div className="plate-name">Passion Orange</div>
@@ -1480,10 +1602,41 @@
                   </div>
                   <div className="mobile-cake-details">
                     <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
-                    <div className="hover-card-price">¥3,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
                 </a>
+              </div>
+
+              <div className="showcase-mobile-coming-soon">
+                <img src="images/showcase/showcase-empty.png" alt="MAJORINS Showcase Coming Soon" className="showcase-mobile-coming-soon-frame" />
+
+                <div className="mobile-cake-card coming-soon">
+                  <div className="mobile-cake-link">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="mobile-cake-image" />
+                    <div className="mobile-coming-soon-overlay">
+                      <span className="coming-soon-label">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mobile-cake-card coming-soon">
+                  <div className="mobile-cake-link">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="mobile-cake-image" />
+                    <div className="mobile-coming-soon-overlay">
+                      <span className="coming-soon-label">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mobile-cake-card coming-soon">
+                  <div className="mobile-cake-link">
+                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="mobile-cake-image" />
+                    <div className="mobile-coming-soon-overlay">
+                      <span className="coming-soon-label">Coming Soon</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -1755,11 +1908,11 @@
           >
             <div style={styles.ctaSectionContent}>
               <h2 style={styles.ctaTitle}>MAJORIN SWEETS</h2>
-              <p style={styles.ctaSubtitle}>🌹 完全予約制 | 月100個限定 🌹</p>
+              <p style={styles.ctaSubtitle}>🌹 完全予約制 | 1日10個限定 🌹</p>
               
               <div style={styles.priceBox}>
                 <p style={styles.priceLabel}>お一人様</p>
-                <p style={styles.priceAmount}>¥3,800〜</p>
+                <p style={styles.priceAmount}>¥4,800〜</p>
                 <p style={styles.priceNote}>（税込・送料込）</p>
               </div>
 
@@ -1782,7 +1935,7 @@
 
               <div style={styles.ctaNote}>
                 <p style={styles.ctaNoteText}>
-                  ※ 月初に予約を開始し、100個に達し次第締め切ります<br />
+                  ※ 1日10個に達し次第、その日の受付を締め切ります<br />
                   ※ お届けまで2-3週間程度お時間をいただきます
                 </p>
               </div>

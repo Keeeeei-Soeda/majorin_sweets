@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const JSON_PATH = path.join(__dirname, 'stripe-products.json');
 const HTML_PATH = path.join(__dirname, '../../majorin_sweet_0607.html');
+const INDEX_HTML_PATH = path.join(__dirname, '../../index.html');
 const NEW_PRICE_YEN = 4800;
 
 async function loadEnvFile() {
@@ -119,15 +120,18 @@ async function main() {
   fs.writeFileSync(JSON_PATH, JSON.stringify(products, null, 2) + '\n');
   console.log('stripe-products.json を更新しました');
 
-  if (fs.existsSync(HTML_PATH)) {
-    let html = fs.readFileSync(HTML_PATH, 'utf8');
-    for (const { oldUrl, newUrl } of urlMap) {
-      if (oldUrl && newUrl && oldUrl !== newUrl) {
-        html = html.split(oldUrl).join(newUrl);
+  if (fs.existsSync(HTML_PATH) || fs.existsSync(INDEX_HTML_PATH)) {
+    for (const htmlPath of [HTML_PATH, INDEX_HTML_PATH]) {
+      if (!fs.existsSync(htmlPath)) continue;
+      let html = fs.readFileSync(htmlPath, 'utf8');
+      for (const { oldUrl, newUrl } of urlMap) {
+        if (oldUrl && newUrl && oldUrl !== newUrl) {
+          html = html.split(oldUrl).join(newUrl);
+        }
       }
+      fs.writeFileSync(htmlPath, html);
+      console.log(`${path.basename(htmlPath)} の Payment Link を更新しました`);
     }
-    fs.writeFileSync(HTML_PATH, html);
-    console.log(`majorin_sweet_0607.html の Payment Link を更新しました`);
   }
 }
 

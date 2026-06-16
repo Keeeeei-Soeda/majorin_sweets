@@ -1233,6 +1233,18 @@
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       };
 
+      const openDoorFromTicket = () => {
+        setTicketState('gone');
+        requestAnimationFrame(() => {
+          const doorEl = document.getElementById('door-section');
+          if (!doorEl) return;
+          // チケット削除後のレイアウト確定を待ってから扉先頭へ固定（scrollIntoView だと MOVIE まで飛ぶことがある）
+          window.scrollTo({ top: doorEl.offsetTop, left: 0, behavior: 'auto' });
+          setDoorState('opening');
+          setTimeout(() => setDoorState('open'), 2000);
+        });
+      };
+
       const handleChoice = (choice) => {
         if (choice === 'buy') {
           setTimeout(scrollToShowcase, 300);
@@ -1272,11 +1284,7 @@
                   onClick={() => {
                     if (ticketState !== 'visible') return;
                     setTicketState('lifting');
-                    setTimeout(() => {
-                      setTicketState('gone');
-                      const doorEl = document.getElementById('door-section');
-                      if (doorEl) doorEl.scrollIntoView({ behavior: 'smooth' });
-                    }, 1000);
+                    setTimeout(openDoorFromTicket, 1000);
                   }}
                   role="button"
                   tabIndex={0}

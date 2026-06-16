@@ -127,10 +127,34 @@ function applyButlerPatches(source) {
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       };
 
+      const openDoorFromTicket = () => {
+        setTicketState('gone');
+        requestAnimationFrame(() => {
+          const doorEl = document.getElementById('door-section');
+          if (!doorEl) return;
+          // チケット削除後のレイアウト確定を待ってから扉先頭へ固定（scrollIntoView だと MOVIE まで飛ぶことがある）
+          window.scrollTo({ top: doorEl.offsetTop, left: 0, behavior: 'auto' });
+          setDoorState('opening');
+          setTimeout(() => setDoorState('open'), 2000);
+        });
+      };
+
       return (`,
     `      const scrollToShowcase = () => {
         const el = document.getElementById('showcase');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      const openDoorFromTicket = () => {
+        setTicketState('gone');
+        requestAnimationFrame(() => {
+          const doorEl = document.getElementById('door-section');
+          if (!doorEl) return;
+          // チケット削除後のレイアウト確定を待ってから扉先頭へ固定（scrollIntoView だと MOVIE まで飛ぶことがある）
+          window.scrollTo({ top: doorEl.offsetTop, left: 0, behavior: 'auto' });
+          setDoorState('opening');
+          setTimeout(() => setDoorState('open'), 2000);
+        });
       };
 ${HANDLE_CHOICE}
       return (`,

@@ -1,0 +1,9 @@
+{
+  "name": "majorin-hp",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 3000",
+    "dev": "python3 -m http.server 3000",
+    "sync:versions": "node scripts/sync-html-versions.mjs"
+  }
+}

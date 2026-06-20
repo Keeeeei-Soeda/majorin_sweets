@@ -1,0 +1,164 @@
+/* ========================================
+   MAJORINS WANKO — poster page
+   ======================================== */
+
+.wanko-page {
+  --wanko-bg-gray: #969690;
+  --wanko-bg-dark: #1a1410;
+  --wanko-text-light: #ffffff;
+  --wanko-text-muted: rgba(255, 255, 255, 0.72);
+  --wanko-accent-pink: #f2a2c0;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Serif JP', serif;
+
+  margin: 0;
+  background: var(--wanko-bg-gray);
+  color: var(--wanko-text-light);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+.wanko-page *,
+.wanko-page *::before,
+.wanko-page *::after {
+  box-sizing: border-box;
+}
+
+.wanko-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(150, 150, 144, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 14px 20px;
+}
+
+.wanko-header__brand {
+  max-width: 560px;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--wanko-text-muted);
+  text-transform: uppercase;
+}
+
+.wanko-header__brand span {
+  color: var(--wanko-text-light);
+}
+
+.wanko-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1.1s ease-out, transform 1.1s ease-out;
+}
+
+.wanko-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wanko-poster {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(32px, 6vw, 64px) 20px;
+  gap: clamp(24px, 4vw, 36px);
+}
+
+.wanko-poster__frame {
+  width: min(100%, 420px);
+  margin: 0 auto;
+}
+
+.wanko-poster__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.wanko-poster__instagram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--wanko-text-light);
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 2px;
+  transition: opacity 0.3s ease, background 0.3s ease;
+}
+
+.wanko-poster__instagram:hover {
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.back-to-main {
+  background: linear-gradient(180deg, #969690 0%, #6b6b66 30%, #3d2f25 65%, #1a1410 100%);
+  padding: clamp(64px, 10vw, 96px) 20px;
+  text-align: center;
+}
+
+.back-to-main .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  letter-spacing: 0.12em;
+  color: #f5ebe0;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.back-to-main .back-link:hover {
+  opacity: 0.85;
+}
+
+.back-to-main .back-link .arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.back-to-main .back-link:hover .arrow {
+  transform: translateX(-8px);
+}
+
+.wanko-footer {
+  background: var(--wanko-bg-dark);
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.wanko-footer__copy {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: rgba(245, 235, 224, 0.5);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wanko-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .back-to-main .back-link .arrow {
+    transition: none;
+  }
+
+  .back-to-main .back-link:hover .arrow {
+    transform: none;
+  }
+}

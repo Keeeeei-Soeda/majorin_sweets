@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>MAJORINS WANKO — Anniversary Cake</title>
+  <meta name="description" content="MAJORINS WANKO anniversary cake — 9月発売予定。Instagramよりご確認ください。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Noto+Serif+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/wanko.css">
+</head>
+<body class="wanko-page">
+
+  <header class="wanko-header">
+    <p class="wanko-header__brand">MAJORIN SWEETS / <span>WANKO</span></p>
+  </header>
+
+  <main>
+    <section class="wanko-poster wanko-reveal" aria-label="MAJORINS WANKO">
+      <div class="wanko-poster__frame">
+        <img
+          src="../images/wanko/wanko-poster.png"
+          alt="MAJORINS WANKO anniversary cake — 9月発売予定。Instagramよりご確認ください。"
+          class="wanko-poster__image"
+        />
+      </div>
+      <a
+        href="https://www.instagram.com/majorins_sweets/"
+        class="wanko-poster__instagram"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Instagram でフォロー
+      </a>
+    </section>
+
+    <section class="back-to-main wanko-reveal" aria-label="Return to MAJORIN SWEETS">
+      <a href="/" class="back-link">
+        <span class="arrow">←</span>
+        <span>Return to MAJORIN SWEETS</span>
+      </a>
+    </section>
+  </main>
+
+  <footer class="wanko-footer">
+    <p class="wanko-footer__copy">© 2026 MAJORINS WANKO. All rights reserved.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      document.querySelectorAll('.wanko-reveal').forEach(function (el) {
+        if (prefersReduced) el.classList.add('is-visible');
+      });
+
+      if (!prefersReduced) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.wanko-reveal:not(.is-visible)').forEach(function (el) {
+          observer.observe(el);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+/* ========================================
+   Transition Bridge + WANKO Teaser (index.html)
+   Scoped custom properties — no :root collision
+   ======================================== */
+
+.transition-bridge {
+  --showcase-bg: #0a0a0a;
+  --bridge-text: #d4c5a9;
+  --bridge-cream: #f5ebe0;
+  --bridge-gray: #969690;
+  --bridge-gold: #c9a961;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body-jp: 'Noto Serif JP', serif;
+
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(60px, 10vw, 100px) 20px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #2a1f1a 40%, #6b5544 70%, #969690 100%);
+  color: var(--bridge-text);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+}
+
+.transition-bridge.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.transition-bridge__inner {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.transition-bridge__door {
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(24px, 4vw, 40px);
+  animation: bridgeDoorGlow 4s ease-in-out infinite;
+}
+
+.transition-bridge__door img {
+  width: clamp(120px, 18vw, 180px);
+  height: auto;
+}
+
+@keyframes bridgeDoorGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.transition-bridge__whisper-fr {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  letter-spacing: 0.1em;
+  line-height: 1.6;
+  margin-bottom: clamp(20px, 3vw, 32px);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.25);
+}
+
+.transition-bridge__whisper-ja {
+  font-family: var(--font-body-jp);
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+  line-height: 2.2;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== WANKO Teaser ===== */
+
+.wanko-teaser {
+  --teaser-bg: #969690;
+  --teaser-text: #ffffff;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body-jp: 'Noto Serif JP', serif;
+
+  background: var(--teaser-bg);
+  padding: clamp(64px, 10vw, 120px) 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+}
+
+.wanko-teaser.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wanko-teaser__inner {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.wanko-teaser__poster-link {
+  display: block;
+  margin-bottom: clamp(24px, 4vw, 32px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.wanko-teaser__poster-link:hover {
+  opacity: 0.92;
+  transform: translateY(-2px);
+}
+
+.wanko-teaser__poster {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.wanko-teaser__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  letter-spacing: 0.12em;
+  color: var(--teaser-text);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 4px;
+  transition: opacity 0.3s ease;
+}
+
+.wanko-teaser__cta::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--teaser-text);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.wanko-teaser__cta:hover {
+  opacity: 0.85;
+}
+
+.wanko-teaser__cta:hover::after {
+  transform: scaleX(1);
+}
+
+.wanko-teaser__cta .arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.wanko-teaser__cta:hover .arrow {
+  transform: translateX(8px);
+}
+
+@media (max-width: 768px) {
+  .transition-bridge {
+    min-height: 50vh;
+  }
+
+  .wanko-teaser {
+    padding: clamp(64px, 14vw, 100px) 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transition-bridge,
+  .wanko-teaser {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .transition-bridge__door {
+    animation: none;
+    opacity: 1;
+  }
+
+  .wanko-teaser__cta::after,
+  .wanko-teaser__cta .arrow,
+  .wanko-teaser__poster-link {
+    transition: none;
+  }
+
+  .wanko-teaser__poster-link:hover {
+    transform: none;
+  }
+
+  .wanko-teaser__cta:hover .arrow {
+    transform: none;
+  }
+}

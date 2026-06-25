@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="preload" href="0525/0525.mp4" as="video" type="video/mp4">
+  <link rel="stylesheet" href="css/transition.css">
   
   <style>
     * {
@@ -1228,6 +1229,29 @@
         return () => window.removeEventListener('scroll', handleScroll);
       }, [doorState]);
 
+      useEffect(() => {
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const targets = document.querySelectorAll('.transition-bridge, .wanko-teaser');
+        if (!targets.length) return undefined;
+
+        if (prefersReduced) {
+          targets.forEach((el) => el.classList.add('is-visible'));
+          return undefined;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15 });
+
+        targets.forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
+      }, []);
+
       const scrollToShowcase = () => {
         const el = document.getElementById('showcase');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -1291,7 +1315,7 @@
                   aria-label="チケットを使って扉を開く"
                 >
                   <img
-                    src="images/ticket.jpg"
+                    src="images/ticket_logo.png"
                     alt="MAJORINS Museum チケット"
                     style={styles.ticketImage}
                     draggable={false}
@@ -1950,6 +1974,39 @@
             </div>
           </section>
 
+          {/* ========== TRANSITION BRIDGE ========== */}
+          <section className="transition-bridge" aria-label="another door">
+            <div className="transition-bridge__inner">
+              <div className="transition-bridge__door" aria-hidden="true">
+                <img src="images/wanko/small-door.svg" alt="" />
+              </div>
+              <p className="transition-bridge__whisper-fr">
+                Derrière l&apos;atelier,<br />une autre porte.
+              </p>
+              <p className="transition-bridge__whisper-ja">
+                工房の奥に、もう一つの扉がある。<br />
+                そこには、また別の物語が眠っている。
+              </p>
+            </div>
+          </section>
+
+          {/* ========== WANKO TEASER ========== */}
+          <section className="wanko-teaser" aria-label="MAJORINS WANKO">
+            <div className="wanko-teaser__inner">
+              <a href="/wanko/" className="wanko-teaser__poster-link">
+                <img
+                  src="images/wanko/wanko-poster.png"
+                  alt="MAJORINS WANKO anniversary cake — 9月発売予定"
+                  className="wanko-teaser__poster"
+                />
+              </a>
+              <a href="/wanko/" className="wanko-teaser__cta">
+                <span>Step into the other room</span>
+                <span className="arrow">→</span>
+              </a>
+            </div>
+          </section>
+
           {/* ========== CTA SECTION ========== */}
           <section 
             id="reservation"
@@ -2113,7 +2170,7 @@
       ticketScreen: {
         height: '100dvh',
         maxHeight: '100dvh',
-        background: '#0a0a0a',
+        background: '#A5A5A5',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -2148,12 +2205,12 @@
         letterSpacing: '0.08em',
         margin: '0 0 8px',
         fontWeight: 500,
-        color: '#f5f0e8',
+        color: '#1A1A1A',
       },
       welcomeJp: {
         fontFamily: "'Noto Serif JP', serif",
         fontSize: 'clamp(11px, 2vw, 13px)',
-        color: '#c8bfae',
+        color: '#333333',
         margin: '2px 0',
         letterSpacing: '0.2em',
         lineHeight: 1.7,
@@ -2183,7 +2240,7 @@
       closingJp: {
         fontFamily: "'Noto Serif JP', serif",
         fontSize: 'clamp(12px, 2.2vw, 14px)',
-        color: '#d8d0bf',
+        color: '#1A1A1A',
         margin: '2px 0',
         letterSpacing: '0.12em',
         lineHeight: 1.7,
@@ -2199,13 +2256,13 @@
         fontFamily: "'Cormorant Garamond', serif",
         fontStyle: 'italic',
         fontSize: '12px',
-        color: '#998a72',
+        color: '#605F5F',
         letterSpacing: '0.22em',
       },
       hintJp: {
         fontFamily: "'Noto Serif JP', serif",
         fontSize: '14px',
-        color: '#e0d8c4',
+        color: '#333333',
         letterSpacing: '0.18em',
         fontWeight: 400,
       },

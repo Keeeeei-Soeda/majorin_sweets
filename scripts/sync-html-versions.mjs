@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * index.html（執事なし・正本）を 0617_ver02.html に同期し、
- * 執事セクションを復元した 0617_ver01.html を生成する。
+ * index.html（執事なし・正本）を versions/0617_ver02.html に同期し、
+ * 執事セクションを復元した versions/0617_ver01.html を生成する。
  *
  * 使い方: npm run sync:versions
  * 今後 index.html を編集したら、このコマンドで両バージョンへ反映してください。
@@ -13,8 +13,8 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const canonical = path.join(root, 'index.html');
-const ver02 = path.join(root, '0617_ver02.html');
-const ver01 = path.join(root, '0617_ver01.html');
+const ver02 = path.join(root, 'versions', '0617_ver02.html');
+const ver01 = path.join(root, 'versions', '0617_ver01.html');
 
 const BUTLER_STATE = `      const [showButler, setShowButler] = useState(false);
       const [showChoices, setShowChoices] = useState(false);
@@ -181,5 +181,5 @@ fs.writeFileSync(ver02, base);
 fs.writeFileSync(ver01, applyButlerPatches(base));
 
 console.log('同期完了:');
-console.log('  index.html → 0617_ver02.html（執事なし）');
-console.log('  index.html → 0617_ver01.html（執事あり・復元）');
+console.log('  index.html → versions/0617_ver02.html（執事なし）');
+console.log('  index.html → versions/0617_ver01.html（執事あり・復元）');

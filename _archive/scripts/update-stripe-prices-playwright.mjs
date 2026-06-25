@@ -23,7 +23,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AUTH_DIR = path.join(__dirname, '.stripe-auth');
 const JSON_PATH = path.join(__dirname, 'stripe-products.json');
-const HTML_PATH = path.join(__dirname, '../../majorin_sweet_0607.html');
+const HTML_PATH = path.join(__dirname, '../html/majorin_sweet_0607.html');
 const ACCT = 'acct_1Tb5Hp3A10QFS30c';
 const BASE = `https://dashboard.stripe.com/${ACCT}`;
 

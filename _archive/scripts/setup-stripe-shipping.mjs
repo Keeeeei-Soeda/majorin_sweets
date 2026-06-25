@@ -17,7 +17,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SHIPPING_JSON = path.join(__dirname, 'stripe-shipping.json');
 const PRODUCTS_JSON = path.join(__dirname, 'stripe-products.json');
-const HTML_PATH = path.join(__dirname, '../../majorin_sweet_0607.html');
+const HTML_PATH = path.join(__dirname, '../html/majorin_sweet_0607.html');
 const INDEX_HTML_PATH = path.join(__dirname, '../../index.html');
 
 async function loadEnvFile() {

@@ -1376,13 +1376,16 @@
                       <div style={styles.doorHeroContent}>
                         <div style={styles.logoContainer}>
                           <h1 style={styles.logo}>MAJORIN SWEETS</h1>
-                          <div style={styles.ornament}>🌹 ✦ 🌹</div>
                         </div>
                         <p className="hero-caption-body" style={styles.tagline}>
-                          完璧な人生などない、<br />
-                          でもその一瞬を輝かせるマジョリンスイーツ
+                          MAJORINS が手掛ける素材、製法にごだわった高級ラインスイーツ。
                         </p>
                         <p className="hero-caption-body" style={styles.subTagline}>
+                          日々が記念日。その瞬間に輝きと彩りを添え贅沢なひと時を過ごして頂けるよう
+                          <br />
+                          イメージして作りました。
+                        </p>
+                        <p className="hero-caption-body" style={styles.doorTagline}>
                           魔法の扉を開けて、MAJORINS の世界へ
                         </p>
                       </div>
@@ -2133,29 +2136,37 @@
         fontWeight: 700,
         letterSpacing: '0.3em',
         margin: 0,
-        background: 'linear-gradient(135deg, #D4AF37 0%, #DE86A3 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textShadow: '0 0 30px rgba(212, 175, 55, 0.5)',
-      },
-      ornament: {
-        fontSize: '2rem',
-        color: '#C04060', /* PINK_LOGO_COLOR — TODO: T1 */
-        marginTop: '20px',
+        /* ヒロインのフード（ニット）に合わせたウォームグレー */
+        color: '#C4B5B0',
+        textShadow: '0 2px 14px rgba(0, 0, 0, 0.45)',
       },
       tagline: {
         fontFamily: "'Playfair Display', serif",
-        fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-        lineHeight: 1.8,
+        fontSize: 'clamp(1.05rem, 2.8vw, 1.55rem)',
+        lineHeight: 1.9,
         marginBottom: '20px',
         animation: 'fadeInUp 1.5s ease-out 0.3s both',
-        fontWeight: 600,
+        fontWeight: 500,
+        maxWidth: '36em',
+        marginLeft: 'auto',
+        marginRight: 'auto',
       },
       subTagline: {
         fontFamily: "'Playfair Display', serif",
-        fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
-        marginBottom: '50px',
+        fontSize: 'clamp(1rem, 2.5vw, 1.4rem)',
+        lineHeight: 1.9,
+        marginBottom: '20px',
         animation: 'fadeInUp 1.5s ease-out 0.4s both',
+        fontWeight: 500,
+        maxWidth: '36em',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+      },
+      doorTagline: {
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 'clamp(0.95rem, 2.2vw, 1.25rem)',
+        marginBottom: '50px',
+        animation: 'fadeInUp 1.5s ease-out 0.5s both',
         fontStyle: 'italic',
       },
       scrollHint: {

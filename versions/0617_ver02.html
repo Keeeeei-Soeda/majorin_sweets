@@ -978,7 +978,7 @@
     // TODO: T1 — ロゴ基準ピンク確定後に置換
     const PINK_LOGO_COLOR = '#C04060';
 
-    const HERO_IMAGE = 'images/spring2026/hero_main.jpg';
+    const HERO_IMAGE = 'images/spring2026/hero_giftbox.jpg';
 
     // マジョリンからの手紙（25件）
     const MARJORIN_MESSAGES = [
@@ -1274,12 +1274,15 @@
           {ticketState !== 'gone' && (
             <section style={styles.ticketScreen}>
               <div style={styles.ticketScreenInner}>
+                {/* 2026-07-30: welcome_card.jpg に焼き込みテキストありのため非表示（MAJORIN SWEETS 含む） */}
+                {/*
                 <div style={styles.ticketTopBlock}>
                   <h1 style={styles.ticketTitle}>MAJORIN SWEETS</h1>
                   <p style={styles.welcomeJp}>ようこそ　いらっしゃいませ</p>
                   <p style={styles.welcomeJp}>素敵な貴方に</p>
                   <p style={styles.welcomeJp}>ご来店頂き嬉しいわ!</p>
                 </div>
+                */}
 
                 <div
                   style={{
@@ -1299,7 +1302,7 @@
                   aria-label="チケットを使って扉を開く"
                 >
                   <img
-                    src="images/ticket_logo.png"
+                    src="images/spring2026/welcome_card.jpg"
                     alt="MAJORINS Museum チケット"
                     style={styles.ticketImage}
                     draggable={false}
@@ -1307,8 +1310,11 @@
                 </div>
 
                 <div style={styles.ticketBottomBlock}>
+                  {/* 2026-07-30: welcome_card.jpg に焼き込みテキストありのため非表示 */}
+                  {/*
                   <p style={styles.closingJp}>日常の一瞬を輝かせるマジョリンスイーツ</p>
                   <p style={styles.closingJp}>魔法の扉を開け MAJORINS の世界へ</p>
+                  */}
                   <div style={styles.actionHint}>
                     <span style={styles.hintEn} className="hint-pc-only">— Click to open the door —</span>
                     <span style={styles.hintEn} className="hint-sp-only">— Tap to open the door —</span>
@@ -1326,7 +1332,7 @@
             images/door-left.png  … 左扉（透過PNG）。左端を軸に rotateY で開く
             images/door-right.png … 右扉（透過PNG）。右端を軸に開く
             images/doorman.png    … 扉が開いた後に表示する執事（奥レイヤー）
-            ヒーロー画像: images/spring2026/hero_main.jpg
+            ヒーロー画像: images/spring2026/hero_giftbox.jpg（旧: hero_main.jpg 残置）
           */}
           {/* ========== DOOR SECTION ========== */}
           <section 
@@ -1354,6 +1360,8 @@
                       opacity: doorState === 'opening' ? 0.5 : 1,
                     }}
                   />
+                  {/* 2026-07-30: hero_giftbox.jpg に焼き込みテキストあり。グラデ＋HTMLテキストは非表示（画像視認性のため） */}
+                  {/*
                   <div style={styles.doorHeroOverlay}>
                     <div style={styles.heroGradientOverlay} />
                     {(doorState === 'open' || doorState === 'story') && (
@@ -1375,6 +1383,7 @@
                       </div>
                     )}
                   </div>
+                  */}
                 </>
               )}
               
@@ -1425,7 +1434,8 @@
             </div>
           </section>
 
-          {/* Movie — 自動再生せず、ユーザーが再生ボタンで視聴（769px以上は .movie-video-frame で16:9） */}
+          {/* Movie — 2026-07-30: 平石さん指示により一旦割愛（復活時はこのコメントを外す） */}
+          {/*
           <section style={styles.movieSection} aria-label="ブランドムービー">
             <div style={styles.movieSectionInner}>
               <div style={styles.movieOrnament}>🌹 ━━━ ✦ ━━━ 🌹</div>
@@ -1446,6 +1456,7 @@
               </div>
             </div>
           </section>
+          */}
 
           {/* ========== SHOWCASE SECTION ========== */}
           <section className="showcase-section" id="showcase">
@@ -1669,7 +1680,7 @@
             </div>
           </section>
 
-          {/* Value Proposition */}
+          {/* Value Proposition → パウンドケーキ KV 暫定差し替え（2026-07-30） */}
           <section 
             ref={el => sectionRefs.current['value'] = el}
             style={{
@@ -1681,13 +1692,24 @@
             }}
           >
             <div style={styles.sectionContent}>
+              {/* TODO: 将来ここに商品開発・製法・素材コンテンツ（マジョリンコーナー）を展開 */}
+              <img
+                src="images/spring2026/pound_cake_keyvisual.jpg"
+                alt="MAJORINS PREMIUM POUND CAKE"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  borderRadius: '4px',
+                }}
+              />
+              {/* 旧3カード構成（一旦割愛・復活用に残置）
               <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
               <h2 style={styles.valueMainTitle}>
                 心に響くスイーツ。<br />
                 貴方が輝くパッションを届けたい
               </h2>
               <div style={styles.valueCards} data-grid>
-                {/* value card 1 */}
                 <div style={styles.miniValueCard}>
                   <div style={styles.miniValueCardImgWrap}>
                     <img src="images/image04.png" alt="魔法は、置いた" style={styles.miniValueCardImg} />
@@ -1697,7 +1719,6 @@
                     <p style={styles.miniValueText}>貴方の夢はなんですか?</p>
                   </div>
                 </div>
-                {/* value card 2 */}
                 <div style={styles.miniValueCard}>
                   <div style={styles.miniValueCardImgWrap}>
                     <img src="images/image06.png" alt="勝者でなくてもいい" style={styles.miniValueCardImg} />
@@ -1707,7 +1728,6 @@
                     <p style={styles.miniValueText}>勝負ではなく<br />心があるものの方が強い</p>
                   </div>
                 </div>
-                {/* value card 3 — 現状維持 */}
                 <div style={styles.miniValueCard}>
                   <div style={styles.miniValueCardImgWrap}>
                     <img src="images/image05.png" alt="真実の一言" style={styles.miniValueCardImg} />
@@ -1718,6 +1738,7 @@
                   </div>
                 </div>
               </div>
+              */}
             </div>
           </section>
 

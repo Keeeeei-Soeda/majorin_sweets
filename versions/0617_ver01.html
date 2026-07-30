@@ -21,6 +21,10 @@
       padding: 0;
     }
     
+    html {
+      scrollbar-gutter: stable;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -470,7 +474,8 @@
       width: 100%;
       height: auto;
       display: block;
-      mix-blend-mode: multiply;
+      /* 実写透過PNG向け: multiply は黒背景AI版向けだったため通常合成に変更 */
+      mix-blend-mode: normal;
       filter: brightness(1) contrast(1.05);
       transition: filter 0.5s ease;
     }
@@ -500,7 +505,7 @@
 
     .showcase-window--coming-soon .cake-item.coming-soon .cake-image {
       filter: none;
-      mix-blend-mode: multiply;
+      mix-blend-mode: normal;
     }
 
     .coming-soon-overlay {
@@ -819,7 +824,7 @@
         width: 100%;
         height: auto;
         display: block;
-        mix-blend-mode: multiply;
+        mix-blend-mode: normal;
         filter: brightness(1.05) contrast(1.05);
       }
 
@@ -1552,7 +1557,7 @@
               <div className="cake-item" data-position="left">
                 <a href="https://buy.stripe.com/5kQ7sEaZOf3M8CI9VMgw006" className="cake-link" target="_blank" rel="noopener noreferrer">
                   <div className="cake-image-wrap">
-                    <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="cake-image" />
+                    <img src="images/showcase/cake-noir-melt.png?v=20260730" alt="Noir Melt" className="cake-image" />
                     <div className="spotlight-glow"></div>
                   </div>
                   <div className="cake-plate">
@@ -1573,7 +1578,7 @@
               <div className="cake-item" data-position="center">
                 <a href="https://buy.stripe.com/00w14g7NCbRAcSYfg6gw007" className="cake-link" target="_blank" rel="noopener noreferrer">
                   <div className="cake-image-wrap">
-                    <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="cake-image" />
+                    <img src="images/showcase/cake-verdant-veil.png?v=20260730" alt="Verdant Veil" className="cake-image" />
                     <div className="spotlight-glow"></div>
                   </div>
                   <div className="cake-plate">
@@ -1594,7 +1599,7 @@
               <div className="cake-item" data-position="right">
                 <a href="https://buy.stripe.com/aFacMY5Fu3l46uA2tkgw008" className="cake-link" target="_blank" rel="noopener noreferrer">
                   <div className="cake-image-wrap">
-                    <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="cake-image" />
+                    <img src="images/showcase/cake-passion-orange.png?v=20260730" alt="Passion Orange Vert" className="cake-image" />
                     <div className="spotlight-glow"></div>
                   </div>
                   <div className="cake-plate">
@@ -1653,7 +1658,7 @@
             <div className="showcase-mobile">
               <div className="mobile-cake-card">
                 <a href="https://buy.stripe.com/5kQ7sEaZOf3M8CI9VMgw006" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
-                  <img src="images/showcase/cake-noir-melt.png" alt="Noir Melt" className="mobile-cake-image" />
+                  <img src="images/showcase/cake-noir-melt.png?v=20260730" alt="Noir Melt" className="mobile-cake-image" />
                   <div className="mobile-cake-plate">
                     <div className="plate-name">Noir Melt</div>
                     <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
@@ -1668,7 +1673,7 @@
 
               <div className="mobile-cake-card">
                 <a href="https://buy.stripe.com/00w14g7NCbRAcSYfg6gw007" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
-                  <img src="images/showcase/cake-verdant-veil.png" alt="Verdant Veil" className="mobile-cake-image" />
+                  <img src="images/showcase/cake-verdant-veil.png?v=20260730" alt="Verdant Veil" className="mobile-cake-image" />
                   <div className="mobile-cake-plate">
                     <div className="plate-name">Verdant Veil</div>
                     <div className="plate-tagline">貴方の心が芽生える新緑茶に包まれて</div>
@@ -1683,7 +1688,7 @@
 
               <div className="mobile-cake-card">
                 <a href="https://buy.stripe.com/aFacMY5Fu3l46uA2tkgw008" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
-                  <img src="images/showcase/cake-passion-orange.png" alt="Passion Orange Vert" className="mobile-cake-image" />
+                  <img src="images/showcase/cake-passion-orange.png?v=20260730" alt="Passion Orange Vert" className="mobile-cake-image" />
                   <div className="mobile-cake-plate">
                     <div className="plate-name">Passion Orange</div>
                     <div className="plate-tagline">気分も弾けるフレッシュオレンジ C'est trop bon!</div>
@@ -2252,7 +2257,9 @@
       },
       ticketArea: {
         cursor: 'pointer',
-        display: 'block',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         margin: 0,
         padding: 0,
         width: '100%',
@@ -2266,7 +2273,7 @@
         maxWidth: '620px',
         height: 'auto',
         display: 'block',
-        margin: 0,
+        margin: '0 auto',
         padding: 0,
         verticalAlign: 'top',
         userSelect: 'none',

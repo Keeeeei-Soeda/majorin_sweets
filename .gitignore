@@ -1,6 +1,13 @@
 .DS_Store
 .playwright-mcp/
+.env
+.env.*
+!.env.example
 IMG_*.PNG
 IMG_*.jpg
+IMG_*.JPG
+IMG_*.JPEG
 _archive/scripts/node_modules/
+_archive/scripts/.env
+_archive/incoming/
 0525/0525.MP3

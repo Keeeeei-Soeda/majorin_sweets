@@ -1,0 +1,6 @@
+# 現行ショーケース公開画像 ← 原板
+# live: images/showcase/*
+
+cake01.png  ->  cake-passion-orange.png  (Passion Orange / 右)
+cake02.png  ->  cake-noir-melt.png       (Noir Melt / 左)
+cake03.png  ->  cake-verdant-veil.png    (Verdant Veil / 中央)

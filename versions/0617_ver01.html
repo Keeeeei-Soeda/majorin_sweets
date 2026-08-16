@@ -331,8 +331,66 @@
       .story-row-img {
         width: 100%;
       }
-      .story-row-img img {
-        height: 260px;
+    .story-row-img img {
+      height: 260px;
+      }
+    }
+
+    /* ===== CRAFTING QUOTES（③ THE MOMENT 文言を画像へ転記） ===== */
+    .crafting-quote {
+      position: absolute;
+      z-index: 2;
+      font-family: 'Noto Serif JP', serif;
+      color: #fff;
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.85),
+        0 2px 12px rgba(0, 0, 0, 0.7);
+      line-height: 1.9;
+      letter-spacing: 0.06em;
+      pointer-events: none;
+      font-weight: 400;
+    }
+    .crafting-quote p {
+      margin: 0;
+    }
+    .crafting-quote--left {
+      top: 6%;
+      left: 3%;
+      max-width: min(440px, 38%);
+      font-size: clamp(0.7rem, 1.28vw, 1.02rem);
+      text-align: left;
+    }
+    .crafting-quote--right {
+      top: 14%;
+      right: 3%;
+      max-width: min(400px, 33%);
+      font-size: clamp(0.7rem, 1.22vw, 0.98rem);
+      text-align: left;
+    }
+    .crafting-quote-author {
+      margin-top: 0.85em !important;
+      text-align: right;
+      font-size: 0.88em;
+      opacity: 0.92;
+      letter-spacing: 0.12em;
+    }
+    @media (max-width: 768px) {
+      .crafting-quote {
+        background: rgba(18, 10, 12, 0.48);
+        padding: 10px 12px 12px;
+        border-radius: 4px;
+        max-width: 92% !important;
+        left: 4% !important;
+        right: 4% !important;
+        font-size: 0.72rem;
+        line-height: 1.75;
+      }
+      .crafting-quote--left {
+        top: 3%;
+      }
+      .crafting-quote--right {
+        top: auto;
+        bottom: 26%;
       }
     }
 
@@ -447,8 +505,9 @@
 
     .cake-item {
       position: absolute;
-      bottom: 18%;
-      width: 22%;
+      /* 2026-08-16: 平石さん① 空中配置をやめ、ケース底面へ着地 */
+      bottom: 6.5%;
+      width: 20%;
       transform: translateX(-50%);
       cursor: pointer;
       z-index: 3;
@@ -1274,7 +1333,6 @@
         });
       };
 
-
       const handleChoice = (choice) => {
         if (choice === 'buy') {
           setTimeout(scrollToShowcase, 300);
@@ -1735,38 +1793,10 @@
           </section>
 
           {/* ========== STORY SECTION — 常時表示 ========== */}
-          {/* Workshop Image Section */}
-          <section 
-            id="story"
-            ref={el => sectionRefs.current['workshop'] = el}
-            style={{
-              ...styles.section,
-              ...styles.workshopSection,
-              opacity: isVisible['workshop'] ? 1 : 0,
-              transform: isVisible['workshop'] ? 'translateY(0)' : 'translateY(50px)',
-              transition: 'all 1s ease-out'
-            }}
-          >
-            <div style={styles.sectionContent}>
-              <div style={styles.workshopImageContainer}>
-                <img 
-                  src="images/image02.JPG" 
-                  alt="Majorin's Workshop" 
-                  style={styles.workshopImage}
-                />
-                <div style={styles.workshopTextOverlay}>
-                  <h2 style={styles.workshopTitle}>マジョリンの工房</h2>
-                  <p style={styles.workshopText}>
-                    ここで、魔法ではなく心を込めて<br />
-                    一つひとつ、お菓子を作っています
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
+          {/* 2026-08-16: 平石さん② グレーのマジョリンを先、工房を後へ */}
           {/* Value Proposition → パウンドケーキ KV 暫定差し替え（2026-07-30） */}
           <section 
+            id="story"
             ref={el => sectionRefs.current['value'] = el}
             style={{
               ...styles.section,
@@ -1824,6 +1854,35 @@
                 </div>
               </div>
               */}
+            </div>
+          </section>
+
+          {/* Workshop Image Section */}
+          <section 
+            ref={el => sectionRefs.current['workshop'] = el}
+            style={{
+              ...styles.section,
+              ...styles.workshopSection,
+              opacity: isVisible['workshop'] ? 1 : 0,
+              transform: isVisible['workshop'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out'
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.workshopImageContainer}>
+                <img 
+                  src="images/image02.JPG" 
+                  alt="Majorin's Workshop" 
+                  style={styles.workshopImage}
+                />
+                <div style={styles.workshopTextOverlay}>
+                  <h2 style={styles.workshopTitle}>マジョリンの工房</h2>
+                  <p style={styles.workshopText}>
+                    ここで、魔法ではなく心を込めて<br />
+                    一つひとつ、お菓子を作っています
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -1910,7 +1969,28 @@
             <WitchMascot src="images/image13.png" side="right" topPx={1950} onOpenLetter={openGlobalLetter} />
           </section>
 
-          {/* Crafting Image */}
+          {/* The Moment — 本文は直後の画像へ移動済み。見出しのみ残す */}
+          <section 
+            ref={el => sectionRefs.current['turning'] = el}
+            style={{
+              ...styles.section,
+              ...styles.roseSection,
+              overflow: 'visible',
+              opacity: isVisible['turning'] ? 1 : 0,
+              transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
+              transition: 'all 1s ease-out 0.2s',
+              minHeight: 'auto',
+              padding: '48px 20px 8px',
+            }}
+          >
+            <div style={styles.sectionContent}>
+              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
+              <h2 style={styles.sectionTitle}>THE MOMENT</h2>
+              <h3 style={styles.subtitle}>心が温かくなったある日</h3>
+            </div>
+          </section>
+
+          {/* Crafting Image — ③ THE MOMENT 本文を画像へ転記（2026-08-16） */}
           <section 
             ref={el => sectionRefs.current['crafting'] = el}
             style={{
@@ -1928,6 +2008,19 @@
                   alt="魔法で作ったものは魔法で失う。でも心を込めたものは魂に残る" 
                   style={styles.craftingImage}
                 />
+                <div className="crafting-quote crafting-quote--left">
+                  <p>この味、何か優しくて、懐かしくて…心がホッとする…</p>
+                  <p>昔、母が作ってくれたケーキと同じ温かい気持ちになる、</p>
+                  <p>心が美味しい、、元気がでる、、これだわ！！</p>
+                  <p className="crafting-quote-author">マジョリン、街のカフェにて</p>
+                </div>
+                <div className="crafting-quote crafting-quote--right">
+                  <p>その瞬間私はハッと思った</p>
+                  <p>お菓子には人を癒すことができると。</p>
+                  <p>想いも届けることができる…</p>
+                  <p>マジョリンの幸せな魔法がかかった</p>
+                  <p>お菓子を貴方に届けたい。</p>
+                </div>
                 <div style={styles.craftingTextOverlay}>
                   <h3 style={styles.craftingTitle}>
                     「貴方の魂に響く<br />
@@ -1936,53 +2029,6 @@
                 </div>
               </div>
             </div>
-          </section>
-
-          {/* The Moment */}
-          <section 
-            ref={el => sectionRefs.current['turning'] = el}
-            style={{
-              ...styles.section,
-              ...styles.roseSection,
-              overflow: 'visible',
-              opacity: isVisible['turning'] ? 1 : 0,
-              transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
-              transition: 'all 1s ease-out 0.2s'
-            }}
-          >
-            <div style={styles.sectionContent}>
-              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
-              <h2 style={styles.sectionTitle}>THE MOMENT</h2>
-              <h3 style={styles.subtitle}>心が温かくなったある日</h3>
-              
-              <div style={styles.turningContent}>
-                <div style={styles.epiphanyBox}>
-                  <p style={styles.epiphanyQuote}>
-                    これ、何か優しくて、懐かしくて…心がホッとする…<br />
-                    これは昔母が作ってくれたケーキと同じ温かい気持ちになる、、<br />
-                    心が美味しい、、元気がでる、、これだわ！！
-                  </p>
-                  <p style={styles.epiphanyAuthor}>マジョリン、街のカフェにて</p>
-                </div>
-                
-                <div style={styles.epiphany}>
-                  <p style={styles.epiphanyText}>
-                    その瞬間私はハッと思った
-                  </p>
-                  <p style={styles.epiphanyHighlight}>
-                    お菓子には人を癒すことができると。<br />
-                    想いも届けることができる…マジョリンの幸せな魔法がかかったお菓子を<br />
-                    貴方に届けたい。
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 丸型魔女 ×4（右・左・右・左）topPx は各コンテンツ行の中間付近 */}
-            <WitchMascot src="images/image15.png" side="right" topPx={140}  onOpenLetter={openGlobalLetter} />
-            <WitchMascot src="images/image16.png" side="left"  topPx={480}  onOpenLetter={openGlobalLetter} />
-            <WitchMascot src="images/image17.png" side="right" topPx={780}  onOpenLetter={openGlobalLetter} />
-            <WitchMascot src="images/image18.png" side="left"  topPx={1080} onOpenLetter={openGlobalLetter} />
           </section>
 
           {/* スイーツを選ぶボタン */}
@@ -2759,13 +2805,14 @@
       craftingImageContainer: {
         position: 'relative',
         width: '100%',
-        height: '70vh',
+        height: '85vh',
         overflow: 'hidden',
       },
       craftingImage: {
         width: '100%',
         height: '100%',
         objectFit: 'cover',
+        objectPosition: 'center 40%',
       },
       craftingTextOverlay: {
         position: 'absolute',

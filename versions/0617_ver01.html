@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="preload" href="0525/0525.mp4" as="video" type="video/mp4">
+  <link rel="preload" href="0525/0525.mp4?v=20260816" as="video" type="video/mp4">
   <link rel="stylesheet" href="css/transition.css">
   
   <style>
@@ -942,7 +942,7 @@
   <div id="majorin-opening">
     <video
       id="majorin-opening-video"
-      src="0525/0525.mp4"
+      src="0525/0525.mp4?v=20260816"
       muted
       autoplay
       playsinline
@@ -960,7 +960,8 @@
     (function () {
       var WHITE_IN_MS = 800;
       var FADE_MS = 1000;
-      var FALLBACK_MS = 42000;
+      // 2026-08-16: opening_movie.mp4（約27.4秒）差し替え。旧0525.mp4は約40秒で FALLBACK 42000
+      var FALLBACK_MS = 32000;
       var shell = document.getElementById('majorin-opening');
       var video = document.getElementById('majorin-opening-video');
       var white = document.getElementById('majorin-opening-white');
@@ -1332,6 +1333,7 @@
           setTimeout(() => setDoorState('open'), 2000);
         });
       };
+
 
       const handleChoice = (choice) => {
         if (choice === 'buy') {
@@ -1969,26 +1971,11 @@
             <WitchMascot src="images/image13.png" side="right" topPx={1950} onOpenLetter={openGlobalLetter} />
           </section>
 
-          {/* The Moment — 本文は直後の画像へ移動済み。見出しのみ残す */}
-          <section 
-            ref={el => sectionRefs.current['turning'] = el}
-            style={{
-              ...styles.section,
-              ...styles.roseSection,
-              overflow: 'visible',
-              opacity: isVisible['turning'] ? 1 : 0,
-              transform: isVisible['turning'] ? 'translateY(0)' : 'translateY(50px)',
-              transition: 'all 1s ease-out 0.2s',
-              minHeight: 'auto',
-              padding: '48px 20px 8px',
-            }}
-          >
-            <div style={styles.sectionContent}>
-              <div style={styles.ornamentalDivider}>🌸 ━━━ ✦ ━━━ 🌸</div>
-              <h2 style={styles.sectionTitle}>THE MOMENT</h2>
-              <h3 style={styles.subtitle}>心が温かくなったある日</h3>
-            </div>
-          </section>
+          {/*
+            THE MOMENT 見出し帯は 2026-08-16 に除去。
+            本文は直後の crafting 画像上に残置。復元手順・旧JSXは
+            docs/the_moment_heading_removal_20260816.md
+          */}
 
           {/* Crafting Image — ③ THE MOMENT 本文を画像へ転記（2026-08-16） */}
           <section 
@@ -2833,6 +2820,8 @@
       },
       
       // ========== ROSE/TURNING POINT SECTION ==========
+      // THE MOMENT 見出し帯は 2026-08-16 除去。スタイルは復元用に残置。
+      // docs/the_moment_heading_removal_20260816.md
       roseSection: {
         background: 'linear-gradient(135deg, #FDE8EA 0%, #FFF2F3 50%, #FAE0EC 100%)',
       },

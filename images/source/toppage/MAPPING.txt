@@ -1,0 +1,9 @@
+# トップページ STORY 公開画像 ← 原板
+# live: images/toppage/*
+
+image01_1920.png  ->  majorin-study.png      (読書 / 1行目・画像左)
+image02_1920.png  ->  majorin-witch-hat.png  (魔女帽 / 2行目・画像右)
+image03_1920.png  ->  majorin-garden.png     (バラの庭 / 3行目・画像左)
+
+# モバイルは既存正方形寄りを継続使用
+# images/image11.png / image09.png / image10.png

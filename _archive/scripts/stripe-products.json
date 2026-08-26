@@ -6,7 +6,7 @@
     "image": "images/showcase/cake-noir-melt.png",
     "productId": "prod_UbWb2nqwQ8wjHZ",
     "priceId": "price_1Tfr7c3A10QFS30cZiB51VM1",
-    "paymentUrl": "https://buy.stripe.com/5kQ7sEaZOf3M8CI9VMgw006"
+    "paymentUrl": "https://buy.stripe.com/5kQdR21pe5tcf164Bsgw009"
   },
   {
     "name": "ヴァーダント ベール（Verdant Veil）",
@@ -15,7 +15,7 @@
     "image": "images/showcase/cake-verdant-veil.png",
     "productId": "prod_UbWbEju4koEU9T",
     "priceId": "price_1Tfr7d3A10QFS30cxsuzLgbC",
-    "paymentUrl": "https://buy.stripe.com/00w14g7NCbRAcSYfg6gw007"
+    "paymentUrl": "https://buy.stripe.com/dRm4gs6Jyf3MaKQ3xogw00a"
   },
   {
     "name": "パッションオレンジヴェール（Passion Orange Vert）",
@@ -24,6 +24,6 @@
     "image": "images/showcase/cake-passion-orange.png",
     "productId": "prod_UbWbaxnbZbMlni",
     "priceId": "price_1Tfr7f3A10QFS30c2sjr3cti",
-    "paymentUrl": "https://buy.stripe.com/aFacMY5Fu3l46uA2tkgw008"
+    "paymentUrl": "https://buy.stripe.com/5kQ28k7NC2h05qw2tkgw00b"
   }
 ]

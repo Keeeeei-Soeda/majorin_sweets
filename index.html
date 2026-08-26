@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="preload" href="0525/opening_20260816.mp4" as="video" type="video/mp4">
-  <link rel="stylesheet" href="css/transition.css">
+  <link rel="stylesheet" href="css/transition.css?v=20260826wanko">
   
   <style>
     * {
@@ -1136,6 +1136,38 @@
       .fab-order { animation: none; }
       .fab-order:hover, .fab-order:focus-visible { transform: none; }
     }
+    /* === [ADD 2026-08-26] 美味しさのひみつ（動画=吹き出し＋テキスト左右入替）=== */
+    .secret-section { width:100%; padding:64px 22px 40px; }
+    .secret-head { text-align:center; margin:0 auto 44px; }
+    .secret-kicker { font-family:'Cinzel',serif; letter-spacing:.35em; font-size:12px; color:#d4af6e; text-transform:uppercase; }
+    .secret-title { font-family:'Cormorant Garamond',serif; font-weight:400; font-size:32px; color:#f0d090; margin-top:8px; letter-spacing:.03em; }
+    .secret-row { max-width:960px; margin:0 auto 56px; display:grid; grid-template-columns:0.92fr 1.08fr; gap:44px; align-items:center; }
+    .secret-row.reverse { grid-template-columns:1.08fr 0.92fr; }
+    .secret-row.reverse .secret-visual { order:2; }
+    .secret-row.reverse .secret-copy { order:1; }
+    .secret-visual { position:relative; display:flex; justify-content:center; }
+    .secret-bubble { position:relative; width:100%; max-width:330px; aspect-ratio:1/1; border-radius:34px; overflow:hidden; border:1px solid rgba(212,175,110,.55); background:#180a10; box-shadow:0 14px 44px rgba(0,0,0,.45); }
+    .secret-video { width:100%; height:100%; object-fit:cover; display:block; }
+    .secret-tail { position:absolute; top:50%; width:0; height:0; }
+    .secret-row:not(.reverse) .secret-tail { right:-14px; transform:translateY(-50%); border-style:solid; border-width:11px 0 11px 16px; border-color:transparent transparent transparent rgba(212,175,110,.55); }
+    .secret-row.reverse .secret-tail { left:-14px; transform:translateY(-50%); border-style:solid; border-width:11px 16px 11px 0; border-color:transparent rgba(212,175,110,.55) transparent transparent; }
+    .secret-dots { position:absolute; top:calc(50% + 30px); display:flex; gap:6px; }
+    .secret-row:not(.reverse) .secret-dots { right:-26px; }
+    .secret-row.reverse .secret-dots { left:-26px; }
+    .secret-dots span { width:7px; height:7px; border-radius:50%; border:1px solid rgba(212,175,110,.5); }
+    .secret-dots span:nth-child(2){ width:5px; height:5px; }
+    .secret-dots span:nth-child(3){ width:3px; height:3px; }
+    .secret-num { font-family:'Cormorant Garamond',serif; font-size:15px; letter-spacing:.2em; color:#c47b8a; }
+    .secret-h3 { font-family:'Noto Serif JP',serif; font-weight:500; font-size:19px; color:#f0d090; margin:4px 0 16px; letter-spacing:.04em; }
+    .secret-p { font-family:'Noto Serif JP',serif; font-size:14.5px; line-height:2.0; color:#f5e8d8; }
+    .secret-mobile-video { display:none; }
+    @media (max-width:640px){
+      .secret-row, .secret-row.reverse { grid-template-columns:1fr; gap:24px; margin-bottom:40px; }
+      .secret-visual { display:none; } /* 行内動画は非表示 → テキスト2連続 */
+      .secret-mobile-video { display:flex; justify-content:center; margin:0 auto 36px; }
+      .secret-mobile-video .secret-bubble { max-width:250px; }
+      .secret-title { font-size:26px; }
+    }
   </style>
 </head>
 <body>
@@ -1259,6 +1291,10 @@
     //   { img: 'images/spring2026/handling_02.jpg', title: '半解凍で食べる', body: '（本文待ち：半解凍時のおすすめ）' },
     //   { img: 'images/spring2026/handling_03.jpg', title: '到着後の保存', body: '（本文待ち：到着後◯日以内・保存方法）' },
     // ];
+
+    // ===== 2026-08-26 美味しさのひみつ 本文（動画セクション横テキスト）=====
+    const SECRET_1 = 'MAJORINS のケーキは全て、身体との親和性が良いとされる米粉で生地を焼いています。サンドされたクリームも、生地とのバランスを考慮したガナッシュクリームやフレッシュな果実のソース、クリームチーズなどを、絶妙な口当たりになるようサンドしました。カットしてお皿に乗せ、お口に頬張るまでが芸術です。';
+    const SECRET_2 = '製法に美味しさの秘密があります。MAJORINS のスイーツの生地たちは、焼き上がりすぐに急速冷却・冷凍できるブラストチラーを装備。オーブンで焼き上がった生地を即座に冷やすことで、焼き立ての風味・水分量を保持させています。短時間でデコレーション作業に入れ、新鮮さを維持したまま急速冷凍し、出来たてのスイーツをお届けします。解凍後は、驚くほどの出来たての美味しさを味わって頂けます。';
 
     // ===== 2026-08-26 成分表記（金額の下）=====
     const CAKE_INGREDIENTS = {
@@ -1824,19 +1860,43 @@
             </div>
           </section>
 
-          {/* ========== CAKE CUT MOVIE（2026-08-22 NEW / 2026-08-26 動画差し替え）========== */}
-          <section className="cakecut-section" aria-label="ケーキカット動画">
-            <div className="cakecut-inner">
-              <video
-                className="cakecut-video"
-                src={`${CAKE_CUT_VIDEO}?v=20260826`}
-                autoPlay muted loop playsInline
-              />
-              {/* --- 旧プレースホルダ（動画到着まで表示していた器）---
-              <div className="cakecut-placeholder">
-                ケーキカット動画（10秒弱・背景ぼかし）挿入予定
+          {/* ========== 美味しさのひみつ（2026-08-26 動画=吹き出し＋テキスト左右入替 / 旧 CAKE CUT MOVIE を作り替え）========== */}
+          <section className="secret-section" aria-label="美味しさのひみつ">
+            <div className="secret-head">
+              <div className="secret-kicker">The Secret of Taste</div>
+              <h2 className="secret-title">美味しさのひみつ</h2>
+            </div>
+
+            {/* Row 1: 動画（吹き出し）｜ ひみつ1 */}
+            <div className="secret-row">
+              <div className="secret-visual">
+                <div className="secret-bubble">
+                  <video className="secret-video" src={`${CAKE_CUT_VIDEO}?v=20260826`} autoPlay muted loop playsInline />
+                </div>
+                <span className="secret-tail" aria-hidden="true"></span>
+                <span className="secret-dots" aria-hidden="true"><span></span><span></span><span></span></span>
               </div>
-              */}
+              <div className="secret-copy">
+                <div className="secret-num">01</div>
+                <h3 className="secret-h3">美味しさのひみつ 1</h3>
+                <p className="secret-p">{SECRET_1}</p>
+              </div>
+            </div>
+
+            {/* Row 2: ひみつ2 ｜ 動画（吹き出し）※左右入替 */}
+            <div className="secret-row reverse">
+              <div className="secret-visual">
+                <div className="secret-bubble">
+                  <video className="secret-video" src={`${CAKE_CUT_VIDEO}?v=20260826`} autoPlay muted loop playsInline />
+                </div>
+                <span className="secret-tail" aria-hidden="true"></span>
+                <span className="secret-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+              </div>
+              <div className="secret-copy">
+                <div className="secret-num">02</div>
+                <h3 className="secret-h3">美味しさのひみつ 2</h3>
+                <p className="secret-p">{SECRET_2}</p>
+              </div>
             </div>
           </section>
 
@@ -1850,37 +1910,7 @@
             />
           </section>
 
-          {/* ========== HANDLING / 食べ方（2026-08-22 NEW / 2026-08-26 完成グラフィック1枚でベタ張り）========== */}
-          {/* ※平石さん確認で「ショーケースの後」の場合は、この <section> を SHOWCASE の </section> 直後へ移動 */}
-          <section className="handling-section" aria-label="取り扱い・食べ方">
-            {/* 焼き込みテキストありのため、見出し等の HTML テキストは置かない */}
-            <img
-              className="handling-image"
-              src={`${HANDLING_IMAGE}?v=20260826`}
-              alt="INSIDER TIPS — 作り手が教える美味しい召し上がり方"
-            />
-            {/* 旧・3行フレーム（写真分割版が来た場合の復活用に残置）
-            <div className="story-page">
-              <div className="story-page-heading">
-                <h2 className="story-page-kicker">HOW TO ENJOY</h2>
-                <h3 className="story-tale-title">［お召し上がり方・取り扱い］</h3>
-              </div>
-              <div className="story-zigzag">
-                {HANDLING_ITEMS.map((it, i) => (
-                  <div className="story-row" key={i}>
-                    <div className="story-row-img">
-                      <div className="handling-img-placeholder">写真待ち</div>
-                    </div>
-                    <div className="story-row-text">
-                      <h4 className="handling-item-title">{it.title}</h4>
-                      <p className="handling-item-body">{it.body}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            */}
-          </section>
+          {/* 2026-08-26: 「食べ方(insider tips)」は Showcase の後ろへ移動しました（下記 SHOWCASE の直後を参照）*/}
 
           {/* ========== SHOWCASE SECTION ========== */}
           <section className="showcase-section" id="showcase">
@@ -2095,6 +2125,37 @@
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* ========== HANDLING / 食べ方（2026-08-22 NEW / 2026-08-26 完成グラフィック1枚でベタ張り）========== */}
+          <section className="handling-section" aria-label="取り扱い・食べ方">
+            {/* 焼き込みテキストありのため、見出し等の HTML テキストは置かない */}
+            <img
+              className="handling-image"
+              src={`${HANDLING_IMAGE}?v=20260826`}
+              alt="INSIDER TIPS — 作り手が教える美味しい召し上がり方"
+            />
+            {/* 旧・3行フレーム（写真分割版が来た場合の復活用に残置）
+            <div className="story-page">
+              <div className="story-page-heading">
+                <h2 className="story-page-kicker">HOW TO ENJOY</h2>
+                <h3 className="story-tale-title">［お召し上がり方・取り扱い］</h3>
+              </div>
+              <div className="story-zigzag">
+                {HANDLING_ITEMS.map((it, i) => (
+                  <div className="story-row" key={i}>
+                    <div className="story-row-img">
+                      <div className="handling-img-placeholder">写真待ち</div>
+                    </div>
+                    <div className="story-row-text">
+                      <h4 className="handling-item-title">{it.title}</h4>
+                      <p className="handling-item-body">{it.body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            */}
           </section>
 
           {/* 2026-08-22: 「心に響くスイーツ」KVブロックは Showcase の前へ移動しました（下記 SHOWCASE の直前を参照）*/}
@@ -2347,12 +2408,6 @@
                   痛みと共に生きる人々に、<br />
                   完璧じゃない甘さを。<br />
                   魔法じゃない、本物の支えを。
-                </p>
-                {/* === [ADD] ご利用ガイドへの導線 === */}
-                <p style={{ marginBottom: '12px' }}>
-                  <a href="/guide/" style={{ color: '#d4af6e', textDecoration: 'none', fontSize: '0.85rem', letterSpacing: '0.08em', borderBottom: '1px solid rgba(212,175,110,0.4)', paddingBottom: '2px' }}>
-                    ご利用ガイド（送料・お届け・返品について）
-                  </a>
                 </p>
                 <p style={styles.copyright}>© 2026 Majorin Sweets. All rights reserved.</p>
               </div>

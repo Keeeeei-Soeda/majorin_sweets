@@ -80,7 +80,8 @@
   --font-body-jp: 'Noto Serif JP', serif;
 
   background: var(--teaser-bg);
-  padding: clamp(64px, 10vw, 120px) 20px;
+  /* 材料・食べ方画像と同程度の全幅表示（旧 max-width:420px を撤廃） */
+  padding: clamp(40px, 6vw, 72px) 0;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 1.2s ease-out, transform 1.2s ease-out;
@@ -92,7 +93,8 @@
 }
 
 .wanko-teaser__inner {
-  max-width: 420px;
+  max-width: none;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
 }
@@ -112,8 +114,8 @@
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 2px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .wanko-teaser__cta {
@@ -166,7 +168,7 @@
   }
 
   .wanko-teaser {
-    padding: clamp(64px, 14vw, 100px) 20px;
+    padding: clamp(32px, 8vw, 56px) 0;
   }
 }
 

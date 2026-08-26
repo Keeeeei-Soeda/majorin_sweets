@@ -1,25 +1,28 @@
 [
   {
     "name": "ノワール メルト（Noir Melt）",
-    "description": "願いが叶った夜更けに溶ける魅惑の生チョコ。カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。",
+    "description": "願いが叶った夜更けに溶ける魅惑の生チョコ。カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。\n\n【原材料】米粉、バター、卵、アーモンド、粉糖、チョコレート、ブラックココア、カルダモン、カシス、フランボワーズ、ストロベリーチョコ、ヘーゼルナッツ、ゼラチン、生クリーム、銀箔、エディフルフラワーローズ",
     "priceYen": 4800,
     "image": "images/showcase/cake-noir-melt.png",
+    "productId": "prod_UbWb2nqwQ8wjHZ",
     "priceId": "price_1Tfr7c3A10QFS30cZiB51VM1",
     "paymentUrl": "https://buy.stripe.com/5kQ7sEaZOf3M8CI9VMgw006"
   },
   {
     "name": "ヴァーダント ベール（Verdant Veil）",
-    "description": "貴方の心が芽生える新緑茶に包まれて。香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。",
+    "description": "貴方の心が芽生える新緑茶に包まれて。香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。\n\n【原材料】米粉、バター、卵、アーモンド、粉糖、抹茶チョコレート、抹茶、生クリーム、抹茶バタークリーム、ドライグランベリー、ピスタチオ、銀箔",
     "priceYen": 4800,
     "image": "images/showcase/cake-verdant-veil.png",
+    "productId": "prod_UbWbEju4koEU9T",
     "priceId": "price_1Tfr7d3A10QFS30cxsuzLgbC",
     "paymentUrl": "https://buy.stripe.com/00w14g7NCbRAcSYfg6gw007"
   },
   {
     "name": "パッションオレンジヴェール（Passion Orange Vert）",
-    "description": "気分も弾けるフレッシュオレンジ C'est trop bon! 燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。",
+    "description": "気分も弾けるフレッシュオレンジ C'est trop bon! 燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。\n\n【原材料】米粉、バター、卵、アーモンド、粉糖、オレンジ、カラマンダリン、ホワイトチョコレート、クリームチーズ、生クリーム、ゼラチン、クエン酸、スミレ砂糖漬け、エディフルフラワー、銀シュガー",
     "priceYen": 4800,
     "image": "images/showcase/cake-passion-orange.png",
+    "productId": "prod_UbWbaxnbZbMlni",
     "priceId": "price_1Tfr7f3A10QFS30c2sjr3cti",
     "paymentUrl": "https://buy.stripe.com/aFacMY5Fu3l46uA2tkgw008"
   }

@@ -617,9 +617,81 @@
       animation: showcaseFadeUp 1.4s ease 0.8s forwards;
     }
 
+    /* 実写ショーケース写真（2026-08-26 IMG_0622） */
+    .showcase-window--photo {
+      aspect-ratio: 3 / 2;
+    }
+
+    .showcase-window--photo .showcase-bg {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ネームプレートを写真の下へ均等配置。ホバー／クリックはプレートのみ（写真上は反応しない） */
+    .showcase-window--photo .cake-item {
+      top: 100%;
+      bottom: auto;
+      width: 28%;
+      margin-top: 18px;
+    }
+
+    .showcase-window--photo .cake-item[data-position="left"]   { left: 16%; }
+    .showcase-window--photo .cake-item[data-position="center"] { left: 50%; }
+    .showcase-window--photo .cake-item[data-position="right"]  { left: 84%; }
+
+    .showcase-window--photo .cake-image-wrap {
+      display: none;
+    }
+
+    .showcase-window--photo .cake-plate {
+      position: relative;
+      left: auto;
+      top: auto;
+      transform: none;
+      width: 100%;
+      min-width: 0;
+      margin: 0 auto;
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+    }
+
+    .showcase-window--photo .cake-item:not(.coming-soon):hover .cake-plate {
+      border-color: var(--color-gold-bright);
+      box-shadow:
+        0 6px 22px rgba(0, 0, 0, 0.65),
+        0 0 18px rgba(212, 175, 110, 0.28),
+        inset 0 1px 0 rgba(212, 175, 110, 0.45);
+      transform: translateY(-2px);
+    }
+
+    /* プレート〜案内文の隙間もホバー判定に含める（カーソル移動で消えないように） */
+    .showcase-window--photo .cake-link {
+      padding-bottom: 18px;
+    }
+
+    .showcase-window--photo .hover-card {
+      top: 100%;
+    }
+
+    /* 案内文上にカーソルがある間も表示を維持 */
+    .showcase-window--photo .cake-item:not(.coming-soon):has(.hover-card:hover) .hover-card {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .showcase-mobile-photo {
+      display: none;
+    }
+
     /* ショーケースA: 値札・ホバーカード分の余白を確保 */
     .showcase-window:not(.showcase-window--coming-soon) {
       margin-bottom: 320px;
+    }
+
+    /* 実写版: プレートが写真下に出るため、ホバーカード（原材料含む）分をさらに確保 */
+    .showcase-window--photo:not(.showcase-window--coming-soon) {
+      margin-bottom: clamp(480px, 58vw, 580px);
     }
 
     .showcase-bg {
@@ -682,17 +754,22 @@
     .showcase-window--coming-soon {
       margin-top: 0;
       margin-bottom: 16px;
-      filter: grayscale(100%) brightness(0.62) contrast(0.95) saturate(0.35);
+      filter: grayscale(35%) brightness(0.78) contrast(0.98);
     }
 
     .cake-item.coming-soon {
       cursor: default;
       pointer-events: none;
+      bottom: 38%;
+      width: 22%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .showcase-window--coming-soon .cake-item.coming-soon .cake-image {
-      filter: none;
-      mix-blend-mode: normal;
+    .showcase-window--coming-soon .cake-item.coming-soon .coming-soon-overlay {
+      position: relative;
+      inset: auto;
     }
 
     .coming-soon-overlay {
@@ -964,6 +1041,14 @@
       .showcase-window {
         display: none;
         margin-bottom: 0;
+      }
+
+      .showcase-mobile-photo {
+        display: block;
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto 36px;
+        height: auto;
       }
 
       /* スマホでは Coming Soon ブロックを出さない（空枠＋縦積みの違和感を解消） */
@@ -1927,35 +2012,11 @@
               <p className="showcase-intro-text">扉の向こうに並ぶ、三つの魔法。<br />マジョリンが今宵お届けする逸品をどうぞ。</p>
             </div>
 
-            <div className="showcase-window">
-              <img src="images/showcase/showcase-empty.png" alt="MAJORINS Showcase" className="showcase-bg" />
+            <div className="showcase-window showcase-window--photo">
+              <img src="images/showcase/showcase-photo.jpg?v=20260826" alt="MAJORINS Showcase — Verdant Veil / Noir Melt / Passion Orange" className="showcase-bg" />
 
+              {/* 写真の並び: 左=Verdant / 中央=Noir / 右=Passion（個別PNGは非表示・ヒット領域＋値札＋ホバーのみ） */}
               <div className="cake-item" data-position="left">
-                <a href="https://buy.stripe.com/5kQdR21pe5tcf164Bsgw009" className="cake-link" target="_blank" rel="noopener noreferrer">
-                  <div className="cake-image-wrap">
-                    <img src="images/showcase/cake-noir-melt.png?v=20260821" alt="Noir Melt" className="cake-image" />
-                    <div className="spotlight-glow"></div>
-                  </div>
-                  <div className="cake-plate">
-                    <div className="plate-name">Noir Melt</div>
-                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
-                  </div>
-                  <div className="hover-card">
-                    <div className="hover-card-name-jp">ノワール メルト</div>
-                    <div className="hover-card-name-en">Noir Melt</div>
-                    <div className="hover-card-divider"></div>
-                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
-                    <div className="hover-card-ingredients">
-                      <div className="hover-card-ingredients-label">原材料</div>
-                      <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.noir}</p>
-                    </div>
-                    <div className="hover-card-cta">View Details</div>
-                  </div>
-                </a>
-              </div>
-
-              <div className="cake-item" data-position="center">
                 <a href="https://buy.stripe.com/dRm4gs6Jyf3MaKQ3xogw00a" className="cake-link" target="_blank" rel="noopener noreferrer">
                   <div className="cake-image-wrap">
                     <img src="images/showcase/cake-verdant-veil.png?v=20260821" alt="Verdant Veil" className="cake-image" />
@@ -1974,6 +2035,31 @@
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.verdant}</p>
+                    </div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="cake-item" data-position="center">
+                <a href="https://buy.stripe.com/5kQdR21pe5tcf164Bsgw009" className="cake-link" target="_blank" rel="noopener noreferrer">
+                  <div className="cake-image-wrap">
+                    <img src="images/showcase/cake-noir-melt.png?v=20260821" alt="Noir Melt" className="cake-image" />
+                    <div className="spotlight-glow"></div>
+                  </div>
+                  <div className="cake-plate">
+                    <div className="plate-name">Noir Melt</div>
+                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
+                  </div>
+                  <div className="hover-card">
+                    <div className="hover-card-name-jp">ノワール メルト</div>
+                    <div className="hover-card-name-en">Noir Melt</div>
+                    <div className="hover-card-divider"></div>
+                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-ingredients">
+                      <div className="hover-card-ingredients-label">原材料</div>
+                      <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.noir}</p>
                     </div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
@@ -2010,59 +2096,30 @@
               <img src="images/showcase/showcase-empty.png" alt="MAJORINS Showcase Coming Soon" className="showcase-bg" />
 
               <div className="cake-item coming-soon" data-position="left">
-                <div className="cake-link">
-                  <div className="cake-image-wrap">
-                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="cake-image" />
-                    <div className="coming-soon-overlay">
-                      <span className="coming-soon-label">Coming Soon</span>
-                    </div>
-                  </div>
+                <div className="coming-soon-overlay">
+                  <span className="coming-soon-label">Coming Soon</span>
                 </div>
               </div>
 
               <div className="cake-item coming-soon" data-position="center">
-                <div className="cake-link">
-                  <div className="cake-image-wrap">
-                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="cake-image" />
-                    <div className="coming-soon-overlay">
-                      <span className="coming-soon-label">Coming Soon</span>
-                    </div>
-                  </div>
+                <div className="coming-soon-overlay">
+                  <span className="coming-soon-label">Coming Soon</span>
                 </div>
               </div>
 
               <div className="cake-item coming-soon" data-position="right">
-                <div className="cake-link">
-                  <div className="cake-image-wrap">
-                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="cake-image" />
-                    <div className="coming-soon-overlay">
-                      <span className="coming-soon-label">Coming Soon</span>
-                    </div>
-                  </div>
+                <div className="coming-soon-overlay">
+                  <span className="coming-soon-label">Coming Soon</span>
                 </div>
               </div>
             </div>
 
             <div className="showcase-mobile">
-              <div className="mobile-cake-card">
-                <a href="https://buy.stripe.com/5kQdR21pe5tcf164Bsgw009" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
-                  <img src="images/showcase/cake-noir-melt.png?v=20260821" alt="Noir Melt" className="mobile-cake-image" />
-                  <div className="mobile-cake-plate">
-                    <div className="plate-name">Noir Melt</div>
-                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
-                  </div>
-                  <div className="mobile-cake-details">
-                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
-                    <div className="hover-card-ingredients">
-                      <div className="hover-card-ingredients-label">原材料</div>
-                      <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.noir}</p>
-                    </div>
-                    <div className="hover-card-cta">View Details</div>
-                  </div>
-                </a>
-              </div>
-
+              <img
+                className="showcase-mobile-photo"
+                src="images/showcase/showcase-photo.jpg?v=20260826"
+                alt="MAJORINS Showcase — Verdant Veil / Noir Melt / Passion Orange"
+              />
               <div className="mobile-cake-card">
                 <a href="https://buy.stripe.com/dRm4gs6Jyf3MaKQ3xogw00a" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
                   <img src="images/showcase/cake-verdant-veil.png?v=20260821" alt="Verdant Veil" className="mobile-cake-image" />
@@ -2076,6 +2133,25 @@
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.verdant}</p>
+                    </div>
+                    <div className="hover-card-cta">View Details</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="mobile-cake-card">
+                <a href="https://buy.stripe.com/5kQdR21pe5tcf164Bsgw009" className="mobile-cake-link" target="_blank" rel="noopener noreferrer">
+                  <img src="images/showcase/cake-noir-melt.png?v=20260821" alt="Noir Melt" className="mobile-cake-image" />
+                  <div className="mobile-cake-plate">
+                    <div className="plate-name">Noir Melt</div>
+                    <div className="plate-tagline">願いが叶った夜更けに溶ける魅惑の生チョコ</div>
+                  </div>
+                  <div className="mobile-cake-details">
+                    <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
+                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    <div className="hover-card-ingredients">
+                      <div className="hover-card-ingredients-label">原材料</div>
+                      <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.noir}</p>
                     </div>
                     <div className="hover-card-cta">View Details</div>
                   </div>
@@ -2106,7 +2182,6 @@
 
                 <div className="mobile-cake-card coming-soon">
                   <div className="mobile-cake-link">
-                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="mobile-cake-image" />
                     <div className="mobile-coming-soon-overlay">
                       <span className="coming-soon-label">Coming Soon</span>
                     </div>
@@ -2115,7 +2190,6 @@
 
                 <div className="mobile-cake-card coming-soon">
                   <div className="mobile-cake-link">
-                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="mobile-cake-image" />
                     <div className="mobile-coming-soon-overlay">
                       <span className="coming-soon-label">Coming Soon</span>
                     </div>
@@ -2124,7 +2198,6 @@
 
                 <div className="mobile-cake-card coming-soon">
                   <div className="mobile-cake-link">
-                    <img src="images/showcase/cake-noir-melt.png" alt="Coming Soon" className="mobile-cake-image" />
                     <div className="mobile-coming-soon-overlay">
                       <span className="coming-soon-label">Coming Soon</span>
                     </div>

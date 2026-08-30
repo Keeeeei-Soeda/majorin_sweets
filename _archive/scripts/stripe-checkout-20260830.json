@@ -1,0 +1,25 @@
+{
+  "couponId": "peZPp2uW",
+  "promotionCodeId": "promo_1UA15l3A10QFS30cToPibhTw",
+  "promotionCode": "MAJORIN300",
+  "shippingRateId": "shr_1U8cKh3A10QFS30cDgDiCewG",
+  "paymentLinks": [
+    {
+      "name": "ノワール メルト",
+      "oldUrl": "https://buy.stripe.com/5kQdR21pe5tcf164Bsgw009",
+      "newUrl": "https://buy.stripe.com/fZu3co4Bq1cW7yE0lcgw00c"
+    },
+    {
+      "name": "ヴァーダント ベール",
+      "oldUrl": "https://buy.stripe.com/dRm4gs6Jyf3MaKQ3xogw00a",
+      "newUrl": "https://buy.stripe.com/dRm28k1pef3Mg5a5Fwgw00d"
+    },
+    {
+      "name": "パッションオレンジ",
+      "oldUrl": "https://buy.stripe.com/5kQ28k7NC2h05qw2tkgw00b",
+      "newUrl": "https://buy.stripe.com/6oU8wI6Jyg7QcSY9VMgw00e"
+    }
+  ],
+  "promotionCodeNote": "Customer UI still returns このコードは無効です despite API discounts working. Recreated with Stripe-Version 2023-10-16 (legacy coupon field). Needs Dashboard-side verification.",
+  "status": "promo_ui_failing"
+}

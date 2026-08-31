@@ -535,7 +535,9 @@
   var state = {
     qty: { noir: 0, verdant: 0, passion: 0 },
     stock: null,
-    receptionOpen: PREVIEW || isReceptionOpen(Date.now()),
+    // TEMP 2026-08-31: 動作確認のため受付時間制約を無効化。復活時は下行を戻す
+    // receptionOpen: PREVIEW || isReceptionOpen(Date.now()),
+    receptionOpen: true,
     submitting: false
   };
 
@@ -544,7 +546,8 @@
   /* ===== 在庫の解釈 ===== */
   function remainingOf(sku) {
     if (PREVIEW) return MAX_PER_ORDER;
-    if (!state.receptionOpen) return 0;
+    // TEMP 2026-08-31: 受付時間外でも数量選択可。復活時は下行を戻す
+    // if (!state.receptionOpen) return 0;
     var it = state.stock && state.stock[sku];
     if (!it) return MAX_PER_ORDER;
     if (it.soldOut) return 0;
@@ -641,7 +644,9 @@
     $shipping.classList.toggle('order-summary__amount--free', hasItems && free);
     $total.textContent = yen(subtotal + shipping);
 
-    $submit.disabled = PREVIEW || !hasItems || state.submitting || !state.receptionOpen;
+    $submit.disabled = PREVIEW || !hasItems || state.submitting;
+    // TEMP 2026-08-31: 受付時間外でも決済可。復活時は下行を戻す
+    // $submit.disabled = PREVIEW || !hasItems || state.submitting || !state.receptionOpen;
     $submit.textContent = state.submitting ? 'お支払い画面へ移動しています…' : 'お支払いへ進む';
   }
 
@@ -649,9 +654,10 @@
     if (PREVIEW) {
       $notice.hidden = false;
       $notice.innerHTML = '<strong>確認用プレビュー</strong>　受付時間・在庫の判定を無視して表示しています。お支払いには進めません。';
-    } else if (!state.receptionOpen) {
-      $notice.hidden = false;
-      $notice.innerHTML = '現在は受付時間外です。ご注文の受付は毎週<strong>木曜10:00〜日曜10:00</strong>です。';
+    // TEMP 2026-08-31: 受付時間外バナーを無効化。復活時はこのブロックを戻す
+    // } else if (!state.receptionOpen) {
+    //   $notice.hidden = false;
+    //   $notice.innerHTML = '現在は受付時間外です。ご注文の受付は毎週<strong>木曜10:00〜日曜10:00</strong>です。';
     } else {
       $notice.hidden = true;
     }

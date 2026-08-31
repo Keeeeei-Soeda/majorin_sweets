@@ -116,12 +116,16 @@ async function readCounts(kv, weekId) {
 function buildStatus(nowMs, counts) {
   const weekStart = weekStartUtc(nowMs);
   const weekId = weekIdFromStart(weekStart);
-  const accepting = isAccepting(nowMs, weekStart);
+  // TEMP 2026-08-31: 動作確認のため受付時間制約を無効化。復活時は下行を戻す
+  // const accepting = isAccepting(nowMs, weekStart);
+  const accepting = true;
   const items = {};
   for (const key of PRODUCT_KEYS) {
     const sold = Number(counts[key] || 0);
     const remaining = Math.max(0, LIMIT_PER_ITEM - sold);
-    const soldOut = !accepting || remaining <= 0;
+    // TEMP 2026-08-31: 受付時間外でも soldOut にしない。復活時は下行を戻す
+    // const soldOut = !accepting || remaining <= 0;
+    const soldOut = remaining <= 0;
     items[key] = { sold, remaining, soldOut, limit: LIMIT_PER_ITEM };
   }
   return {
@@ -192,6 +196,7 @@ async function createCheckoutSession(env, items, opts = {}) {
     opts.qaToken === env.QA_CHECKOUT_TOKEN;
 
   if (!status.accepting && !forceOpen) {
+    // TEMP 2026-08-31: buildStatus 側で accepting=true 固定中。復活後はこのブロックが再び有効になる
     return {
       ok: false,
       status: 403,

@@ -23,7 +23,9 @@
   .note{ color:var(--muted); font-size:13px; }
   .back{ display:inline-block; margin-top:8px; color:var(--gold); text-decoration:none; font-size:14px; letter-spacing:.08em; border-bottom:1px solid rgba(212,175,110,.4); padding-bottom:2px; }
   footer{ text-align:center; margin-top:56px; color:var(--muted); font-size:12px; }
-  @media(max-width:520px){ body{padding:44px 18px 72px;} h1{font-size:28px;margin-bottom:36px;} }
+  .footer-nav{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px 26px; margin:0 0 22px; }
+  .footer-nav a{ color:var(--gold); text-decoration:none; font-size:14px; letter-spacing:.08em; border-bottom:1px solid rgba(212,175,110,.4); padding-bottom:2px; }
+  @media(max-width:520px){ body{padding:44px 18px 72px;} h1{font-size:28px;margin-bottom:36px;} .footer-nav{gap:10px 18px;} .footer-nav a{font-size:13px;} }
 </style>
 </head>
 <body>
@@ -102,7 +104,13 @@
     </section>
 
     <a class="back" href="/">← トップへ戻る</a>
-    <footer>© 2026 Majorin Sweets. All rights reserved.</footer>
+    <footer>
+      <nav class="footer-nav">
+        <a href="/company/">企業案内</a>
+        <a href="/guide/">ご利用ガイド</a>
+      </nav>
+      © 2026 Majorin Sweets. All rights reserved.
+    </footer>
   </div>
 </body>
 </html>

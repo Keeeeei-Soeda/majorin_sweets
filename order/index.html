@@ -407,6 +407,13 @@
     letter-spacing: 0.08em;
     border-bottom: 1px solid rgba(212, 175, 110, 0.4);
     padding-bottom: 2px;
+    margin-bottom: 0;
+  }
+  .order-footer__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 26px;
     margin-bottom: 26px;
   }
   .order-footer__copyright {
@@ -420,10 +427,12 @@
     .order-layout { grid-template-columns: 1fr; gap: 28px; }
     .order-summary { position: static; }
   }
-  @media (max-width: 560px) {
+  @media (max-width: 520px) {
     .order-intro { padding: 44px 18px 32px; }
     .order-item { grid-template-columns: 88px 1fr; gap: 16px; padding: 18px; }
     .order-item__foot { justify-content: flex-start; }
+    .order-footer__nav { gap: 10px 18px; }
+    .order-footer__guide { font-size: 0.78rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -492,7 +501,10 @@
       完璧じゃない甘さを。<br>
       魔法じゃない、本物の支えを。
     </p>
-    <a class="order-footer__guide" href="/guide/">ご利用ガイド（送料・お届け・返品について）</a>
+    <nav class="order-footer__nav">
+      <a class="order-footer__guide" href="/company/">企業案内</a>
+      <a class="order-footer__guide" href="/guide/">ご利用ガイド（送料・お届け・返品について）</a>
+    </nav>
     <p class="order-footer__copyright">© 2026 Majorin Sweets. All rights reserved.</p>
   </div>
 </footer>

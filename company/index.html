@@ -106,7 +106,10 @@
     font-size: 0.84rem; line-height: 1.95; color: var(--color-text);
     letter-spacing: 0.04em; margin: 0;
   }
-  .spec__val a { color: var(--color-gold); text-decoration: none; border-bottom: 1px solid rgba(212, 175, 110, 0.4); }
+  .block__lead a, .spec__val a {
+    color: var(--color-gold); text-decoration: none;
+    border-bottom: 1px solid rgba(212, 175, 110, 0.4);
+  }
 
   /* 未確定プレースホルダ */
   .tbd {
@@ -176,6 +179,9 @@
   <section class="block">
     <h2 class="block__title">私たちについて</h2>
     <p class="block__lead">
+      MAJORINS は、<a href="https://www.mama-syokuzai.co.jp/" target="_blank" rel="noopener noreferrer">ママ食材株式会社</a>が運営するスイーツブランドです。
+    </p>
+    <p class="block__lead">
       <!-- ▼原稿待ち：ブランドの成り立ち・想いを2〜3段落で -->
       <span class="tbd">原稿待ち</span> ブランドの成り立ち、大切にしていること、これからについて。
     </p>
@@ -186,20 +192,36 @@
     <h2 class="block__title">会社概要</h2>
     <div class="spec">
       <div class="spec__row">
-        <p class="spec__key">商号</p>
-        <p class="spec__val"><span class="tbd">要確認</span></p>
+        <p class="spec__key">会社名</p>
+        <p class="spec__val">ママ食材株式会社</p>
       </div>
       <div class="spec__row">
         <p class="spec__key">代表者</p>
-        <p class="spec__val"><span class="tbd">要確認</span></p>
+        <p class="spec__val">平石 旭</p>
       </div>
       <div class="spec__row">
         <p class="spec__key">所在地</p>
-        <p class="spec__val"><span class="tbd">要確認</span></p>
+        <p class="spec__val">【本社】〒441-3147 愛知県豊橋市大岩町字岩田13番地1</p>
       </div>
       <div class="spec__row">
-        <p class="spec__key">事業内容</p>
-        <p class="spec__val"><span class="tbd">要確認</span>（洋菓子の製造・販売 など）</p>
+        <p class="spec__key">設立</p>
+        <p class="spec__val">1980年8月</p>
+      </div>
+      <div class="spec__row">
+        <p class="spec__key">TEL</p>
+        <p class="spec__val"><a href="tel:0532395229">0532-39-5229</a></p>
+      </div>
+      <div class="spec__row">
+        <p class="spec__key">FAX</p>
+        <p class="spec__val">0532-39-5230</p>
+      </div>
+      <div class="spec__row">
+        <p class="spec__key">業務内容</p>
+        <p class="spec__val">青果卸、カット野菜卸、食品販売（MAJORINS スイーツの製造・販売を含みます）</p>
+      </div>
+      <div class="spec__row">
+        <p class="spec__key">公式サイト</p>
+        <p class="spec__val"><a href="https://www.mama-syokuzai.co.jp/" target="_blank" rel="noopener noreferrer">https://www.mama-syokuzai.co.jp/</a></p>
       </div>
       <div class="spec__row">
         <p class="spec__key">お問合せ</p>
@@ -214,23 +236,23 @@
     <div class="spec">
       <div class="spec__row">
         <p class="spec__key">販売業者</p>
-        <p class="spec__val"><span class="tbd">要確認</span></p>
+        <p class="spec__val">ママ食材株式会社</p>
       </div>
       <div class="spec__row">
         <p class="spec__key">運営統括責任者</p>
-        <p class="spec__val"><span class="tbd">要確認</span></p>
+        <p class="spec__val">平石 旭</p>
       </div>
       <div class="spec__row">
         <p class="spec__key">所在地</p>
-        <p class="spec__val"><span class="tbd">要確認</span></p>
+        <p class="spec__val">〒441-3147 愛知県豊橋市大岩町字岩田13番地1</p>
       </div>
       <div class="spec__row">
         <p class="spec__key">電話番号</p>
-        <p class="spec__val"><span class="tbd">要確認</span>（受付時間もあわせて記載）</p>
+        <p class="spec__val"><a href="tel:0532395229">0532-39-5229</a></p>
       </div>
       <div class="spec__row">
         <p class="spec__key">メールアドレス</p>
-        <p class="spec__val"><span class="tbd">要確認</span></p>
+        <p class="spec__val"><a href="/contact/">お問合せフォーム</a>よりご連絡ください</p>
       </div>
       <div class="spec__row">
         <p class="spec__key">販売価格</p>
@@ -255,16 +277,15 @@
       <div class="spec__row">
         <p class="spec__key">引渡し時期</p>
         <p class="spec__val">
-          毎週水曜日10時よりご予約を受付け、翌週木曜日より順次発送いたします。<br>
-          週のご予約上限に達しましたら翌週の注文分となり、発送も翌々週となりますので、
-          お届けまで1〜2週間程お時間をいただきます。
+          ご注文受付は毎週木曜10:00〜日曜10:00です。木曜または金曜に発送予定（翌週末のお届けを目安）となります。<br>
+          各商品とも週10個限定のため、上限到達後は翌週受付・発送となる場合があります。詳細は <a href="/guide/">ご利用ガイド</a> をご確認ください。
         </p>
       </div>
       <div class="spec__row">
         <p class="spec__key">返品・交換</p>
         <p class="spec__val">
           食品のため、お客様都合による返品・交換はお受けできません。<br>
-          商品に破損・不良があった場合は、商品到着後<span class="tbd">◯日</span>以内にご連絡ください。
+          商品に破損・不良があった場合は、商品到着後7日以内にご連絡ください。
           <a href="/guide/">ご利用ガイド</a>もあわせてご確認ください。
         </p>
       </div>

@@ -3,6 +3,7 @@
  *
  * GET  /status    公開：残り個数・受付可否
  * POST /checkout  注文内容から Stripe Checkout Session を作成
+ * POST /contact   お問合せ受付（KV 保存）
  * POST /webhook   Stripe checkout.session.completed
  */
 
@@ -358,6 +359,61 @@ async function applySession(env, session) {
   return { ok: true, weekId, added, counts };
 }
 
+async function handleContact(env, payload) {
+  const name = String(payload?.name || '').trim();
+  const email = String(payload?.email || '').trim();
+  const message = String(payload?.message || '').trim();
+  const tel = String(payload?.tel || '').trim();
+  const zip = String(payload?.zip || '').trim();
+  const address = String(payload?.address || '').trim();
+  const category = String(payload?.category || '').trim();
+
+  if (!name || name.length > 100) {
+    return { ok: false, status: 400, body: { error: 'invalid_name', message: 'お名前をご入力ください。' } };
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) {
+    return { ok: false, status: 400, body: { error: 'invalid_email', message: 'メールアドレスを正しくご入力ください。' } };
+  }
+  if (!message || message.length > 5000) {
+    return { ok: false, status: 400, body: { error: 'invalid_message', message: 'お問合せ内容をご入力ください。' } };
+  }
+  if (tel && !/^[0-9+\-() ]{9,20}$/.test(tel)) {
+    return { ok: false, status: 400, body: { error: 'invalid_tel', message: '電話番号を正しくご入力ください。' } };
+  }
+
+  const now = Date.now();
+  const id = `contact:${now}:${crypto.randomUUID().slice(0, 8)}`;
+  const record = {
+    id,
+    createdAt: new Date(now).toISOString(),
+    name,
+    email,
+    tel,
+    zip,
+    address,
+    category,
+    message,
+  };
+  await env.STOCK.put(id, JSON.stringify(record), { expirationTtl: 60 * 60 * 24 * 120 });
+
+  // 任意: CONTACT_WEBHOOK_URL があれば通知（Slack Incoming Webhook 等）
+  if (env.CONTACT_WEBHOOK_URL) {
+    try {
+      await fetch(env.CONTACT_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: `【MAJORINS お問合せ】${name} <${email}>\n種別: ${category || 'なし'}\n${message}`,
+        }),
+      });
+    } catch {
+      // 保存は成功しているので通知失敗は握りつぶす
+    }
+  }
+
+  return { ok: true, status: 200, body: { ok: true, id } };
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -390,6 +446,21 @@ export default {
         return json(result.body, result.status, origin);
       } catch (err) {
         return json({ error: String(err.message || err), message: '決済画面を開けませんでした。' }, 500, origin);
+      }
+    }
+
+    if (request.method === 'POST' && url.pathname === '/contact') {
+      let payload;
+      try {
+        payload = await request.json();
+      } catch {
+        return json({ error: 'invalid_json', message: 'リクエストが不正です。' }, 400, origin);
+      }
+      try {
+        const result = await handleContact(env, payload);
+        return json(result.body, result.status, origin);
+      } catch (err) {
+        return json({ error: String(err.message || err), message: '送信できませんでした。' }, 500, origin);
       }
     }
 

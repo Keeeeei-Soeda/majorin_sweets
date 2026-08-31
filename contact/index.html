@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お問合せ | Majorin Sweets</title>
+<meta name="description" content="MAJORINS へのお問合せはこちらのフォームからお願いいたします。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; padding: 0; }
+
+  :root {
+    --color-bg: #14080d;
+    --color-bg-deep: #0a0407;
+    --color-rose: #c47b8a;
+    --color-gold: #d4af6e;
+    --color-gold-bright: #f0d090;
+    --color-text: #f5e8d8;
+    --color-text-muted: #b8a090;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body-jp: 'Noto Serif JP', serif;
+  }
+
+  body {
+    background: radial-gradient(ellipse at center top, #2a1820 0%, var(--color-bg) 40%, var(--color-bg-deep) 100%);
+    background-attachment: fixed;
+    color: var(--color-text);
+    font-family: var(--font-body-jp);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 16px 22px;
+    background: rgba(10, 4, 7, 0.82);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(212, 175, 110, 0.28);
+  }
+  .site-header__logo {
+    font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 0.32em;
+    color: var(--color-gold-bright); text-decoration: none;
+  }
+  .site-header__back {
+    font-size: 0.78rem; letter-spacing: 0.1em; color: var(--color-text-muted);
+    text-decoration: none; border-bottom: 1px solid rgba(184, 160, 144, 0.35);
+    padding-bottom: 2px; white-space: nowrap;
+  }
+  .site-header__back:hover { color: var(--color-gold-bright); border-color: var(--color-gold); }
+
+  .page-intro { text-align: center; max-width: 640px; margin: 0 auto; padding: 64px 20px 40px; }
+  .page-intro__eyebrow {
+    font-family: var(--font-display); font-style: italic; color: var(--color-rose);
+    letter-spacing: 0.3em; font-size: 0.85rem; margin-bottom: 18px;
+  }
+  .page-intro__title {
+    font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 400;
+    letter-spacing: 0.05em; color: var(--color-gold-bright); margin: 0 0 16px;
+  }
+  .page-intro__text {
+    font-size: 0.92rem; line-height: 2; color: var(--color-text-muted);
+    font-weight: 300; letter-spacing: 0.08em; margin: 0;
+  }
+
+  .page-main { max-width: 720px; margin: 0 auto; padding: 0 20px 80px; }
+
+  .form-card {
+    padding: 34px 34px 30px;
+    background: linear-gradient(180deg, rgba(42, 24, 32, 0.5) 0%, rgba(20, 10, 13, 0.72) 100%);
+    border: 1px solid rgba(212, 175, 110, 0.3);
+    border-radius: 4px;
+  }
+
+  .field { margin-bottom: 24px; }
+  .field:last-of-type { margin-bottom: 28px; }
+
+  .field__label {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.8rem; letter-spacing: 0.1em; color: var(--color-gold);
+    margin-bottom: 9px;
+  }
+  .field__req {
+    font-size: 0.62rem; letter-spacing: 0.08em; color: var(--color-rose);
+    border: 1px solid rgba(196, 123, 138, 0.55); border-radius: 2px;
+    padding: 2px 7px; line-height: 1.5;
+  }
+  .field__opt {
+    font-size: 0.62rem; letter-spacing: 0.08em; color: var(--color-text-muted);
+    border: 1px solid rgba(184, 160, 144, 0.35); border-radius: 2px;
+    padding: 2px 7px; line-height: 1.5;
+  }
+  .field__hint {
+    font-size: 0.7rem; line-height: 1.8; color: var(--color-text-muted);
+    margin: 7px 0 0; letter-spacing: 0.03em;
+  }
+
+  .input, .textarea, .select {
+    width: 100%;
+    padding: 13px 14px;
+    font-family: var(--font-body-jp);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    background: rgba(10, 4, 7, 0.55);
+    border: 1px solid rgba(212, 175, 110, 0.32);
+    border-radius: 2px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .input:focus, .textarea:focus, .select:focus {
+    outline: none;
+    border-color: var(--color-gold-bright);
+    box-shadow: 0 0 0 3px rgba(212, 175, 110, 0.14);
+  }
+  .input::placeholder, .textarea::placeholder { color: rgba(184, 160, 144, 0.5); }
+  .textarea { min-height: 160px; resize: vertical; }
+  .select { appearance: none; cursor: pointer; }
+  .select option { background: #1a0f12; color: var(--color-text); }
+
+  .field--invalid .input,
+  .field--invalid .textarea,
+  .field--invalid .select { border-color: #d98a8a; }
+  .field__error {
+    display: none;
+    font-size: 0.72rem; line-height: 1.7; color: #f2b8b8;
+    margin: 7px 0 0; letter-spacing: 0.03em;
+  }
+  .field--invalid .field__error { display: block; }
+
+  .field__row { display: grid; grid-template-columns: 160px 1fr; gap: 12px; }
+
+  .consent {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 16px 18px;
+    border: 1px solid rgba(212, 175, 110, 0.22);
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+  .consent input { margin-top: 3px; width: 17px; height: 17px; accent-color: var(--color-gold); flex-shrink: 0; }
+  .consent label {
+    font-size: 0.78rem; line-height: 1.95; color: var(--color-text-muted); letter-spacing: 0.03em;
+  }
+  .consent a { color: var(--color-gold); text-decoration: none; border-bottom: 1px solid rgba(212, 175, 110, 0.4); }
+  .consent.field--invalid { border-color: #d98a8a; }
+
+  .submit {
+    display: block; width: 100%;
+    padding: 17px 0;
+    font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.28em;
+    color: #1a0f12;
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-bright) 100%);
+    border: none; border-radius: 2px; cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  }
+  .submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(212, 175, 110, 0.35); }
+  .submit:disabled { opacity: 0.4; cursor: not-allowed; }
+  .submit:focus-visible { outline: 2px solid var(--color-gold-bright); outline-offset: 3px; }
+
+  .form-message {
+    margin-top: 18px; padding: 14px 16px;
+    border-radius: 2px; font-size: 0.8rem; line-height: 1.9; letter-spacing: 0.03em;
+  }
+  .form-message[hidden] { display: none; }
+  .form-message--error { border: 1px solid rgba(217, 138, 138, 0.5); background: rgba(217, 138, 138, 0.1); color: #f2b8b8; }
+
+  .done { text-align: center; padding: 30px 10px; }
+  .done__title {
+    font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.14em;
+    color: var(--color-gold-bright); margin: 0 0 18px; font-weight: 400;
+  }
+  .done__text { font-size: 0.86rem; line-height: 2.1; color: var(--color-text); margin: 0 0 26px; }
+  .done__back {
+    display: inline-block; color: var(--color-gold); text-decoration: none;
+    font-size: 0.82rem; letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(212, 175, 110, 0.4); padding-bottom: 2px;
+  }
+  [hidden] { display: none !important; }
+
+  .site-footer {
+    background: linear-gradient(135deg, #2a1a2a 0%, #1a0a1a 100%);
+    padding: 60px 20px 52px; text-align: center;
+    border-top: 1px solid rgba(212, 175, 110, 0.2);
+  }
+  .site-footer__inner { max-width: 800px; margin: 0 auto; }
+  .site-footer__logo {
+    font-family: 'Cinzel', serif; font-size: clamp(1.5rem, 4vw, 2.2rem);
+    letter-spacing: 0.3em; margin: 0 0 30px; font-weight: 700;
+    background: linear-gradient(135deg, #C04060 0%, #DE86A3 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .site-footer__nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 26px; margin-bottom: 30px; }
+  .site-footer__nav a {
+    color: var(--color-gold); text-decoration: none; font-size: 0.82rem;
+    letter-spacing: 0.08em; border-bottom: 1px solid rgba(212, 175, 110, 0.4); padding-bottom: 2px;
+  }
+  .site-footer__copyright { font-size: 0.78rem; color: rgba(245, 240, 242, 0.6); margin: 0; }
+
+  /* 既存サイトの SP 境界（max-width: 520px） */
+  @media (max-width: 520px) {
+    .site-header { padding: 14px 16px; }
+    .page-intro { padding: 44px 18px 30px; }
+    .page-intro__title { font-size: 1.85rem; }
+    .page-main { padding: 0 18px 72px; }
+    .form-card { padding: 24px 18px 22px; }
+    .field__row { grid-template-columns: 1fr; }
+    .site-footer { padding: 48px 18px 44px; }
+    .site-footer__nav { gap: 10px 18px; }
+    .site-footer__nav a { font-size: 0.78rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .submit { transition: none; }
+    .submit:hover:not(:disabled) { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="site-header__logo" href="/">MAJORINS</a>
+  <a class="site-header__back" href="/">トップへ戻る</a>
+</header>
+
+<div class="page-intro">
+  <div class="page-intro__eyebrow">Contact</div>
+  <h1 class="page-intro__title">お問合せ</h1>
+  <p class="page-intro__text">商品やご注文についてのご質問を承ります。<br>3営業日以内にご返信いたします。</p>
+</div>
+
+<main class="page-main">
+  <div class="form-card">
+
+    <div id="formArea">
+
+      <div class="field" data-field>
+        <div class="field__label"><span>お名前</span><span class="field__req">必須</span></div>
+        <input class="input" type="text" id="name" name="name" autocomplete="name" placeholder="副田 渓">
+        <p class="field__error">お名前をご入力ください。</p>
+      </div>
+
+      <div class="field" data-field>
+        <div class="field__label"><span>メールアドレス</span><span class="field__req">必須</span></div>
+        <input class="input" type="email" id="email" name="email" autocomplete="email" placeholder="example@majorins.jp">
+        <p class="field__hint">ご返信先となります。お間違いのないようご確認ください。</p>
+        <p class="field__error">メールアドレスを正しくご入力ください。</p>
+      </div>
+
+      <div class="field" data-field>
+        <div class="field__label"><span>電話番号</span><span class="field__opt">任意</span></div>
+        <input class="input" type="tel" id="tel" name="tel" autocomplete="tel" placeholder="0000-00-0000">
+        <p class="field__error">電話番号を正しくご入力ください。</p>
+      </div>
+
+      <div class="field" data-field>
+        <div class="field__label"><span>ご住所</span><span class="field__opt">任意</span></div>
+        <div class="field__row">
+          <input class="input" type="text" id="zip" name="zip" autocomplete="postal-code" placeholder="000-0000">
+          <input class="input" type="text" id="address" name="address" autocomplete="street-address" placeholder="都道府県市区町村 番地・建物名">
+        </div>
+        <p class="field__hint">商品のお届けに関するお問合せの場合にご記入ください。</p>
+      </div>
+
+      <div class="field" data-field>
+        <div class="field__label"><span>お問合せ種別</span><span class="field__opt">任意</span></div>
+        <select class="select" id="category" name="category">
+          <option value="">選択してください</option>
+          <option value="商品について">商品について</option>
+          <option value="ご注文・お届けについて">ご注文・お届けについて</option>
+          <option value="ギフト・のしについて">ギフト・のしについて</option>
+          <option value="取材・お取引について">取材・お取引について</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+
+      <div class="field" data-field>
+        <div class="field__label"><span>お問合せ内容</span><span class="field__req">必須</span></div>
+        <textarea class="textarea" id="message" name="message" placeholder="お問合せ内容をご記入ください。"></textarea>
+        <p class="field__error">お問合せ内容をご入力ください。</p>
+      </div>
+
+      <div class="consent" data-field>
+        <input type="checkbox" id="consent">
+        <label for="consent">
+          ご入力いただいた個人情報は、お問合せへの回答および必要なご連絡のみに利用いたします。
+          <a href="/privacy/">個人情報の取扱いについて</a>に同意します。
+        </label>
+      </div>
+
+      <button type="button" class="submit" id="submit">送信する</button>
+      <p class="form-message form-message--error" id="formError" hidden></p>
+    </div>
+
+    <div class="done" id="doneArea" hidden>
+      <h2 class="done__title">送信いたしました</h2>
+      <p class="done__text">
+        お問合せいただきありがとうございます。<br>
+        内容を確認のうえ、3営業日以内にご返信いたします。<br>
+        しばらくお待ちくださいませ。
+      </p>
+      <a class="done__back" href="/">トップへ戻る</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <p class="site-footer__logo">MAJORINS</p>
+    <nav class="site-footer__nav">
+      <a href="/company/">企業案内</a>
+      <a href="/contact/">お問合せ</a>
+      <a href="/guide/">ご利用ガイド</a>
+    </nav>
+    <p class="site-footer__copyright">© 2026 Majorin Sweets. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var CONTACT_URL = 'https://majorins-stock.majorins.workers.dev/contact';
+
+  var $form   = document.getElementById('formArea');
+  var $done   = document.getElementById('doneArea');
+  var $submit = document.getElementById('submit');
+  var $error  = document.getElementById('formError');
+  var $consent = document.getElementById('consent');
+
+  var v = function (id) { return document.getElementById(id).value.trim(); };
+  var fieldOf = function (el) { return el.closest('[data-field]'); };
+
+  function setInvalid(el, invalid) {
+    var f = fieldOf(el);
+    if (f) f.classList.toggle('field--invalid', invalid);
+  }
+
+  function validate() {
+    var ok = true;
+    var checks = [
+      ['name',    function (val) { return val.length > 0; }],
+      ['email',   function (val) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val); }],
+      ['message', function (val) { return val.length > 0; }]
+    ];
+    checks.forEach(function (c) {
+      var el = document.getElementById(c[0]);
+      var valid = c[1](el.value.trim());
+      setInvalid(el, !valid);
+      if (!valid && ok) { ok = false; el.focus(); }
+    });
+
+    var tel = document.getElementById('tel');
+    var telVal = tel.value.trim();
+    var telOk = telVal === '' || /^[0-9+\-() ]{9,20}$/.test(telVal);
+    setInvalid(tel, !telOk);
+    if (!telOk && ok) { ok = false; tel.focus(); }
+
+    var consentOk = $consent.checked;
+    fieldOf($consent).classList.toggle('field--invalid', !consentOk);
+    if (!consentOk && ok) { ok = false; $consent.focus(); }
+
+    return ok;
+  }
+
+  ['name', 'email', 'tel', 'message'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () { setInvalid(el, false); });
+  });
+  $consent.addEventListener('change', function () {
+    fieldOf($consent).classList.toggle('field--invalid', !$consent.checked);
+  });
+
+  function showError(msg) { $error.textContent = msg; $error.hidden = false; }
+
+  $submit.addEventListener('click', function () {
+    $error.hidden = true;
+    if (!validate()) {
+      showError('未入力の項目があります。ご確認ください。');
+      return;
+    }
+
+    $submit.disabled = true;
+    $submit.textContent = '送信しています…';
+
+    fetch(CONTACT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: v('name'), email: v('email'), tel: v('tel'),
+        zip: v('zip'), address: v('address'),
+        category: v('category'), message: v('message')
+      })
+    })
+      .then(function (r) {
+        return r.json().catch(function () { return null; })
+          .then(function (body) { return { ok: r.ok, body: body }; });
+      })
+      .then(function (res) {
+        if (res.ok) {
+          $form.hidden = true;
+          $done.hidden = false;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        $submit.disabled = false;
+        $submit.textContent = '送信する';
+        showError((res.body && res.body.message) ||
+          '送信できませんでした。時間をおいてもう一度お試しください。');
+      })
+      .catch(function () {
+        $submit.disabled = false;
+        $submit.textContent = '送信する';
+        showError('送信できませんでした。通信環境をご確認のうえ、もう一度お試しください。');
+      });
+  });
+})();
+</script>
+</body>
+</html>

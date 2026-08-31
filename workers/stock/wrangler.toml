@@ -1,7 +1,7 @@
-# デプロイ: cd workers/stock && npx wrangler login && npx wrangler deploy
+# デプロイ: cd workers/stock && npx wrangler deploy
 # 秘密情報: npx wrangler secret put STRIPE_WEBHOOK_SECRET
 #           npx wrangler secret put STRIPE_SECRET_KEY
-# Stripe Webhook URL: https://<worker-host>/webhook
+# Stripe Webhook URL: https://majorins-stock.<account>.workers.dev/webhook
 #   イベント: checkout.session.completed
 
 name = "majorins-stock"
@@ -10,8 +10,5 @@ compatibility_date = "2026-08-30"
 
 [[kv_namespaces]]
 binding = "STOCK"
-id = "REPLACE_AFTER_KV_CREATE"
-preview_id = "REPLACE_AFTER_KV_CREATE"
-
-[vars]
-# フロントの STOCK_API_URL に、デプロイ後の https://majorins-stock.<account>.workers.dev/status を入れる
+id = "39cd022ac93a4b05bcb98202ec3d989a"
+preview_id = "c3be2fc5f4d04ac89290a33ee5eb9673"

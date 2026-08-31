@@ -1,17 +1,26 @@
 /**
  * MAJORINS 週次在庫（商品ごと 10 個 / 木 10:00 JST リセット）
  *
- * GET  /status   公開：残り個数・受付可否
- * POST /webhook  Stripe checkout.session.completed
+ * GET  /status    公開：残り個数・受付可否
+ * POST /checkout  注文内容から Stripe Checkout Session を作成
+ * POST /webhook   Stripe checkout.session.completed
  */
 
 const LIMIT_PER_ITEM = 10;
 const PRODUCT_KEYS = ['noir', 'verdant', 'passion'];
-const PRICE_TO_KEY = {
-  price_1Tfr7c3A10QFS30cZiB51VM1: 'noir',
-  price_1Tfr7d3A10QFS30cxsuzLgbC: 'verdant',
-  price_1Tfr7f3A10QFS30c2sjr3cti: 'passion',
+const KEY_TO_PRICE = {
+  noir: 'price_1Tfr7c3A10QFS30cZiB51VM1',
+  verdant: 'price_1Tfr7d3A10QFS30cxsuzLgbC',
+  passion: 'price_1Tfr7f3A10QFS30c2sjr3cti',
 };
+const PRICE_TO_KEY = Object.fromEntries(
+  Object.entries(KEY_TO_PRICE).map(([k, v]) => [v, k]),
+);
+const PRICE_YEN = { noir: 4800, verdant: 4800, passion: 4800 };
+const FREE_SHIPPING_YEN = 10000;
+const SHIPPING_RATE_PAID = 'shr_1U8cKh3A10QFS30cDgDiCewG';
+const SHIPPING_RATE_FREE = 'shr_1UARvb3A10QFS30c5a46Ocnr';
+const SITE_ORIGIN = 'https://shop.majorins.jp';
 
 const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 
@@ -170,6 +179,146 @@ async function fetchSessionLineItems(sessionId, secretKey) {
   return res.json();
 }
 
+async function createCheckoutSession(env, items, opts = {}) {
+  const now = Date.now();
+  const weekStart = weekStartUtc(now);
+  const weekId = weekIdFromStart(weekStart);
+  const counts = await readCounts(env.STOCK, weekId);
+  const status = buildStatus(now, counts);
+  const forceOpen =
+    Boolean(env.QA_CHECKOUT_TOKEN) &&
+    typeof opts.qaToken === 'string' &&
+    opts.qaToken.length > 0 &&
+    opts.qaToken === env.QA_CHECKOUT_TOKEN;
+
+  if (!status.accepting && !forceOpen) {
+    return {
+      ok: false,
+      status: 403,
+      body: {
+        error: 'not_accepting',
+        message: '現在は受付時間外です。ご注文の受付は毎週木曜10:00〜日曜10:00です。',
+        items: status.items,
+        accepting: false,
+      },
+    };
+  }
+
+  // forceOpen 時は soldOut を在庫のみで再評価（受付時間外でも残数チェック）
+  if (forceOpen) {
+    for (const key of PRODUCT_KEYS) {
+      const sold = Number(counts[key] || 0);
+      const remaining = Math.max(0, LIMIT_PER_ITEM - sold);
+      status.items[key] = { sold, remaining, soldOut: remaining <= 0, limit: LIMIT_PER_ITEM };
+    }
+    status.accepting = true;
+  }
+
+  const lineItems = [];
+  let subtotal = 0;
+
+  for (const raw of items) {
+    const sku = String(raw?.sku || '');
+    const qty = Number(raw?.qty || 0);
+    if (!PRODUCT_KEYS.includes(sku)) {
+      return {
+        ok: false,
+        status: 400,
+        body: { error: 'invalid_sku', message: '不明な商品です。', sku },
+      };
+    }
+    if (!Number.isInteger(qty) || qty <= 0 || qty > LIMIT_PER_ITEM) {
+      return {
+        ok: false,
+        status: 400,
+        body: { error: 'invalid_qty', message: '数量が正しくありません。', sku, qty },
+      };
+    }
+    const remaining = status.items[sku].remaining;
+    if (qty > remaining) {
+      return {
+        ok: false,
+        status: 409,
+        body: {
+          error: 'sold_out',
+          message: `${sku} の在庫が不足しています（残り ${remaining} 本）。`,
+          items: status.items,
+        },
+      };
+    }
+    lineItems.push({ price: KEY_TO_PRICE[sku], quantity: qty });
+    subtotal += PRICE_YEN[sku] * qty;
+  }
+
+  if (!lineItems.length) {
+    return {
+      ok: false,
+      status: 400,
+      body: { error: 'empty_cart', message: 'ケーキの個数をお選びください。' },
+    };
+  }
+
+  const shippingFree = subtotal >= FREE_SHIPPING_YEN;
+  const body = new URLSearchParams();
+  body.append('mode', 'payment');
+  body.append('success_url', `${SITE_ORIGIN}/order/?success=1`);
+  body.append('cancel_url', `${SITE_ORIGIN}/order/?canceled=1`);
+  body.append('billing_address_collection', 'auto');
+  body.append('phone_number_collection[enabled]', 'false');
+  body.append('shipping_address_collection[allowed_countries][0]', 'JP');
+  body.append('allow_promotion_codes', 'true');
+  body.append('locale', 'ja');
+  body.append('custom_fields[0][key]', 'remarks');
+  body.append('custom_fields[0][label][type]', 'custom');
+  body.append('custom_fields[0][label][custom]', '備考（のし・表書きなど）');
+  body.append('custom_fields[0][type]', 'text');
+  body.append('custom_fields[0][optional]', 'true');
+  body.append('custom_fields[0][text][maximum_length]', '200');
+
+  lineItems.forEach((li, i) => {
+    body.append(`line_items[${i}][price]`, li.price);
+    body.append(`line_items[${i}][quantity]`, String(li.quantity));
+  });
+
+  if (shippingFree) {
+    body.append('shipping_options[0][shipping_rate]', SHIPPING_RATE_FREE);
+  } else {
+    body.append('shipping_options[0][shipping_rate]', SHIPPING_RATE_PAID);
+  }
+
+  const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body,
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: 502,
+      body: {
+        error: 'stripe_error',
+        message: data.error?.message || '決済セッションを作成できませんでした。',
+      },
+    };
+  }
+
+  return {
+    ok: true,
+    status: 200,
+    body: {
+      url: data.url,
+      id: data.id,
+      subtotal,
+      shipping: shippingFree ? 0 : 1300,
+      shippingFree,
+    },
+  };
+}
+
 async function applySession(env, session) {
   const sessionId = session.id;
   if (!sessionId) return { ok: false, reason: 'no_session_id' };
@@ -223,6 +372,25 @@ export default {
       const weekId = weekIdFromStart(weekStartUtc(now));
       const counts = await readCounts(env.STOCK, weekId);
       return json(buildStatus(now, counts), 200, origin);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/checkout') {
+      if (!env.STRIPE_SECRET_KEY) {
+        return json({ error: 'misconfigured', message: '決済設定が未完了です。' }, 500, origin);
+      }
+      let payload;
+      try {
+        payload = await request.json();
+      } catch {
+        return json({ error: 'invalid_json', message: 'リクエストが不正です。' }, 400, origin);
+      }
+      const items = Array.isArray(payload?.items) ? payload.items : [];
+      try {
+        const result = await createCheckoutSession(env, items, { qaToken: payload?.qaToken });
+        return json(result.body, result.status, origin);
+      } catch (err) {
+        return json({ error: String(err.message || err), message: '決済画面を開けませんでした。' }, 500, origin);
+      }
     }
 
     if (request.method === 'POST' && url.pathname === '/webhook') {

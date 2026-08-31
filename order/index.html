@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ご注文 | Majorin Sweets</title>
+<meta name="description" content="MAJORINS のケーキをお選びください。商品合計10,000円以上で送料無料。">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; padding: 0; }
+
+  :root {
+    --color-bg: #14080d;
+    --color-bg-deep: #0a0407;
+    --color-rose: #c47b8a;
+    --color-gold: #d4af6e;
+    --color-gold-bright: #f0d090;
+    --color-text: #f5e8d8;
+    --color-text-muted: #b8a090;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body-jp: 'Noto Serif JP', serif;
+  }
+
+  body {
+    background: radial-gradient(ellipse at center top, #2a1820 0%, var(--color-bg) 40%, var(--color-bg-deep) 100%);
+    background-attachment: fixed;
+    color: var(--color-text);
+    font-family: var(--font-body-jp);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  /* ========== HEADER ========== */
+  .order-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 22px;
+    background: rgba(10, 4, 7, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(212, 175, 110, 0.28);
+  }
+  .order-header__logo {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.32em;
+    color: var(--color-gold-bright);
+    text-decoration: none;
+  }
+  .order-header__back {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(184, 160, 144, 0.35);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  .order-header__back:hover { color: var(--color-gold-bright); border-color: var(--color-gold); }
+
+  /* ========== INTRO ========== */
+  .order-intro {
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 64px 20px 40px;
+  }
+  .order-intro__eyebrow {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--color-rose);
+    letter-spacing: 0.3em;
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+  }
+  .order-intro__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    color: var(--color-gold-bright);
+    margin: 0 0 16px;
+  }
+  .order-intro__text {
+    font-size: 0.92rem;
+    line-height: 2;
+    color: var(--color-text-muted);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    margin: 0;
+  }
+
+  /* ========== NOTICE ========== */
+  .order-notice {
+    max-width: 880px;
+    margin: 0 auto 32px;
+    padding: 14px 20px;
+    border: 1px solid rgba(196, 123, 138, 0.45);
+    background: rgba(196, 123, 138, 0.1);
+    border-radius: 3px;
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: var(--color-text);
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+  .order-notice[hidden] { display: none; }
+
+  /* ========== LAYOUT ========== */
+  .order-layout {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ========== ITEM ========== */
+  .order-items { display: flex; flex-direction: column; gap: 20px; }
+
+  .order-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 22px;
+    padding: 22px;
+    background: linear-gradient(180deg, rgba(42, 24, 32, 0.55) 0%, rgba(20, 10, 13, 0.75) 100%);
+    border: 1px solid rgba(212, 175, 110, 0.3);
+    border-radius: 4px;
+    align-items: center;
+  }
+  .order-item__thumb {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+  }
+  .order-item__name-en {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.16em;
+    color: var(--color-gold-bright);
+    margin: 0 0 2px;
+    font-weight: 400;
+  }
+  .order-item__name-jp {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.12em;
+    margin: 0 0 10px;
+  }
+  .order-item__desc {
+    font-size: 0.78rem;
+    line-height: 1.85;
+    color: var(--color-text-muted);
+    margin: 0 0 14px;
+    max-width: 42em;
+  }
+  .order-item__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .order-item__price {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--color-gold-bright);
+    letter-spacing: 0.04em;
+  }
+  .order-item__price span {
+    font-family: var(--font-body-jp);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-left: 6px;
+    letter-spacing: 0.1em;
+  }
+
+  /* 数量ステッパー */
+  .qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(212, 175, 110, 0.45);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .qty__btn {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    color: var(--color-gold);
+    font-size: 1.15rem;
+    font-family: var(--font-display);
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+    line-height: 1;
+  }
+  .qty__btn:hover:not(:disabled) { background: rgba(212, 175, 110, 0.16); color: var(--color-gold-bright); }
+  .qty__btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .qty__btn:focus-visible { outline: 2px solid var(--color-gold-bright); outline-offset: -2px; }
+  .qty__value {
+    width: 46px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-text);
+    border-left: 1px solid rgba(212, 175, 110, 0.25);
+    border-right: 1px solid rgba(212, 175, 110, 0.25);
+    line-height: 40px;
+  }
+  .order-item__stock {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.08em;
+    margin-top: 8px;
+  }
+
+  /* 売り切れ */
+  .order-item.is-unavailable { opacity: 0.55; }
+  .order-item.is-unavailable .order-item__thumb { filter: grayscale(45%) brightness(0.72); }
+  .order-item__soldout {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--color-text);
+    border: 1px solid rgba(212, 175, 110, 0.45);
+    background: rgba(20, 8, 13, 0.6);
+    padding: 9px 16px;
+  }
+
+  /* ========== SUMMARY ========== */
+  .order-summary {
+    position: sticky;
+    top: 84px;
+    padding: 26px 24px 28px;
+    background: linear-gradient(180deg, rgba(26, 15, 18, 0.95) 0%, rgba(20, 10, 13, 0.98) 100%);
+    border: 1px solid rgba(212, 175, 110, 0.4);
+    border-radius: 4px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+  .order-summary__title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: 0.2em;
+    color: var(--color-gold-bright);
+    margin: 0 0 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(212, 175, 110, 0.25);
+    font-weight: 400;
+  }
+  .order-summary__lines { margin-bottom: 16px; min-height: 24px; }
+  .order-summary__line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: var(--color-text-muted);
+  }
+  .order-summary__empty {
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: var(--color-text-muted);
+  }
+  .order-summary__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    padding: 7px 0;
+    letter-spacing: 0.06em;
+  }
+  .order-summary__row--total {
+    border-top: 1px solid rgba(212, 175, 110, 0.25);
+    margin-top: 10px;
+    padding-top: 16px;
+    color: var(--color-text);
+  }
+  .order-summary__row--total .order-summary__amount {
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    color: var(--color-gold-bright);
+  }
+  .order-summary__sub {
+    display: block;
+    font-size: 0.66rem;
+    line-height: 1.7;
+    color: rgba(184, 160, 144, 0.75);
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+  }
+  .order-summary__amount {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--color-text);
+  }
+  .order-summary__amount--free { color: var(--color-gold-bright); }
+
+  .order-submit {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 17px 0;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.28em;
+    color: #1a0f12;
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-bright) 100%);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  }
+  .order-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(212, 175, 110, 0.35);
+  }
+  .order-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+  .order-submit:focus-visible { outline: 2px solid var(--color-gold-bright); outline-offset: 3px; }
+
+  .order-error {
+    margin-top: 14px;
+    font-size: 0.75rem;
+    line-height: 1.8;
+    color: #f2b8b8;
+    letter-spacing: 0.04em;
+  }
+  .order-error[hidden] { display: none; }
+
+  .order-summary__note {
+    margin: 16px 0 0;
+    font-size: 0.68rem;
+    line-height: 1.9;
+    color: var(--color-text-muted);
+    letter-spacing: 0.04em;
+  }
+  .order-summary__note a { color: var(--color-gold); text-decoration: none; border-bottom: 1px solid rgba(212, 175, 110, 0.4); }
+
+  /* ========== FOOTER ========== */
+  .order-footer {
+    background: linear-gradient(135deg, #2a1a2a 0%, #1a0a1a 100%);
+    padding: 64px 20px 56px;
+    text-align: center;
+    border-top: 1px solid rgba(212, 175, 110, 0.2);
+  }
+  .order-footer__inner { max-width: 800px; margin: 0 auto; }
+  .order-footer__logo {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: 0.3em;
+    margin: 0 0 28px;
+    background: linear-gradient(135deg, #C04060 0%, #DE86A3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+  }
+  .order-footer__text {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 2.1;
+    color: rgba(245, 240, 242, 0.85);
+    font-style: italic;
+    margin: 0 0 28px;
+  }
+  .order-footer__guide {
+    display: inline-block;
+    color: var(--color-gold);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid rgba(212, 175, 110, 0.4);
+    padding-bottom: 2px;
+    margin-bottom: 26px;
+  }
+  .order-footer__copyright {
+    font-size: 0.78rem;
+    color: rgba(245, 240, 242, 0.6);
+    margin: 0;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 900px) {
+    .order-layout { grid-template-columns: 1fr; gap: 28px; }
+    .order-summary { position: static; }
+  }
+  @media (max-width: 560px) {
+    .order-intro { padding: 44px 18px 32px; }
+    .order-item { grid-template-columns: 88px 1fr; gap: 16px; padding: 18px; }
+    .order-item__foot { justify-content: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .order-submit, .qty__btn { transition: none; }
+    .order-submit:hover:not(:disabled) { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="order-header">
+  <a class="order-header__logo" href="/">MAJORIN SWEETS</a>
+  <a class="order-header__back" href="/#showcase">ショーケースへ戻る</a>
+</header>
+
+<div class="order-intro">
+  <div class="order-intro__eyebrow">Order</div>
+  <h1 class="order-intro__title">ご注文</h1>
+  <p class="order-intro__text">お選びいただいたケーキを、一度のお会計でお届けします。<br>商品合計10,000円以上で送料が無料になります。</p>
+</div>
+
+<p class="order-notice" id="notice" hidden></p>
+
+<main class="order-layout">
+  <!-- ========== 商品 ========== -->
+  <section class="order-items" id="items" aria-label="ケーキを選ぶ"></section>
+
+  <!-- ========== 合計 ========== -->
+  <aside class="order-summary" aria-label="ご注文内容">
+    <h2 class="order-summary__title">ご注文内容</h2>
+
+    <div class="order-summary__lines" id="summaryLines">
+      <p class="order-summary__empty">ケーキの個数をお選びください。</p>
+    </div>
+
+    <div class="order-summary__row">
+      <span>商品合計</span>
+      <span class="order-summary__amount" id="subtotal">¥0</span>
+    </div>
+    <div class="order-summary__row">
+      <span>送料（クール便）<small class="order-summary__sub">10,000円以上のご購入で送料無料</small></span>
+      <span class="order-summary__amount" id="shipping">—</span>
+    </div>
+    <div class="order-summary__row order-summary__row--total">
+      <span>お支払い金額</span>
+      <span class="order-summary__amount" id="total">¥0</span>
+    </div>
+
+    <button type="button" class="order-submit" id="submit" disabled>お支払いへ進む</button>
+    <p class="order-error" id="error" hidden></p>
+
+    <p class="order-summary__note">
+      お届け先・のし・クーポンは次のお支払い画面でご入力いただけます。<br>
+      <a href="/guide/">送料・お届け・返品について</a>
+    </p>
+  </aside>
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="order-footer">
+  <div class="order-footer__inner">
+    <p class="order-footer__logo">MAJORIN SWEETS</p>
+    <p class="order-footer__text">
+      痛みと共に生きる人々に、<br>
+      完璧じゃない甘さを。<br>
+      魔法じゃない、本物の支えを。
+    </p>
+    <a class="order-footer__guide" href="/guide/">ご利用ガイド（送料・お届け・返品について）</a>
+    <p class="order-footer__copyright">© 2026 Majorin Sweets. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 設定 ===== */
+  var WORKER_BASE   = 'https://majorins-stock.majorins.workers.dev';
+  var STATUS_URL    = WORKER_BASE + '/status';
+  var CHECKOUT_URL  = WORKER_BASE + '/checkout';
+  var STOCK_LIMIT   = 10;
+  var FREE_SHIPPING = 10000;
+  var SHIPPING_FEE  = 1300;
+  var MAX_PER_ORDER = 10;
+
+  var CAKES = [
+    { sku: 'noir', nameEn: 'Noir Melt', nameJp: 'ノワール メルト', price: 4800,
+      img: '/images/showcase/cake-noir-melt.png?v=20260821',
+      desc: 'カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。' },
+    { sku: 'verdant', nameEn: 'Verdant Veil', nameJp: 'ヴァーダント ベール', price: 4800,
+      img: '/images/showcase/cake-verdant-veil.png?v=20260821',
+      desc: '香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。' },
+    { sku: 'passion', nameEn: 'Passion Orange', nameJp: 'パッションオレンジヴェール', price: 4800,
+      img: '/images/showcase/cake-passion-orange.png?v=20260821',
+      desc: '燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。' }
+  ];
+
+  /* ===== 受付時間（木10:00〜日10:00 JST）※ トップページと同一ロジック ===== */
+  function jstWall(nowMs) {
+    var t = new Date(nowMs + 9 * 3600 * 1000);
+    return { y: t.getUTCFullYear(), mo: t.getUTCMonth(), d: t.getUTCDate(), dow: t.getUTCDay() };
+  }
+  function jstToUtcMs(y, mo, d, h) { return Date.UTC(y, mo, d, h - 9, 0, 0, 0); }
+  function weekStartUtc(nowMs) {
+    var w = jstWall(nowMs);
+    var daysFromThu = (w.dow + 7 - 4) % 7;
+    var thuMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromThu * 86400000;
+    var thu = new Date(thuMidnight);
+    var start = jstToUtcMs(thu.getUTCFullYear(), thu.getUTCMonth(), thu.getUTCDate(), 10);
+    if (nowMs < start) {
+      var prev = new Date(thuMidnight - 7 * 86400000);
+      start = jstToUtcMs(prev.getUTCFullYear(), prev.getUTCMonth(), prev.getUTCDate(), 10);
+    }
+    return start;
+  }
+  function isReceptionOpen(nowMs) {
+    var start = weekStartUtc(nowMs);
+    return nowMs >= start && nowMs < start + 3 * 86400000;
+  }
+
+  /* ===== プレビューモード ===== */
+  var IS_PRODUCTION = /(^|\.)majorins\.jp$/.test(location.hostname) ||
+                      /\.github\.io$/.test(location.hostname);
+  var PREVIEW = /[?&]preview=1(&|$)/.test(location.search) || !IS_PRODUCTION;
+
+  /* ===== 状態 ===== */
+  var state = {
+    qty: { noir: 0, verdant: 0, passion: 0 },
+    stock: null,
+    receptionOpen: PREVIEW || isReceptionOpen(Date.now()),
+    submitting: false
+  };
+
+  var yen = function (n) { return '¥' + n.toLocaleString('ja-JP'); };
+
+  /* ===== 在庫の解釈 ===== */
+  function remainingOf(sku) {
+    if (PREVIEW) return MAX_PER_ORDER;
+    if (!state.receptionOpen) return 0;
+    var it = state.stock && state.stock[sku];
+    if (!it) return MAX_PER_ORDER;
+    if (it.soldOut) return 0;
+    if (typeof it.remaining === 'number') return Math.max(0, it.remaining);
+    if (typeof it.count === 'number') return Math.max(0, STOCK_LIMIT - it.count);
+    return MAX_PER_ORDER;
+  }
+  function maxOf(sku) { return Math.min(remainingOf(sku), MAX_PER_ORDER); }
+
+  /* ===== DOM ===== */
+  var $items    = document.getElementById('items');
+  var $notice   = document.getElementById('notice');
+  var $lines    = document.getElementById('summaryLines');
+  var $subtotal = document.getElementById('subtotal');
+  var $shipping = document.getElementById('shipping');
+  var $total    = document.getElementById('total');
+  var $submit   = document.getElementById('submit');
+  var $error    = document.getElementById('error');
+
+  /* ===== 商品カード生成 ===== */
+  var IMG_FALLBACK = 'https://shop.majorins.jp/images/showcase/';
+
+  CAKES.forEach(function (cake) {
+    var el = document.createElement('article');
+    el.className = 'order-item';
+    el.dataset.sku = cake.sku;
+    el.innerHTML =
+      '<img class="order-item__thumb" src="' + cake.img + '" alt="' + cake.nameEn + '" ' +
+        'onerror="this.onerror=null;this.src=\'' + IMG_FALLBACK + cake.img.split('/').pop().split('?')[0] + '\'">' +
+      '<div>' +
+        '<h2 class="order-item__name-en">' + cake.nameEn + '</h2>' +
+        '<p class="order-item__name-jp">' + cake.nameJp + '</p>' +
+        '<p class="order-item__desc">' + cake.desc + '</p>' +
+        '<div class="order-item__foot">' +
+          '<div class="order-item__price">' + yen(cake.price) + '<span>／1本（税込）</span></div>' +
+          '<div class="order-item__control"></div>' +
+        '</div>' +
+        '<p class="order-item__stock" data-stock></p>' +
+      '</div>';
+    $items.appendChild(el);
+  });
+
+  /* ===== 描画 ===== */
+  function renderItems() {
+    CAKES.forEach(function (cake) {
+      var el = $items.querySelector('[data-sku="' + cake.sku + '"]');
+      var control = el.querySelector('.order-item__control');
+      var stockEl = el.querySelector('[data-stock]');
+      var max = maxOf(cake.sku);
+
+      if (max <= 0) {
+        el.classList.add('is-unavailable');
+        control.innerHTML = '<span class="order-item__soldout">SOLD OUT</span>';
+        stockEl.textContent = state.receptionOpen ? '今週分は完売しました。' : '';
+        return;
+      }
+
+      el.classList.remove('is-unavailable');
+      var q = state.qty[cake.sku];
+      control.innerHTML =
+        '<div class="qty">' +
+          '<button type="button" class="qty__btn" data-act="dec" aria-label="' + cake.nameJp + 'を1本減らす"' + (q <= 0 ? ' disabled' : '') + '>−</button>' +
+          '<span class="qty__value" aria-live="polite">' + q + '</span>' +
+          '<button type="button" class="qty__btn" data-act="inc" aria-label="' + cake.nameJp + 'を1本増やす"' + (q >= max ? ' disabled' : '') + '>＋</button>' +
+        '</div>';
+      stockEl.textContent = (max <= 3) ? '残り ' + max + ' 本' : '';
+    });
+  }
+
+  function renderSummary() {
+    var subtotal = 0;
+    var lines = [];
+
+    CAKES.forEach(function (cake) {
+      var q = state.qty[cake.sku];
+      if (q > 0) {
+        subtotal += cake.price * q;
+        lines.push(
+          '<div class="order-summary__line"><span>' + cake.nameJp + ' × ' + q + '</span>' +
+          '<span>' + yen(cake.price * q) + '</span></div>'
+        );
+      }
+    });
+
+    var hasItems = subtotal > 0;
+    var free = subtotal >= FREE_SHIPPING;
+    var shipping = hasItems ? (free ? 0 : SHIPPING_FEE) : 0;
+
+    $lines.innerHTML = hasItems ? lines.join('') :
+      '<p class="order-summary__empty">ケーキの個数をお選びください。</p>';
+
+    $subtotal.textContent = yen(subtotal);
+    $shipping.textContent = hasItems ? (free ? '無料' : yen(SHIPPING_FEE)) : '—';
+    $shipping.classList.toggle('order-summary__amount--free', hasItems && free);
+    $total.textContent = yen(subtotal + shipping);
+
+    $submit.disabled = PREVIEW || !hasItems || state.submitting || !state.receptionOpen;
+    $submit.textContent = state.submitting ? 'お支払い画面へ移動しています…' : 'お支払いへ進む';
+  }
+
+  function renderNotice() {
+    if (PREVIEW) {
+      $notice.hidden = false;
+      $notice.innerHTML = '<strong>確認用プレビュー</strong>　受付時間・在庫の判定を無視して表示しています。お支払いには進めません。';
+    } else if (!state.receptionOpen) {
+      $notice.hidden = false;
+      $notice.innerHTML = '現在は受付時間外です。ご注文の受付は毎週<strong>木曜10:00〜日曜10:00</strong>です。';
+    } else {
+      $notice.hidden = true;
+    }
+  }
+
+  function render() { renderNotice(); renderItems(); renderSummary(); }
+
+  /* ===== 操作 ===== */
+  $items.addEventListener('click', function (e) {
+    var btn = e.target.closest('.qty__btn');
+    if (!btn) return;
+    var sku = btn.closest('[data-sku]').dataset.sku;
+    var max = maxOf(sku);
+    var next = state.qty[sku] + (btn.dataset.act === 'inc' ? 1 : -1);
+    state.qty[sku] = Math.min(Math.max(next, 0), max);
+    hideError();
+    render();
+  });
+
+  function showError(msg) { $error.textContent = msg; $error.hidden = false; }
+  function hideError() { $error.hidden = true; }
+
+  /* ===== 在庫取得 ===== */
+  if (!PREVIEW) fetch(STATUS_URL)
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (data && data.items) {
+        state.stock = data.items;
+        // Worker は accepting、フロント互換で receptionOpen も見る
+        if (typeof data.accepting === 'boolean') state.receptionOpen = data.accepting;
+        else if (typeof data.receptionOpen === 'boolean') state.receptionOpen = data.receptionOpen;
+        CAKES.forEach(function (c) { state.qty[c.sku] = Math.min(state.qty[c.sku], maxOf(c.sku)); });
+        render();
+      }
+    })
+    .catch(function () { /* 取得失敗時はフロント判定のまま。最終判定は Worker 側 */ });
+
+  /* ===== 決済 ===== */
+  $submit.addEventListener('click', function () {
+    if (state.submitting) return;
+    var items = CAKES
+      .filter(function (c) { return state.qty[c.sku] > 0; })
+      .map(function (c) { return { sku: c.sku, qty: state.qty[c.sku] }; });
+    if (!items.length) return;
+
+    state.submitting = true;
+    hideError();
+    renderSummary();
+
+    fetch(CHECKOUT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: items })
+    })
+      .then(function (r) {
+        return r.json().catch(function () { return null; }).then(function (body) {
+          return { ok: r.ok, body: body };
+        });
+      })
+      .then(function (res) {
+        if (res.ok && res.body && res.body.url) {
+          window.location.href = res.body.url;
+          return;
+        }
+        state.submitting = false;
+        var msg = (res.body && res.body.message) ||
+          'お支払い画面を開けませんでした。時間をおいてもう一度お試しください。';
+        showError(msg);
+        if (res.body && res.body.items) {
+          state.stock = res.body.items;
+          CAKES.forEach(function (c) { state.qty[c.sku] = Math.min(state.qty[c.sku], maxOf(c.sku)); });
+        }
+        render();
+      })
+      .catch(function () {
+        state.submitting = false;
+        showError('通信に失敗しました。電波状況をご確認のうえ、もう一度お試しください。');
+        renderSummary();
+      });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

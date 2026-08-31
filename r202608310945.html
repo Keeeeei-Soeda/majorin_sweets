@@ -1422,7 +1422,7 @@
 
     // ===== 2026-08-30 週次在庫（商品ごと10個 / 木10:00〜日10:00 JST）=====
     // Worker デプロイ後に実URLへ差し替え。空のままだと受付時間外のみフロント判定。
-    const STOCK_API_URL = '';
+    const STOCK_API_URL = 'https://majorins-stock.majorins.workers.dev/status';
     const STOCK_LIMIT = 10;
     const SHOWCASE_CAKES = {
       verdant: { href: 'https://buy.stripe.com/dRm28k1pef3Mg5a5Fwgw00d' },

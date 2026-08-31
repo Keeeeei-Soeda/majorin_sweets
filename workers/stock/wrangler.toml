@@ -1,8 +1,10 @@
 # デプロイ: cd workers/stock && npx wrangler deploy
 # 秘密情報: npx wrangler secret put STRIPE_WEBHOOK_SECRET
 #           npx wrangler secret put STRIPE_SECRET_KEY
-# Stripe Webhook URL: https://majorins-stock.<account>.workers.dev/webhook
+# Stripe Webhook URL: https://majorins-stock.majorins.workers.dev/webhook
 #   イベント: checkout.session.completed
+# Status API: https://majorins-stock.majorins.workers.dev/status
+workers_dev = true
 
 name = "majorins-stock"
 main = "src/index.js"

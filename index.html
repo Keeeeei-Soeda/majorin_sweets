@@ -1202,11 +1202,36 @@
     }
 
     /* === [ADD] 浮遊「ご注文」ボタン（B: アイコン＋テキスト）=== */
-    .fab-order {
+    /* 2026-09-01: キャプション追加に伴い、位置指定を .fab-order-wrap へ移動 */
+    .fab-order-wrap {
       position: fixed;
       right: 24px;
       bottom: 24px;
       z-index: 90;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 7px;
+      animation: fabOrderIn .8s ease both;
+    }
+
+    .fab-order-caption {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      line-height: 1.5;
+      color: #f0d090;
+      background: rgba(20, 8, 13, 0.72);
+      border: 1px solid rgba(212, 175, 110, 0.4);
+      border-radius: 20px;
+      padding: 5px 13px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .fab-order {
       display: inline-flex;
       align-items: center;
       gap: 9px;
@@ -1224,7 +1249,6 @@
       cursor: pointer;
       text-decoration: none;
       transition: transform .35s ease, box-shadow .35s ease, background .35s ease, border-color .35s ease;
-      animation: fabOrderIn .8s ease both;
     }
     .fab-order:hover,
     .fab-order:focus-visible {
@@ -1246,11 +1270,14 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     @media (max-width: 520px) {
-      .fab-order { right: 16px; bottom: 16px; padding: 11px 18px 11px 15px; font-size: 13px; }
+      /* 2026-09-01: 位置指定をラッパーへ移動 */
+      .fab-order-wrap { right: 16px; bottom: 16px; }
+      .fab-order { padding: 11px 18px 11px 15px; font-size: 13px; }
       .fab-order svg { width: 16px; height: 16px; }
+      .fab-order-caption { font-size: 10px; padding: 4px 11px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .fab-order { animation: none; }
+      .fab-order-wrap { animation: none; }
       .fab-order:hover, .fab-order:focus-visible { transform: none; }
     }
     /* === [ADD 2026-08-26] 美味しさのひみつ（動画=吹き出し＋テキスト左右入替）=== */
@@ -1420,7 +1447,7 @@
       passion: '米粉、バター、卵、アーモンド、粉糖、オレンジ、カラマンダリン、ホワイトチョコレート、クリームチーズ、生クリーム、ゼラチン、クエン酸、スミレ砂糖漬け、エディフルフラワー、銀シュガー',
     };
 
-    // ===== 2026-08-30 週次在庫（商品ごと10個 / 木10:00〜日10:00 JST）=====
+    // ===== 週次在庫（商品ごと10個 / 水10:00〜日10:00 JST）=====
     const STOCK_API_URL = 'https://majorins-stock.majorins.workers.dev/status';
     const STOCK_LIMIT = 10;
     const SHOWCASE_CAKES = {
@@ -1436,21 +1463,23 @@
     function jstToUtcMs(y, mo, d, h) {
       return Date.UTC(y, mo, d, h - 9, 0, 0, 0);
     }
+    /** 受付週の開始: 直近の水曜 10:00 JST（now がそれより前なら先週水曜） */
     function weekStartUtc(nowMs = Date.now()) {
       const w = jstWallMs(nowMs);
-      const daysFromThu = (w.dow + 7 - 4) % 7;
-      const thuMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromThu * 86400000;
-      const thu = new Date(thuMidnight);
-      let start = jstToUtcMs(thu.getUTCFullYear(), thu.getUTCMonth(), thu.getUTCDate(), 10);
+      const daysFromWed = (w.dow + 7 - 3) % 7;
+      const wedMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromWed * 86400000;
+      const wed = new Date(wedMidnight);
+      let start = jstToUtcMs(wed.getUTCFullYear(), wed.getUTCMonth(), wed.getUTCDate(), 10);
       if (nowMs < start) {
-        const prev = new Date(thuMidnight - 7 * 86400000);
+        const prev = new Date(wedMidnight - 7 * 86400000);
         start = jstToUtcMs(prev.getUTCFullYear(), prev.getUTCMonth(), prev.getUTCDate(), 10);
       }
       return start;
     }
+    /** 受付中: 水曜10:00〜日曜10:00 JST（4日間） */
     function isReceptionOpen(nowMs = Date.now()) {
       const start = weekStartUtc(nowMs);
-      return nowMs >= start && nowMs < start + 3 * 86400000;
+      return nowMs >= start && nowMs < start + 4 * 86400000;
     }
 
     // マジョリンからの手紙（25件）
@@ -2565,13 +2594,29 @@
             style={styles.ctaSection}
           >
             <div style={styles.ctaSectionContent}>
-              <h2 style={styles.ctaTitle}>MAJORIN SWEETS</h2>
-              <p style={styles.ctaSubtitle}>🌹 完全予約制 | 各週・各商品10個限定 🌹</p>
+              {/* 2026-09-01: 平石さん指示 タイトルは MAJORINS のみ + 「ご予約について」を追加
+                  旧: <h2 style={styles.ctaTitle}>MAJORIN SWEETS</h2> */}
+              <h2 style={styles.ctaTitle}>MAJORINS</h2>
+              <p style={styles.ctaSectionLabel}>ご予約について</p>
+              {/* 2026-09-01: 平石さん指示により文言変更
+                  旧: <p style={styles.ctaSubtitle}>🌹 完全予約制 | 各週・各商品10個限定 🌹</p> */}
+              <p style={styles.ctaSubtitle}>🌹 完全予約販売／販売上限あり 🌹</p>
               
               <div style={styles.priceBox}>
-                <p style={styles.priceLabel}>お一人様</p>
-                <p style={styles.priceAmount}>¥4,800〜</p>
-                <p style={styles.priceNote}>（税込・送料込）</p>
+                {/* 2026-09-01: 平石さん指示により枠内の価格表記を削除し、予約スケジュール案内に差し替え
+                    旧:
+                    <p style={styles.priceLabel}>お一人様</p>
+                    <p style={styles.priceAmount}>¥4,800〜</p>
+                    <p style={styles.priceNote}>（税込・送料込）</p>
+                */}
+                <p style={styles.reserveSchedule}>
+                  毎週水曜日10時から予約開始<br />
+                  翌週木曜日より発送。
+                </p>
+                <p style={styles.reserveScheduleNote}>
+                  ご予約上限に達した場合は翌々週の発送となります。<br />
+                  ご了承の程宜しくお願いします。
+                </p>
               </div>
 
               <div style={styles.ctaButtons}>
@@ -2593,18 +2638,33 @@
 
               <div style={styles.ctaNote}>
                 <p style={styles.ctaNoteText}>
-                  ※ 各商品とも週10個に達し次第、SOLD OUTとなります（受付：木曜10:00〜日曜10:00）<br />
-                  ※ 受付時間外もSOLD OUT表示になります。発送は木曜または金曜予定です
+                  {/* 2026-09-01: 平石さん指示により文言差し替え
+                      旧2行:
+                      ※ 各商品とも週10個に達し次第、SOLD OUTとなります（受付：木曜10:00〜日曜10:00）
+                      ※ 受付時間外もSOLD OUT表示になります。発送は木曜または金曜予定です
+                  */}
+                  ※ 週のご予約上限に達しましたら翌週の注文分となり、発送も翌々週となりますので、
+                  お届けまで1〜2週間程お時間頂きます。
                 </p>
               </div>
 
               <div style={styles.footer}>
+                {/* 2026-09-01: 平石さん指示により削除
                 <p style={styles.footerText}>
                   痛みと共に生きる人々に、<br />
                   完璧じゃない甘さを。<br />
                   魔法じゃない、本物の支えを。
                 </p>
-                {/* === [ADD] フッター導線 === */}
+                */}
+                {/* === [ADD] フッターナビ（2026-09-01: 企業案内・お問合せを追加、ご利用ガイドを統合） === */}
+                <nav style={styles.footerNav}>
+                  <a href="/company/" style={styles.footerNavLink}>企業案内</a>
+                  <a href="/contact/" style={styles.footerNavLink}>お問合せ</a>
+                  <a href="/guide/" style={styles.footerNavLink}>ご利用ガイド</a>
+                  <a href="/privacy/" style={styles.footerNavLink}>個人情報の取扱い</a>
+                </nav>
+
+                {/* 2026-09-01: 上記フッターナビへ統合したため非表示
                 <p style={{ marginBottom: '12px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '12px 26px' }}>
                   <a href="/company/" style={{ color: '#d4af6e', textDecoration: 'none', fontSize: '0.85rem', letterSpacing: '0.08em', borderBottom: '1px solid rgba(212,175,110,0.4)', paddingBottom: '2px' }}>
                     企業案内
@@ -2619,6 +2679,7 @@
                     個人情報の取扱い
                   </a>
                 </p>
+                */}
                 <p style={styles.copyright}>© 2026 Majorin Sweets. All rights reserved.</p>
               </div>
             </div>
@@ -2626,18 +2687,21 @@
 
           {/* === [ADD] 浮遊「ご注文」ボタン === */}
           {showOrderFab && (
-            <button
-              type="button"
-              className="fab-order"
-              onClick={scrollToShowcase}
-              aria-label="ご注文欄へ移動"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 8h12l-1 12H7L6 8z" />
-                <path d="M9 8V6a3 3 0 0 1 6 0v2" />
-              </svg>
-              ご注文
-            </button>
+            <div className="fab-order-wrap">
+              <span className="fab-order-caption">毎週水曜10時 予約開始</span>
+              <button
+                type="button"
+                className="fab-order"
+                onClick={scrollToShowcase}
+                aria-label="ご注文欄へ移動"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 8h12l-1 12H7L6 8z" />
+                  <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+                </svg>
+                ご注文
+              </button>
+            </div>
           )}
 
           {/* 手紙ポップアップ: 常に画面中央（各セクション内ではなく body に Portal） */}
@@ -3402,7 +3466,9 @@
       // ========== CTA ==========
       ctaSection: {
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #2a1a2a 0%, #1a0a1a 100%)',
+        /* 2026-09-01: 平石さん指示により背景をグレーへ変更
+           旧: background: 'linear-gradient(135deg, #2a1a2a 0%, #1a0a1a 100%)', */
+        background: '#A5A5A5',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -3422,17 +3488,25 @@
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
       },
+      ctaSectionLabel: {
+        fontFamily: "'Noto Serif JP', serif",
+        fontSize: 'clamp(1.05rem, 2.4vw, 1.35rem)',
+        color: '#1A1A1A',
+        letterSpacing: '0.22em',
+        marginBottom: '32px',
+        fontWeight: 500,
+      },
       ctaSubtitle: {
         fontSize: '1.2rem',
-        color: 'rgba(245, 240, 242, 0.88)',
+        color: '#333333',
         letterSpacing: '0.2em',
-        marginBottom: '60px',
+        marginBottom: '40px',
       },
       priceBox: {
         padding: '40px',
-        background: 'rgba(74, 14, 78, 0.2)',
+        background: 'rgba(255, 255, 255, 0.45)',
         borderRadius: '8px',
-        border: '1px solid rgba(192, 64, 96, 0.35)',
+        border: '1px solid rgba(26, 26, 26, 0.18)',
         marginBottom: '50px',
       },
       priceLabel: {
@@ -3451,6 +3525,23 @@
       priceNote: {
         fontSize: '1rem',
         color: '#c0c0c0',
+      },
+      reserveSchedule: {
+        fontFamily: "'Noto Serif JP', serif",
+        fontSize: 'clamp(1.05rem, 2.6vw, 1.3rem)',
+        lineHeight: 2,
+        color: '#1A1A1A',
+        letterSpacing: '0.08em',
+        marginBottom: '18px',
+        fontWeight: 500,
+      },
+      reserveScheduleNote: {
+        fontFamily: "'Noto Serif JP', serif",
+        fontSize: 'clamp(0.85rem, 2vw, 0.95rem)',
+        lineHeight: 2,
+        color: '#4a4548',
+        letterSpacing: '0.04em',
+        margin: 0,
       },
       ctaButtons: {
         display: 'flex',
@@ -3477,12 +3568,12 @@
       },
       ctaNoteText: {
         fontSize: '0.9rem',
-        color: 'rgba(245, 240, 242, 0.82)',
+        color: '#333333',
         lineHeight: 1.8,
       },
       footer: {
         paddingTop: '60px',
-        borderTop: '1px solid rgba(169, 169, 169, 0.2)',
+        borderTop: '1px solid rgba(26, 26, 26, 0.22)',
       },
       footerText: {
         fontSize: '1.2rem',
@@ -3491,9 +3582,24 @@
         fontStyle: 'italic',
         marginBottom: '30px',
       },
+      footerNav: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: '12px 28px',
+        marginBottom: '24px',
+      },
+      footerNavLink: {
+        color: '#1A1A1A',
+        textDecoration: 'none',
+        fontSize: '0.88rem',
+        letterSpacing: '0.1em',
+        borderBottom: '1px solid rgba(26, 26, 26, 0.35)',
+        paddingBottom: '2px',
+      },
       copyright: {
         fontSize: '0.8rem',
-        color: 'rgba(245, 240, 242, 0.72)',
+        color: '#605F5F',
         marginTop: '20px',
       },
     };

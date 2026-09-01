@@ -41,23 +41,23 @@ function jstToUtcMs(y, mo, d, h, mi = 0) {
   return Date.UTC(y, mo, d, h - 9, mi, 0, 0);
 }
 
-/** 直近の木曜 10:00 JST（now がそれより前なら先週木曜） */
+/** 直近の水曜 10:00 JST（now がそれより前なら先週水曜） */
 export function weekStartUtc(nowMs = Date.now()) {
   const w = jstWall(nowMs);
-  const daysFromThu = (w.dow + 7 - 4) % 7;
-  const thuUtcMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromThu * 86400000;
-  const thu = new Date(thuUtcMidnight);
-  let start = jstToUtcMs(thu.getUTCFullYear(), thu.getUTCMonth(), thu.getUTCDate(), 10, 0);
+  const daysFromWed = (w.dow + 7 - 3) % 7;
+  const wedUtcMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromWed * 86400000;
+  const wed = new Date(wedUtcMidnight);
+  let start = jstToUtcMs(wed.getUTCFullYear(), wed.getUTCMonth(), wed.getUTCDate(), 10, 0);
   if (nowMs < start) {
-    const prev = new Date(thuUtcMidnight - 7 * 86400000);
+    const prev = new Date(wedUtcMidnight - 7 * 86400000);
     start = jstToUtcMs(prev.getUTCFullYear(), prev.getUTCMonth(), prev.getUTCDate(), 10, 0);
   }
   return start;
 }
 
-/** 受付終了: その週の日曜 10:00 JST */
+/** 受付終了: その週の日曜 10:00 JST（水曜10:00から4日後） */
 export function receptionEndUtc(weekStartMs) {
-  return weekStartMs + 3 * 86400000;
+  return weekStartMs + 4 * 86400000;
 }
 
 export function isAccepting(nowMs, weekStartMs) {
@@ -198,7 +198,7 @@ async function createCheckoutSession(env, items, opts = {}) {
       status: 403,
       body: {
         error: 'not_accepting',
-        message: '現在は受付時間外です。ご注文の受付は毎週木曜10:00〜日曜10:00です。',
+        message: '現在は受付時間外です。ご注文の受付は毎週水曜10:00〜日曜10:00です。',
         items: status.items,
         accepting: false,
       },

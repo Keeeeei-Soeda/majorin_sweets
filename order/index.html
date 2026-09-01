@@ -536,7 +536,7 @@
       desc: '燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。' }
   ];
 
-  /* ===== 受付時間（木10:00〜日10:00 JST）※ トップページと同一ロジック ===== */
+  /* ===== 受付時間（水10:00〜日10:00 JST）※ トップページと同一ロジック ===== */
   function jstWall(nowMs) {
     var t = new Date(nowMs + 9 * 3600 * 1000);
     return { y: t.getUTCFullYear(), mo: t.getUTCMonth(), d: t.getUTCDate(), dow: t.getUTCDay() };
@@ -544,19 +544,19 @@
   function jstToUtcMs(y, mo, d, h) { return Date.UTC(y, mo, d, h - 9, 0, 0, 0); }
   function weekStartUtc(nowMs) {
     var w = jstWall(nowMs);
-    var daysFromThu = (w.dow + 7 - 4) % 7;
-    var thuMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromThu * 86400000;
-    var thu = new Date(thuMidnight);
-    var start = jstToUtcMs(thu.getUTCFullYear(), thu.getUTCMonth(), thu.getUTCDate(), 10);
+    var daysFromWed = (w.dow + 7 - 3) % 7;
+    var wedMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromWed * 86400000;
+    var wed = new Date(wedMidnight);
+    var start = jstToUtcMs(wed.getUTCFullYear(), wed.getUTCMonth(), wed.getUTCDate(), 10);
     if (nowMs < start) {
-      var prev = new Date(thuMidnight - 7 * 86400000);
+      var prev = new Date(wedMidnight - 7 * 86400000);
       start = jstToUtcMs(prev.getUTCFullYear(), prev.getUTCMonth(), prev.getUTCDate(), 10);
     }
     return start;
   }
   function isReceptionOpen(nowMs) {
     var start = weekStartUtc(nowMs);
-    return nowMs >= start && nowMs < start + 3 * 86400000;
+    return nowMs >= start && nowMs < start + 4 * 86400000;
   }
 
   /* ===== プレビューモード ===== */
@@ -684,7 +684,7 @@
       $notice.innerHTML = '<strong>確認用プレビュー</strong>　受付時間・在庫の判定を無視して表示しています。お支払いには進めません。';
     } else if (!state.receptionOpen) {
       $notice.hidden = false;
-      $notice.innerHTML = '現在は受付時間外です。ご注文の受付は毎週<strong>木曜10:00〜日曜10:00</strong>です。';
+      $notice.innerHTML = '現在は受付時間外です。ご注文の受付は毎週<strong>水曜10:00〜日曜10:00</strong>です。';
     } else {
       $notice.hidden = true;
     }

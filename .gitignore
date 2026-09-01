@@ -9,9 +9,12 @@ IMG_*.JPEG
 IMG_*.JPG
 IMG_*.PNG
 IMG_*.jpg
+r20*.html
 _archive/incoming/
+_archive/backups/
 _archive/scripts/.env
 _archive/scripts/node_modules/
+_archive/scripts/*-verify-out/
 node_modules/
 workers/**/.wrangler/
 workers/**/node_modules/

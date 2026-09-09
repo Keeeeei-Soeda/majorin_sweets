@@ -1511,26 +1511,27 @@
     function jstToUtcMs(y, mo, d, h) {
       return Date.UTC(y, mo, d, h - 9, 0, 0, 0);
     }
-    /** 受付週の開始: 直近の水曜 10:00 JST（now がそれより前なら先週水曜） */
+    /** 受付週の開始: 直近の木曜 10:00 JST（now がそれより前なら先週木曜）
+     * 旧: 水曜 10:00 起点
+     */
     function weekStartUtc(nowMs = Date.now()) {
       const w = jstWallMs(nowMs);
-      const daysFromWed = (w.dow + 7 - 3) % 7;
-      const wedMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromWed * 86400000;
-      const wed = new Date(wedMidnight);
-      let start = jstToUtcMs(wed.getUTCFullYear(), wed.getUTCMonth(), wed.getUTCDate(), 10);
+      const daysFromThu = (w.dow + 7 - 4) % 7;
+      const thuMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromThu * 86400000;
+      const thu = new Date(thuMidnight);
+      let start = jstToUtcMs(thu.getUTCFullYear(), thu.getUTCMonth(), thu.getUTCDate(), 10);
       if (nowMs < start) {
-        const prev = new Date(wedMidnight - 7 * 86400000);
+        const prev = new Date(thuMidnight - 7 * 86400000);
         start = jstToUtcMs(prev.getUTCFullYear(), prev.getUTCMonth(), prev.getUTCDate(), 10);
       }
       return start;
     }
-    /** 受付中: 2026-09-09 全期間受付（旧: 水曜10:00〜日曜10:00 JST） */
-    // function isReceptionOpen(nowMs = Date.now()) {
-    //   const start = weekStartUtc(nowMs);
-    //   return nowMs >= start && nowMs < start + 4 * 86400000;
-    // }
+    /** 受付中: 木曜10:00〜次週水曜10:00 JST（6日間）
+     * 旧: 全期間 true / 水10:00〜日10:00
+     */
     function isReceptionOpen(nowMs = Date.now()) {
-      return true;
+      const start = weekStartUtc(nowMs);
+      return nowMs >= start && nowMs < start + 6 * 86400000;
     }
 
     // 2026-09-09: 期間限定 特別価格（9/14 00:00 〜 9/26 00:00 JST）※時刻は必ず JST 換算
@@ -1753,9 +1754,9 @@
       const receptionOpen = isReceptionOpen();
       // 2026-09-09: /status の sale を優先、未取得時は JST ローカル判定
       const SALE_ACTIVE = saleInfo ? Boolean(saleInfo.active) : isSaleActiveLocal();
-      // 2026-09-09: 全期間受付。SOLD OUT バッジは出さない（上限超過は次週配送）
+      // 受付時間外のみ SOLD OUT。上限超過は注文可（さらに次の週の木曜配送）
       const cakeSoldOut = (key) => {
-        // 旧: if (!receptionOpen) return true;
+        if (!receptionOpen) return true;
         return false;
       };
       const cakeNextWeek = (key) => {
@@ -1768,7 +1769,7 @@
       };
       const cakeBadge = (key) => {
         if (cakeSoldOut(key)) return { className: 'sold-out', label: 'SOLD OUT' };
-        if (cakeNextWeek(key)) return { className: 'next-week', label: '次週の木曜日配送予定' };
+        if (cakeNextWeek(key)) return { className: 'next-week', label: 'さらに次の週の木曜日配送予定' };
         return null;
       };
 
@@ -2724,11 +2725,14 @@
                     <p style={styles.priceNote}>（税込・送料込）</p>
                 */}
                 <p style={styles.reserveSchedule}>
-                  毎週水曜日10時から予約開始<br />
-                  翌週木曜日より発送。
+                  {/* 2026-09-09: 受付を木10:00〜次週水10:00に変更
+                      旧: 毎週水曜日10時から予約開始 / 翌週木曜日より発送。 */}
+                  毎週木曜日10時から予約開始<br />
+                  次の水曜日10時まで受付。木曜日に発送。
                 </p>
                 <p style={styles.reserveScheduleNote}>
-                  ご予約上限に達した場合は翌々週の発送となります。<br />
+                  {/* 旧: ご予約上限に達した場合は翌々週の発送となります。 */}
+                  ご予約上限に達した場合は、さらに次の週の木曜日の発送となります。<br />
                   ご了承の程宜しくお願いします。
                 </p>
               </div>
@@ -2752,12 +2756,12 @@
 
               <div style={styles.ctaNote}>
                 <p style={styles.ctaNoteText}>
-                  {/* 2026-09-01: 平石さん指示により文言差し替え
-                      旧2行:
-                      ※ 各商品とも週10個に達し次第、SOLD OUTとなります（受付：木曜10:00〜日曜10:00）
-                      ※ 受付時間外もSOLD OUT表示になります。発送は木曜または金曜予定です
+                  {/* 2026-09-09: 受付・発送ルール更新
+                      旧: ※ 週のご予約上限に達しましたら翌週の / 注文分となり発送も翌々週となります / お届けまで1〜2週間程お時間頂きます。
                   */}
-                  ※ 週のご予約上限に達しましたら翌週の<br />注文分となり発送も翌々週となります<br />お届けまで1〜2週間程お時間頂きます。
+                  ※ 受付は毎週木曜10:00〜次週水曜10:00です<br />
+                  ※ 上限到達後もご注文いただけます（さらに次の週の木曜発送）<br />
+                  お届けまで1〜2週間程お時間頂く場合がございます。
                 </p>
               </div>
 
@@ -2801,7 +2805,7 @@
           {/* === [ADD] 浮遊「ご注文」ボタン === */}
           {showOrderFab && (
             <div className="fab-order-wrap">
-              <span className="fab-order-caption">毎週水曜10時 予約開始</span>
+              <span className="fab-order-caption">毎週木曜10時 予約開始</span>
               <button
                 type="button"
                 className="fab-order"

@@ -620,7 +620,7 @@
     return SALE.active ? SALE.unitPrice : cake.price;
   }
 
-  /* ===== 受付時間（2026-09-09: 全期間受付。旧: 水10:00〜日10:00 JST）===== */
+  /* ===== 受付時間（木10:00〜次週水10:00 JST）===== */
   function jstWall(nowMs) {
     var t = new Date(nowMs + 9 * 3600 * 1000);
     return { y: t.getUTCFullYear(), mo: t.getUTCMonth(), d: t.getUTCDate(), dow: t.getUTCDay() };
@@ -628,23 +628,21 @@
   function jstToUtcMs(y, mo, d, h) { return Date.UTC(y, mo, d, h - 9, 0, 0, 0); }
   function weekStartUtc(nowMs) {
     var w = jstWall(nowMs);
-    var daysFromWed = (w.dow + 7 - 3) % 7;
-    var wedMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromWed * 86400000;
-    var wed = new Date(wedMidnight);
-    var start = jstToUtcMs(wed.getUTCFullYear(), wed.getUTCMonth(), wed.getUTCDate(), 10);
+    // 旧: 水曜起点 daysFromWed = (w.dow + 7 - 3) % 7
+    var daysFromThu = (w.dow + 7 - 4) % 7;
+    var thuMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromThu * 86400000;
+    var thu = new Date(thuMidnight);
+    var start = jstToUtcMs(thu.getUTCFullYear(), thu.getUTCMonth(), thu.getUTCDate(), 10);
     if (nowMs < start) {
-      var prev = new Date(wedMidnight - 7 * 86400000);
+      var prev = new Date(thuMidnight - 7 * 86400000);
       start = jstToUtcMs(prev.getUTCFullYear(), prev.getUTCMonth(), prev.getUTCDate(), 10);
     }
     return start;
   }
-  // 旧: 水曜10:00〜日曜10:00 のみ true
-  // function isReceptionOpen(nowMs) {
-  //   var start = weekStartUtc(nowMs);
-  //   return nowMs >= start && nowMs < start + 4 * 86400000;
-  // }
+  // 旧: 全期間 true / さらに旧: 水10:00〜日10:00
   function isReceptionOpen(nowMs) {
-    return true;
+    var start = weekStartUtc(nowMs);
+    return nowMs >= start && nowMs < start + 6 * 86400000;
   }
 
   /* ===== プレビューモード ===== */
@@ -683,8 +681,8 @@
     var it = stockOf(sku);
     if (!it) return '';
     if (it.delivery && it.delivery.label) return it.delivery.label;
-    if (it.overCap) return '次週の木曜日配送予定';
-    return '';
+    if (it.overCap) return 'さらに次の週の木曜日配送予定';
+    return '木曜日配送予定';
   }
 
   /* ===== DOM ===== */
@@ -759,7 +757,7 @@
           '<span class="qty__value" aria-live="polite">' + q + '</span>' +
           '<button type="button" class="qty__btn" data-act="inc" aria-label="' + cake.nameJp + 'を1本増やす"' + (q >= max ? ' disabled' : '') + '>＋</button>' +
         '</div>';
-      // 2026-09-09: 上限超過時は「次週の木曜日配送予定」、水曜枠内は「木曜日配送予定」
+      // 2026-09-09: 上限超過時は「さらに次の週の木曜日配送予定」
       stockEl.innerHTML = del
         ? '<span class="order-item__delivery">' + del + '</span>'
         : '';
@@ -804,11 +802,10 @@
   function renderNotice() {
     if (PREVIEW) {
       $notice.hidden = false;
-      $notice.innerHTML = '<strong>確認用プレビュー</strong>　在庫の判定を無視して表示しています。お支払いには進めません。';
-    // 2026-09-09: 全期間受付のため時間外バナーは出さない
-    // } else if (!state.receptionOpen) {
-    //   $notice.hidden = false;
-    //   $notice.innerHTML = '現在は受付時間外です。ご注文の受付は毎週<strong>水曜10:00〜日曜10:00</strong>です。';
+      $notice.innerHTML = '<strong>確認用プレビュー</strong>　受付時間・在庫の判定を無視して表示しています。お支払いには進めません。';
+    } else if (!state.receptionOpen) {
+      $notice.hidden = false;
+      $notice.innerHTML = '現在は受付時間外です。ご注文の受付は毎週<strong>木曜10:00〜次週水曜10:00</strong>です。';
     } else {
       $notice.hidden = true;
     }

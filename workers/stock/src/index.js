@@ -1,5 +1,8 @@
 /**
- * MAJORINS 週次在庫（商品ごと 10 個 / 水 10:00 JST リセット）
+ * MAJORINS 週次在庫（商品ごと 10 個 / 木 10:00 JST リセット）
+ *
+ * 受付: 木曜 10:00 JST 〜 次週水曜 10:00 JST
+ * 発送: 受付週の翌木曜（上限超過時はさらに次の木曜）
  *
  * GET  /status    公開：残り個数・受付可否・セール・配送目安
  * POST /checkout  注文内容から Stripe Checkout Session を作成
@@ -90,23 +93,28 @@ function jstToUtcMs(y, mo, d, h, mi = 0) {
   return Date.UTC(y, mo, d, h - 9, mi, 0, 0);
 }
 
-/** 直近の水曜 10:00 JST（now がそれより前なら先週水曜） */
+/** 直近の木曜 10:00 JST（now がそれより前なら先週木曜）
+ * 旧: 水曜 10:00 起点
+ */
 export function weekStartUtc(nowMs = Date.now()) {
   const w = jstWall(nowMs);
-  const daysFromWed = (w.dow + 7 - 3) % 7;
-  const wedUtcMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromWed * 86400000;
-  const wed = new Date(wedUtcMidnight);
-  let start = jstToUtcMs(wed.getUTCFullYear(), wed.getUTCMonth(), wed.getUTCDate(), 10, 0);
+  // dow: 0=日 … 4=木
+  const daysFromThu = (w.dow + 7 - 4) % 7;
+  const thuUtcMidnight = Date.UTC(w.y, w.mo, w.d) - daysFromThu * 86400000;
+  const thu = new Date(thuUtcMidnight);
+  let start = jstToUtcMs(thu.getUTCFullYear(), thu.getUTCMonth(), thu.getUTCDate(), 10, 0);
   if (nowMs < start) {
-    const prev = new Date(wedUtcMidnight - 7 * 86400000);
+    const prev = new Date(thuUtcMidnight - 7 * 86400000);
     start = jstToUtcMs(prev.getUTCFullYear(), prev.getUTCMonth(), prev.getUTCDate(), 10, 0);
   }
   return start;
 }
 
-/** 受付終了: その週の日曜 10:00 JST（水曜10:00から4日後） */
+/** 受付終了: 次週水曜 10:00 JST（木曜10:00から6日後）
+ * 旧: 日曜 10:00（水曜起点から4日後）
+ */
 export function receptionEndUtc(weekStartMs) {
-  return weekStartMs + 4 * 86400000;
+  return weekStartMs + 6 * 86400000;
 }
 
 export function isAccepting(nowMs, weekStartMs) {
@@ -122,24 +130,25 @@ export function weekIdFromStart(weekStartMs) {
 
 /**
  * 配送目安（JST）
- * - 水曜（受付週）かつ sold < 10 → 木曜日配送予定（今週）
- * - それ以外（木〜日 / 上限超過）→ 次週の木曜日配送予定
- * sold は Stripe webhook 集計を正とする（職員は木以降に手動更新）
+ * 受付枠内（木10:00〜次週水10:00）の注文:
+ * - sold < 10 → 受付終了直後の木曜に発送（木曜日配送予定）
+ * - sold >= 10 → さらに次の週の木曜（さらに次の週の木曜日配送予定）
+ * sold は Stripe webhook 集計を正とする
+ *
+ * 旧ロジック（水曜のみ通常枠 / それ以外は次週）は廃止
  */
 export function deliveryFor(nowMs, sold) {
-  const w = jstWall(nowMs);
   const underCap = Number(sold || 0) < LIMIT_PER_ITEM;
-  const thisThursday = w.dow === 3 && underCap;
-  if (thisThursday) {
+  if (underCap) {
     return {
-      slot: 'this_thursday',
+      slot: 'cycle_thursday',
       label: '木曜日配送予定',
       nextWeek: false,
     };
   }
   return {
-    slot: 'next_thursday',
-    label: '次週の木曜日配送予定',
+    slot: 'following_thursday',
+    label: 'さらに次の週の木曜日配送予定',
     nextWeek: true,
   };
 }
@@ -190,9 +199,9 @@ async function readCounts(kv, weekId) {
 function buildStatus(nowMs, counts) {
   const weekStart = weekStartUtc(nowMs);
   const weekId = weekIdFromStart(weekStart);
-  // 2026-09-09: 全期間受付（旧: 水曜10:00〜日曜10:00 のみ）
-  // const accepting = isAccepting(nowMs, weekStart);
-  const accepting = true;
+  // 2026-09-09: 木10:00〜次週水10:00 のみ受付（旧: 全期間 / さらに旧: 水〜日）
+  const accepting = isAccepting(nowMs, weekStart);
+  // const accepting = true;
   const saleOn = isSaleActive(nowMs);
   const items = {};
   for (const key of PRODUCT_KEYS) {
@@ -200,10 +209,10 @@ function buildStatus(nowMs, counts) {
     const remaining = Math.max(0, LIMIT_PER_ITEM - sold);
     const overCap = sold >= LIMIT_PER_ITEM;
     const delivery = deliveryFor(nowMs, sold);
-    // 2026-09-09: SOLD OUT で導線を止めない（受付時間ゲート廃止）
+    // 受付時間外のみ導線ブロック。上限超過は注文可（配送週をずらす）
     // 旧: soldOut = !accepting || remaining <= 0
-    // 旧: soldOut = !accepting
-    const soldOut = false;
+    // 旧: soldOut = false（全期間）
+    const soldOut = !accepting;
     items[key] = {
       sold,
       remaining,
@@ -218,7 +227,7 @@ function buildStatus(nowMs, counts) {
     weekStartIso: new Date(weekStart).toISOString(),
     receptionEndIso: new Date(receptionEndUtc(weekStart)).toISOString(),
     accepting,
-    alwaysOpen: true,
+    // alwaysOpen: true, // 2026-09-09 廃止
     limitPerItem: LIMIT_PER_ITEM,
     items,
     // 2026-09-09: 特別価格情報をフロントへ渡す
@@ -291,21 +300,21 @@ async function createCheckoutSession(env, items, opts = {}) {
     opts.qaToken.length > 0 &&
     opts.qaToken === env.QA_CHECKOUT_TOKEN;
 
-  // 2026-09-09: 全期間受付のため時間外チェックを無効化（旧実装は下記）
-  // if (!status.accepting && !forceOpen) {
-  //   return {
-  //     ok: false,
-  //     status: 403,
-  //     body: {
-  //       error: 'not_accepting',
-  //       message: '現在は受付時間外です。ご注文の受付は毎週水曜10:00〜日曜10:00です。',
-  //       items: status.items,
-  //       accepting: false,
-  //     },
-  //   };
-  // }
+  // 2026-09-09: 受付は木10:00〜次週水10:00（時間外は拒否）
+  if (!status.accepting && !forceOpen) {
+    return {
+      ok: false,
+      status: 403,
+      body: {
+        error: 'not_accepting',
+        message: '現在は受付時間外です。ご注文の受付は毎週木曜10:00〜次週水曜10:00です。',
+        items: status.items,
+        accepting: false,
+      },
+    };
+  }
 
-  // forceOpen 時は受付中扱いにする（在庫超過でも注文可）— 常時受付後も QA 用に残す
+  // forceOpen 時は受付中扱いにする（在庫超過でも注文可）
   if (forceOpen) {
     for (const key of PRODUCT_KEYS) {
       const sold = Number(counts[key] || 0);
@@ -349,18 +358,11 @@ async function createCheckoutSession(env, items, opts = {}) {
         body: { error: 'invalid_qty', message: '数量が正しくありません。', sku, qty },
       };
     }
-    // 2026-09-09: 上限超過でも注文受付（旧: qty > remaining で sold_out）
-    // const remaining = status.items[sku].remaining;
-    // if (qty > remaining) { ... error: 'sold_out' ... }
-    // 配送ラベル: 水曜かつ sold < 10 → 今週木曜。上限をまたぐ／木以降 → 次週木曜
+    // 上限超過でも注文受付。上限をまたぐ注文は「さらに次の週」扱い
     const soldBefore = Number(counts[sku] || 0);
     let del = deliveryFor(now, soldBefore);
-    if (del.slot === 'this_thursday' && soldBefore + qty > LIMIT_PER_ITEM) {
-      del = {
-        slot: 'next_thursday',
-        label: '次週の木曜日配送予定',
-        nextWeek: true,
-      };
+    if (!del.nextWeek && soldBefore + qty > LIMIT_PER_ITEM) {
+      del = deliveryFor(now, LIMIT_PER_ITEM);
     }
     deliveryNotes[sku] = del;
 

@@ -4,45 +4,39 @@ function assert(cond, msg) {
   if (!cond) throw new Error(msg);
 }
 
-// 2026-08-30 22:30 JST = 受付終了後（日曜10:00過ぎ）
-const afterClose = Date.parse('2026-08-30T13:30:00.000Z');
-const start = weekStartUtc(afterClose);
-assert(weekIdFromStart(start) === '2026-08-26', `weekId=${weekIdFromStart(start)}`);
-assert(!isAccepting(afterClose, start), 'should be closed after Sun 10:00');
-
-// 2026-08-28 12:00 JST = 金曜＝受付中
-const friday = Date.parse('2026-08-28T03:00:00.000Z');
-const startFri = weekStartUtc(friday);
-assert(weekIdFromStart(startFri) === '2026-08-26', `fri week=${weekIdFromStart(startFri)}`);
-assert(isAccepting(friday, startFri), 'Friday should be accepting');
-
-// 水曜 09:59 JST は前週
-const beforeWed = Date.parse('2026-08-26T00:59:00.000Z');
-const startPrev = weekStartUtc(beforeWed);
-assert(weekIdFromStart(startPrev) === '2026-08-19', `prev=${weekIdFromStart(startPrev)}`);
-
-const end = receptionEndUtc(start);
-assert(end === Date.parse('2026-08-30T01:00:00.000Z'), `end=${new Date(end).toISOString()}`);
-
-// 2026-09-09: 配送ラベル（JST）
-// 水曜 12:00 JST・sold 0 → 今週木曜
-const wedNoon = Date.parse('2026-09-09T03:00:00.000Z'); // 2026-09-09 is Wed
-assert(deliveryFor(wedNoon, 0).slot === 'this_thursday', 'wed under cap');
-assert(deliveryFor(wedNoon, 10).slot === 'next_thursday', 'wed over cap');
-// 金曜 → 次週
-assert(deliveryFor(friday, 0).slot === 'next_thursday', 'fri always next week');
-
-// セール期間境界（JST）
 function jstToUtcMs(y, mo, d, h, mi = 0) {
   return Date.UTC(y, mo, d, h - 9, mi, 0, 0);
 }
-const saleStart = jstToUtcMs(2026, 8, 14, 0, 0);
-const saleEnd = jstToUtcMs(2026, 8, 26, 0, 0);
-assert(saleStart === Date.parse('2026-09-13T15:00:00.000Z'), `saleStart=${new Date(saleStart).toISOString()}`);
-assert(saleEnd === Date.parse('2026-09-25T15:00:00.000Z'), `saleEnd=${new Date(saleEnd).toISOString()}`);
+
+// 受付枠: 2026-09-10(木) 10:00 〜 2026-09-16(水) 10:00 JST
+const thuOpen = jstToUtcMs(2026, 8, 10, 10, 0);
+const wedAlmostClose = jstToUtcMs(2026, 8, 16, 9, 59);
+const wedClosed = jstToUtcMs(2026, 8, 16, 10, 0);
+const gapBeforeNext = jstToUtcMs(2026, 8, 17, 9, 59); // 木10:00前＝閉鎖
+const nextThuOpen = jstToUtcMs(2026, 8, 17, 10, 0);
+
+const start = weekStartUtc(thuOpen);
+assert(weekIdFromStart(start) === '2026-09-10', `weekId=${weekIdFromStart(start)}`);
+assert(isAccepting(thuOpen, start), 'Thu 10:00 should be accepting');
+assert(isAccepting(wedAlmostClose, weekStartUtc(wedAlmostClose)), 'Wed 09:59 should be accepting');
+assert(!isAccepting(wedClosed, weekStartUtc(wedClosed)), 'Wed 10:00 should be closed');
+assert(!isAccepting(gapBeforeNext, weekStartUtc(gapBeforeNext)), 'Thu 09:59 gap should be closed');
+assert(isAccepting(nextThuOpen, weekStartUtc(nextThuOpen)), 'next Thu 10:00 should be accepting');
+
+const end = receptionEndUtc(start);
+assert(end === wedClosed, `end=${new Date(end).toISOString()} expected=${new Date(wedClosed).toISOString()}`);
+
+// 配送: 上限未満=木曜日 / 上限以上=さらに次の週の木曜日
+assert(deliveryFor(thuOpen, 0).slot === 'cycle_thursday', 'under cap');
+assert(deliveryFor(thuOpen, 0).nextWeek === false, 'under cap nextWeek');
+assert(deliveryFor(thuOpen, 10).slot === 'following_thursday', 'over cap');
+assert(deliveryFor(thuOpen, 10).label.includes('さらに次の週'), 'over cap label');
 
 console.log('week logic OK', {
   weekId: weekIdFromStart(start),
   acceptingNow: isAccepting(Date.now(), weekStartUtc()),
-  saleWindow: { start: new Date(saleStart).toISOString(), end: new Date(saleEnd).toISOString() },
+  reception: {
+    start: new Date(start).toISOString(),
+    end: new Date(end).toISOString(),
+  },
 });

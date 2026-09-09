@@ -992,6 +992,54 @@
       letter-spacing: 0.1em;
     }
 
+    /* 2026-09-09: 期間限定 特別価格の打ち消し表示 */
+    .hover-card-price-was {
+      opacity: .5;
+      font-size: .78em;
+      margin-right: .4em;
+      font-weight: 400;
+    }
+
+    /* 2026-09-09: ショーウィンドウ上の特別価格告知 */
+    .showcase-sale-banner {
+      display: flex;
+      align-items: baseline;
+      gap: .75em;
+      flex-wrap: wrap;
+      max-width: 920px;
+      margin: 0 auto 1.5rem;
+      padding: .85rem 1.1rem;
+      border: 1px solid rgba(212, 175, 110, .55);
+      border-radius: 3px;
+      background: rgba(212, 175, 110, .08);
+      font-size: .92rem;
+      line-height: 1.7;
+      color: var(--color-text);
+      text-align: left;
+    }
+    .showcase-sale-banner__label {
+      flex: 0 0 auto;
+      padding: .12em .6em;
+      font-size: .78em;
+      letter-spacing: .08em;
+      border: 1px solid var(--color-gold);
+      border-radius: 2px;
+      color: var(--color-gold);
+    }
+    .cake-item.next-week .cake-image,
+    .mobile-cake-card.next-week .mobile-cake-image {
+      filter: none;
+    }
+    .cake-item.next-week .coming-soon-overlay,
+    .mobile-cake-card.next-week .mobile-coming-soon-overlay {
+      background: rgba(20, 8, 13, 0.45);
+    }
+    .coming-soon-label--next {
+      letter-spacing: 0.12em;
+      font-size: 0.85em;
+      white-space: nowrap;
+    }
+
     .hover-card-ingredients {
       margin: 0 0 16px;
       padding: 10px 12px;
@@ -1476,10 +1524,19 @@
       }
       return start;
     }
-    /** 受付中: 水曜10:00〜日曜10:00 JST（4日間） */
+    /** 受付中: 2026-09-09 全期間受付（旧: 水曜10:00〜日曜10:00 JST） */
+    // function isReceptionOpen(nowMs = Date.now()) {
+    //   const start = weekStartUtc(nowMs);
+    //   return nowMs >= start && nowMs < start + 4 * 86400000;
+    // }
     function isReceptionOpen(nowMs = Date.now()) {
-      const start = weekStartUtc(nowMs);
-      return nowMs >= start && nowMs < start + 4 * 86400000;
+      return true;
+    }
+
+    // 2026-09-09: 期間限定 特別価格（9/14 00:00 〜 9/26 00:00 JST）※時刻は必ず JST 換算
+    function isSaleActiveLocal(nowMs = Date.now()) {
+      const jst = (y, mo, d, h = 0, mi = 0) => Date.UTC(y, mo, d, h - 9, mi, 0, 0);
+      return nowMs >= jst(2026, 8, 14, 0, 0) && nowMs < jst(2026, 8, 26, 0, 0);
     }
 
     // マジョリンからの手紙（25件）
@@ -1674,6 +1731,7 @@
       const [globalLetter, setGlobalLetter] = useState(null);
       const [ticketState, setTicketState] = useState('visible');
       const [stockItems, setStockItems] = useState(null);
+      const [saleInfo, setSaleInfo] = useState(null);
       
       const sectionRefs = useRef({});
       const doorSectionRef = useRef(null);
@@ -1684,17 +1742,34 @@
         fetch(STOCK_API_URL)
           .then((r) => (r.ok ? r.json() : null))
           .then((data) => {
-            if (!cancelled && data?.items) setStockItems(data.items);
+            if (cancelled || !data) return;
+            if (data.items) setStockItems(data.items);
+            if (data.sale) setSaleInfo(data.sale);
           })
           .catch(() => {});
         return () => { cancelled = true; };
       }, []);
 
       const receptionOpen = isReceptionOpen();
+      // 2026-09-09: /status の sale を優先、未取得時は JST ローカル判定
+      const SALE_ACTIVE = saleInfo ? Boolean(saleInfo.active) : isSaleActiveLocal();
+      // 2026-09-09: 全期間受付。SOLD OUT バッジは出さない（上限超過は次週配送）
       const cakeSoldOut = (key) => {
-        if (!receptionOpen) return true;
-        if (stockItems?.[key]?.soldOut) return true;
+        // 旧: if (!receptionOpen) return true;
         return false;
+      };
+      const cakeNextWeek = (key) => {
+        if (!receptionOpen) return false;
+        const it = stockItems?.[key];
+        if (!it) return false;
+        if (it.delivery?.nextWeek) return true;
+        if (it.overCap) return true;
+        return false;
+      };
+      const cakeBadge = (key) => {
+        if (cakeSoldOut(key)) return { className: 'sold-out', label: 'SOLD OUT' };
+        if (cakeNextWeek(key)) return { className: 'next-week', label: '次週の木曜日配送予定' };
+        return null;
       };
 
       const openGlobalLetter = (message, onWhenClosed) => {
@@ -1835,8 +1910,9 @@
                   tabIndex={0}
                   aria-label="チケットを使って扉を開く"
                 >
+                  {/* 2026-09-09: プレ販売にあわせて招待状画像を差し替え。旧: welcome_card.jpg?v=20260821 */}
                   <img
-                    src="images/spring2026/welcome_card.jpg?v=20260821"
+                    src="images/spring2026/welcome_card_v2.jpg?v=20260909"
                     alt="MAJORINS Museum チケット"
                     style={styles.ticketImage}
                     draggable={false}
@@ -2126,18 +2202,26 @@
               <p className="showcase-intro-text">扉の向こうに並ぶ、三つの魔法。<br />マジョリンが今宵お届けする逸品をどうぞ。</p>
             </div>
 
+            {/* 2026-09-09: ショーウィンドウ上に期間限定 特別価格の告知 */}
+            {SALE_ACTIVE && (
+              <div className="showcase-sale-banner" data-sale-banner>
+                <span className="showcase-sale-banner__label">期間限定</span>
+                <span>9/14（月）〜 9/25（金）は全商品 <strong>800円OFF</strong>（¥4,600→¥3,800）の特別価格でご案内しております。</span>
+              </div>
+            )}
+
             <div className="showcase-window showcase-window--photo">
               <img src="images/showcase/showcase-photo.jpg?v=20260826" alt="MAJORINS Showcase — Verdant Veil / Noir Melt / Passion Orange" className="showcase-bg" />
 
               {/* 写真の並び: 左=Verdant / 中央=Noir / 右=Passion（個別PNGは非表示・ヒット領域＋値札＋ホバーのみ） */}
-              <div className={`cake-item${cakeSoldOut('verdant') ? ' sold-out' : ''}`} data-position="left">
+              <div className={`cake-item${cakeBadge('verdant') ? ` ${cakeBadge('verdant').className}` : ''}`} data-position="left">
                 <a href={SHOWCASE_CAKES.verdant.href} className="cake-link">
                   <div className="cake-image-wrap">
                     <img src="images/showcase/cake-verdant-veil.png?v=20260821" alt="Verdant Veil" className="cake-image" />
                     <div className="spotlight-glow"></div>
-                    {cakeSoldOut('verdant') && (
+                    {cakeBadge('verdant') && (
                       <div className="coming-soon-overlay">
-                        <span className="coming-soon-label">SOLD OUT</span>
+                        <span className={`coming-soon-label${cakeBadge('verdant').className === 'next-week' ? ' coming-soon-label--next' : ''}`}>{cakeBadge('verdant').label}</span>
                       </div>
                     )}
                   </div>
@@ -2150,7 +2234,12 @@
                     <div className="hover-card-name-en">Verdant Veil</div>
                     <div className="hover-card-divider"></div>
                     <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    {/* 2026-09-09: 期間限定 特別価格。旧: <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div> */}
+                    <div className="hover-card-price">
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
+                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      <span className="hover-card-price-unit">/ 1本</span>
+                    </div>
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.verdant}</p>
@@ -2160,14 +2249,14 @@
                 </a>
               </div>
 
-              <div className={`cake-item${cakeSoldOut('noir') ? ' sold-out' : ''}`} data-position="center">
+              <div className={`cake-item${cakeBadge('noir') ? ` ${cakeBadge('noir').className}` : ''}`} data-position="center">
                 <a href={SHOWCASE_CAKES.noir.href} className="cake-link">
                   <div className="cake-image-wrap">
                     <img src="images/showcase/cake-noir-melt.png?v=20260821" alt="Noir Melt" className="cake-image" />
                     <div className="spotlight-glow"></div>
-                    {cakeSoldOut('noir') && (
+                    {cakeBadge('noir') && (
                       <div className="coming-soon-overlay">
-                        <span className="coming-soon-label">SOLD OUT</span>
+                        <span className={`coming-soon-label${cakeBadge('noir').className === 'next-week' ? ' coming-soon-label--next' : ''}`}>{cakeBadge('noir').label}</span>
                       </div>
                     )}
                   </div>
@@ -2180,7 +2269,12 @@
                     <div className="hover-card-name-en">Noir Melt</div>
                     <div className="hover-card-divider"></div>
                     <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    {/* 2026-09-09: 期間限定 特別価格。旧: <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div> */}
+                    <div className="hover-card-price">
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
+                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      <span className="hover-card-price-unit">/ 1本</span>
+                    </div>
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.noir}</p>
@@ -2190,14 +2284,14 @@
                 </a>
               </div>
 
-              <div className={`cake-item${cakeSoldOut('passion') ? ' sold-out' : ''}`} data-position="right">
+              <div className={`cake-item${cakeBadge('passion') ? ` ${cakeBadge('passion').className}` : ''}`} data-position="right">
                 <a href={SHOWCASE_CAKES.passion.href} className="cake-link">
                   <div className="cake-image-wrap">
                     <img src="images/showcase/cake-passion-orange.png?v=20260821" alt="Passion Orange Vert" className="cake-image" />
                     <div className="spotlight-glow"></div>
-                    {cakeSoldOut('passion') && (
+                    {cakeBadge('passion') && (
                       <div className="coming-soon-overlay">
-                        <span className="coming-soon-label">SOLD OUT</span>
+                        <span className={`coming-soon-label${cakeBadge('passion').className === 'next-week' ? ' coming-soon-label--next' : ''}`}>{cakeBadge('passion').label}</span>
                       </div>
                     )}
                   </div>
@@ -2210,7 +2304,12 @@
                     <div className="hover-card-name-en">Passion Orange Vert</div>
                     <div className="hover-card-divider"></div>
                     <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    {/* 2026-09-09: 期間限定 特別価格。旧: <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div> */}
+                    <div className="hover-card-price">
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
+                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      <span className="hover-card-price-unit">/ 1本</span>
+                    </div>
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.passion}</p>
@@ -2249,12 +2348,12 @@
                 src="images/showcase/showcase-photo.jpg?v=20260826"
                 alt="MAJORINS Showcase — Verdant Veil / Noir Melt / Passion Orange"
               />
-              <div className={`mobile-cake-card${cakeSoldOut('verdant') ? ' sold-out' : ''}`}>
+              <div className={`mobile-cake-card${cakeBadge('verdant') ? ` ${cakeBadge('verdant').className}` : ''}`}>
                 <a href={SHOWCASE_CAKES.verdant.href} className="mobile-cake-link">
                   <img src="images/showcase/cake-verdant-veil.png?v=20260821" alt="Verdant Veil" className="mobile-cake-image" />
-                  {cakeSoldOut('verdant') && (
+                  {cakeBadge('verdant') && (
                     <div className="mobile-coming-soon-overlay">
-                      <span className="coming-soon-label">SOLD OUT</span>
+                      <span className={`coming-soon-label${cakeBadge('verdant').className === 'next-week' ? ' coming-soon-label--next' : ''}`}>{cakeBadge('verdant').label}</span>
                     </div>
                   )}
                   <div className="mobile-cake-plate">
@@ -2263,7 +2362,12 @@
                   </div>
                   <div className="mobile-cake-details">
                     <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    {/* 2026-09-09: 期間限定 特別価格。旧: ¥4,800 */}
+                    <div className="hover-card-price">
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
+                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      <span className="hover-card-price-unit">/ 1本</span>
+                    </div>
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.verdant}</p>
@@ -2273,12 +2377,12 @@
                 </a>
               </div>
 
-              <div className={`mobile-cake-card${cakeSoldOut('noir') ? ' sold-out' : ''}`}>
+              <div className={`mobile-cake-card${cakeBadge('noir') ? ` ${cakeBadge('noir').className}` : ''}`}>
                 <a href={SHOWCASE_CAKES.noir.href} className="mobile-cake-link">
                   <img src="images/showcase/cake-noir-melt.png?v=20260821" alt="Noir Melt" className="mobile-cake-image" />
-                  {cakeSoldOut('noir') && (
+                  {cakeBadge('noir') && (
                     <div className="mobile-coming-soon-overlay">
-                      <span className="coming-soon-label">SOLD OUT</span>
+                      <span className={`coming-soon-label${cakeBadge('noir').className === 'next-week' ? ' coming-soon-label--next' : ''}`}>{cakeBadge('noir').label}</span>
                     </div>
                   )}
                   <div className="mobile-cake-plate">
@@ -2287,7 +2391,12 @@
                   </div>
                   <div className="mobile-cake-details">
                     <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    {/* 2026-09-09: 期間限定 特別価格。旧: ¥4,800 */}
+                    <div className="hover-card-price">
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
+                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      <span className="hover-card-price-unit">/ 1本</span>
+                    </div>
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.noir}</p>
@@ -2297,12 +2406,12 @@
                 </a>
               </div>
 
-              <div className={`mobile-cake-card${cakeSoldOut('passion') ? ' sold-out' : ''}`}>
+              <div className={`mobile-cake-card${cakeBadge('passion') ? ` ${cakeBadge('passion').className}` : ''}`}>
                 <a href={SHOWCASE_CAKES.passion.href} className="mobile-cake-link">
                   <img src="images/showcase/cake-passion-orange.png?v=20260821" alt="Passion Orange Vert" className="mobile-cake-image" />
-                  {cakeSoldOut('passion') && (
+                  {cakeBadge('passion') && (
                     <div className="mobile-coming-soon-overlay">
-                      <span className="coming-soon-label">SOLD OUT</span>
+                      <span className={`coming-soon-label${cakeBadge('passion').className === 'next-week' ? ' coming-soon-label--next' : ''}`}>{cakeBadge('passion').label}</span>
                     </div>
                   )}
                   <div className="mobile-cake-plate">
@@ -2311,7 +2420,12 @@
                   </div>
                   <div className="mobile-cake-details">
                     <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
-                    <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div>
+                    {/* 2026-09-09: 期間限定 特別価格。旧: ¥4,800 */}
+                    <div className="hover-card-price">
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
+                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      <span className="hover-card-price-unit">/ 1本</span>
+                    </div>
                     <div className="hover-card-ingredients">
                       <div className="hover-card-ingredients-label">原材料</div>
                       <p className="hover-card-ingredients-text">{CAKE_INGREDIENTS.passion}</p>

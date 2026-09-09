@@ -1,7 +1,7 @@
 /**
- * MAJORINS 週次在庫（商品ごと 10 個 / 木 10:00 JST リセット）
+ * MAJORINS 週次在庫（商品ごと 10 個 / 水 10:00 JST リセット）
  *
- * GET  /status    公開：残り個数・受付可否
+ * GET  /status    公開：残り個数・受付可否・セール・配送目安
  * POST /checkout  注文内容から Stripe Checkout Session を作成
  * POST /contact   お問合せ受付（KV 保存）
  * POST /webhook   Stripe checkout.session.completed
@@ -9,15 +9,64 @@
 
 const LIMIT_PER_ITEM = 10;
 const PRODUCT_KEYS = ['noir', 'verdant', 'passion'];
+// 2026-09-09: 通常価格を ¥4,600 に更新（旧 ¥4,800 Price は残置・非使用）
+// const KEY_TO_PRICE = {
+//   noir: 'price_1Tfr7c3A10QFS30cZiB51VM1',
+//   verdant: 'price_1Tfr7d3A10QFS30cxsuzLgbC',
+//   passion: 'price_1Tfr7f3A10QFS30c2sjr3cti',
+// };
 const KEY_TO_PRICE = {
-  noir: 'price_1Tfr7c3A10QFS30cZiB51VM1',
-  verdant: 'price_1Tfr7d3A10QFS30cxsuzLgbC',
-  passion: 'price_1Tfr7f3A10QFS30c2sjr3cti',
+  noir: 'price_1UDgXT3A10QFS30cZgeISwBX',
+  verdant: 'price_1UDgXU3A10QFS30chLVkaZbf',
+  passion: 'price_1UDgXU3A10QFS30ca13csPYP',
 };
+
+// ===== 2026-09: 期間限定 特別価格（1本 800円OFF / ¥4,600 → ¥3,800）=====
+// 期間: 2026-09-14 00:00 JST 〜 2026-09-26 00:00 JST（= 9/25 24:00）
+// mo は 0-based（8 = 9月）
+const SALE_START_JST = { y: 2026, mo: 8, d: 14, h: 0, mi: 0 };
+const SALE_END_JST   = { y: 2026, mo: 8, d: 26, h: 0, mi: 0 };
+const KEY_TO_PRICE_SALE = {
+  noir: 'price_1UDgXT3A10QFS30cq0qW2pRW',
+  verdant: 'price_1UDgXU3A10QFS30crKRgKg2z',
+  passion: 'price_1UDgXU3A10QFS30ceoA55vpv',
+};
+const SALE_PRICE_YEN = { noir: 3800, verdant: 3800, passion: 3800 };
+
+function isSaleActive(nowMs) {
+  const s = SALE_START_JST;
+  const e = SALE_END_JST;
+  const startMs = jstToUtcMs(s.y, s.mo, s.d, s.h, s.mi);
+  const endMs = jstToUtcMs(e.y, e.mo, e.d, e.h, e.mi);
+  return nowMs >= startMs && nowMs < endMs;
+}
+
+function priceMapFor(nowMs) {
+  return isSaleActive(nowMs) ? KEY_TO_PRICE_SALE : KEY_TO_PRICE;
+}
+
+function yenMapFor(nowMs) {
+  return isSaleActive(nowMs) ? SALE_PRICE_YEN : PRICE_YEN;
+}
+// ===== ここまで =====
+
+// 2026-09-09: 特別価格 Price ID も逆引きできるよう両方をマージ（旧実装は下記）
+// const PRICE_TO_KEY = Object.fromEntries(
+//   Object.entries(KEY_TO_PRICE).map(([k, v]) => [v, k]),
+// );
+// 旧 ¥4,800 Price も webhook 在庫反映のため残す
 const PRICE_TO_KEY = Object.fromEntries(
-  Object.entries(KEY_TO_PRICE).map(([k, v]) => [v, k]),
+  [
+    ...Object.entries(KEY_TO_PRICE),
+    ...Object.entries(KEY_TO_PRICE_SALE),
+    ['noir', 'price_1Tfr7c3A10QFS30cZiB51VM1'],
+    ['verdant', 'price_1Tfr7d3A10QFS30cxsuzLgbC'],
+    ['passion', 'price_1Tfr7f3A10QFS30c2sjr3cti'],
+  ].map(([k, v]) => [v, k]),
 );
-const PRICE_YEN = { noir: 4800, verdant: 4800, passion: 4800 };
+// 2026-09-09: 通常表示・計算を ¥4,600 に（旧: 4800）
+// const PRICE_YEN = { noir: 4800, verdant: 4800, passion: 4800 };
+const PRICE_YEN = { noir: 4600, verdant: 4600, passion: 4600 };
 const FREE_SHIPPING_YEN = 10000;
 const SHIPPING_RATE_PAID = 'shr_1U8cKh3A10QFS30cDgDiCewG';
 const SHIPPING_RATE_FREE = 'shr_1UARvb3A10QFS30c5a46Ocnr';
@@ -71,6 +120,30 @@ export function weekIdFromStart(weekStartMs) {
   return `${w.y}-${mm}-${dd}`;
 }
 
+/**
+ * 配送目安（JST）
+ * - 水曜（受付週）かつ sold < 10 → 木曜日配送予定（今週）
+ * - それ以外（木〜日 / 上限超過）→ 次週の木曜日配送予定
+ * sold は Stripe webhook 集計を正とする（職員は木以降に手動更新）
+ */
+export function deliveryFor(nowMs, sold) {
+  const w = jstWall(nowMs);
+  const underCap = Number(sold || 0) < LIMIT_PER_ITEM;
+  const thisThursday = w.dow === 3 && underCap;
+  if (thisThursday) {
+    return {
+      slot: 'this_thursday',
+      label: '木曜日配送予定',
+      nextWeek: false,
+    };
+  }
+  return {
+    slot: 'next_thursday',
+    label: '次週の木曜日配送予定',
+    nextWeek: true,
+  };
+}
+
 function emptyCounts() {
   return { noir: 0, verdant: 0, passion: 0 };
 }
@@ -117,21 +190,47 @@ async function readCounts(kv, weekId) {
 function buildStatus(nowMs, counts) {
   const weekStart = weekStartUtc(nowMs);
   const weekId = weekIdFromStart(weekStart);
-  const accepting = isAccepting(nowMs, weekStart);
+  // 2026-09-09: 全期間受付（旧: 水曜10:00〜日曜10:00 のみ）
+  // const accepting = isAccepting(nowMs, weekStart);
+  const accepting = true;
+  const saleOn = isSaleActive(nowMs);
   const items = {};
   for (const key of PRODUCT_KEYS) {
     const sold = Number(counts[key] || 0);
     const remaining = Math.max(0, LIMIT_PER_ITEM - sold);
-    const soldOut = !accepting || remaining <= 0;
-    items[key] = { sold, remaining, soldOut, limit: LIMIT_PER_ITEM };
+    const overCap = sold >= LIMIT_PER_ITEM;
+    const delivery = deliveryFor(nowMs, sold);
+    // 2026-09-09: SOLD OUT で導線を止めない（受付時間ゲート廃止）
+    // 旧: soldOut = !accepting || remaining <= 0
+    // 旧: soldOut = !accepting
+    const soldOut = false;
+    items[key] = {
+      sold,
+      remaining,
+      soldOut,
+      overCap,
+      limit: LIMIT_PER_ITEM,
+      delivery,
+    };
   }
   return {
     weekId,
     weekStartIso: new Date(weekStart).toISOString(),
     receptionEndIso: new Date(receptionEndUtc(weekStart)).toISOString(),
     accepting,
+    alwaysOpen: true,
     limitPerItem: LIMIT_PER_ITEM,
     items,
+    // 2026-09-09: 特別価格情報をフロントへ渡す
+    sale: {
+      active: saleOn,
+      unitPrice: saleOn ? 3800 : 4600,
+      regularPrice: 4600,
+      discount: 800,
+      label: '特別価格',
+      startsAt: jstToUtcMs(SALE_START_JST.y, SALE_START_JST.mo, SALE_START_JST.d, SALE_START_JST.h, SALE_START_JST.mi),
+      endsAt: jstToUtcMs(SALE_END_JST.y, SALE_END_JST.mo, SALE_END_JST.d, SALE_END_JST.h, SALE_END_JST.mi),
+    },
   };
 }
 
@@ -192,31 +291,46 @@ async function createCheckoutSession(env, items, opts = {}) {
     opts.qaToken.length > 0 &&
     opts.qaToken === env.QA_CHECKOUT_TOKEN;
 
-  if (!status.accepting && !forceOpen) {
-    return {
-      ok: false,
-      status: 403,
-      body: {
-        error: 'not_accepting',
-        message: '現在は受付時間外です。ご注文の受付は毎週水曜10:00〜日曜10:00です。',
-        items: status.items,
-        accepting: false,
-      },
-    };
-  }
+  // 2026-09-09: 全期間受付のため時間外チェックを無効化（旧実装は下記）
+  // if (!status.accepting && !forceOpen) {
+  //   return {
+  //     ok: false,
+  //     status: 403,
+  //     body: {
+  //       error: 'not_accepting',
+  //       message: '現在は受付時間外です。ご注文の受付は毎週水曜10:00〜日曜10:00です。',
+  //       items: status.items,
+  //       accepting: false,
+  //     },
+  //   };
+  // }
 
-  // forceOpen 時は soldOut を在庫のみで再評価（受付時間外でも残数チェック）
+  // forceOpen 時は受付中扱いにする（在庫超過でも注文可）— 常時受付後も QA 用に残す
   if (forceOpen) {
     for (const key of PRODUCT_KEYS) {
       const sold = Number(counts[key] || 0);
       const remaining = Math.max(0, LIMIT_PER_ITEM - sold);
-      status.items[key] = { sold, remaining, soldOut: remaining <= 0, limit: LIMIT_PER_ITEM };
+      const delivery = deliveryFor(now, sold);
+      status.items[key] = {
+        sold,
+        remaining,
+        soldOut: false,
+        overCap: sold >= LIMIT_PER_ITEM,
+        limit: LIMIT_PER_ITEM,
+        delivery,
+      };
     }
     status.accepting = true;
   }
 
+  // 2026-09-09: 特別価格期間の判定
+  const saleNowMs = Date.now();
+  const activePriceMap = priceMapFor(saleNowMs);
+  const activeYenMap = yenMapFor(saleNowMs);
+
   const lineItems = [];
   let subtotal = 0;
+  const deliveryNotes = {};
 
   for (const raw of items) {
     const sku = String(raw?.sku || '');
@@ -235,20 +349,26 @@ async function createCheckoutSession(env, items, opts = {}) {
         body: { error: 'invalid_qty', message: '数量が正しくありません。', sku, qty },
       };
     }
-    const remaining = status.items[sku].remaining;
-    if (qty > remaining) {
-      return {
-        ok: false,
-        status: 409,
-        body: {
-          error: 'sold_out',
-          message: `${sku} の在庫が不足しています（残り ${remaining} 本）。`,
-          items: status.items,
-        },
+    // 2026-09-09: 上限超過でも注文受付（旧: qty > remaining で sold_out）
+    // const remaining = status.items[sku].remaining;
+    // if (qty > remaining) { ... error: 'sold_out' ... }
+    // 配送ラベル: 水曜かつ sold < 10 → 今週木曜。上限をまたぐ／木以降 → 次週木曜
+    const soldBefore = Number(counts[sku] || 0);
+    let del = deliveryFor(now, soldBefore);
+    if (del.slot === 'this_thursday' && soldBefore + qty > LIMIT_PER_ITEM) {
+      del = {
+        slot: 'next_thursday',
+        label: '次週の木曜日配送予定',
+        nextWeek: true,
       };
     }
-    lineItems.push({ price: KEY_TO_PRICE[sku], quantity: qty });
-    subtotal += PRICE_YEN[sku] * qty;
+    deliveryNotes[sku] = del;
+
+    // 2026-09-09: 期間限定 特別価格に対応（旧実装は下記）
+    // lineItems.push({ price: KEY_TO_PRICE[sku], quantity: qty });
+    // subtotal += PRICE_YEN[sku] * qty;
+    lineItems.push({ price: activePriceMap[sku], quantity: qty });
+    subtotal += activeYenMap[sku] * qty;
   }
 
   if (!lineItems.length) {
@@ -316,6 +436,7 @@ async function createCheckoutSession(env, items, opts = {}) {
       subtotal,
       shipping: shippingFree ? 0 : 1300,
       shippingFree,
+      delivery: deliveryNotes,
     },
   };
 }

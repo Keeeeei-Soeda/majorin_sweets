@@ -1,4 +1,4 @@
-import { weekStartUtc, receptionEndUtc, isAccepting, weekIdFromStart } from './src/index.js';
+import { weekStartUtc, receptionEndUtc, isAccepting, weekIdFromStart, deliveryFor } from './src/index.js';
 
 function assert(cond, msg) {
   if (!cond) throw new Error(msg);
@@ -24,7 +24,25 @@ assert(weekIdFromStart(startPrev) === '2026-08-19', `prev=${weekIdFromStart(star
 const end = receptionEndUtc(start);
 assert(end === Date.parse('2026-08-30T01:00:00.000Z'), `end=${new Date(end).toISOString()}`);
 
+// 2026-09-09: 配送ラベル（JST）
+// 水曜 12:00 JST・sold 0 → 今週木曜
+const wedNoon = Date.parse('2026-09-09T03:00:00.000Z'); // 2026-09-09 is Wed
+assert(deliveryFor(wedNoon, 0).slot === 'this_thursday', 'wed under cap');
+assert(deliveryFor(wedNoon, 10).slot === 'next_thursday', 'wed over cap');
+// 金曜 → 次週
+assert(deliveryFor(friday, 0).slot === 'next_thursday', 'fri always next week');
+
+// セール期間境界（JST）
+function jstToUtcMs(y, mo, d, h, mi = 0) {
+  return Date.UTC(y, mo, d, h - 9, mi, 0, 0);
+}
+const saleStart = jstToUtcMs(2026, 8, 14, 0, 0);
+const saleEnd = jstToUtcMs(2026, 8, 26, 0, 0);
+assert(saleStart === Date.parse('2026-09-13T15:00:00.000Z'), `saleStart=${new Date(saleStart).toISOString()}`);
+assert(saleEnd === Date.parse('2026-09-25T15:00:00.000Z'), `saleEnd=${new Date(saleEnd).toISOString()}`);
+
 console.log('week logic OK', {
   weekId: weekIdFromStart(start),
   acceptingNow: isAccepting(Date.now(), weekStartUtc()),
+  saleWindow: { start: new Date(saleStart).toISOString(), end: new Date(saleEnd).toISOString() },
 });

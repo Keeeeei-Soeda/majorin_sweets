@@ -2739,20 +2739,20 @@
               </div>
 
               <div style={styles.ctaButtons}>
-                <button 
-                  style={styles.ctaButton} 
-                  onClick={() => alert('予約ページへ遷移します')}
+                <a
+                  href="/order/"
+                  style={{ ...styles.ctaButton, display: 'inline-block', textDecoration: 'none' }}
                   onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-5px)';
-                    e.target.style.boxShadow = '0 15px 40px rgba(74, 14, 78, 0.6)';
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(74, 14, 78, 0.6)';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 10px 30px rgba(74, 14, 78, 0.4)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 10px 30px rgba(74, 14, 78, 0.4)';
                   }}
                 >
                   今すぐ予約する
-                </button>
+                </a>
               </div>
 
               <div style={styles.ctaNote}>
@@ -2807,18 +2807,17 @@
           {showOrderFab && (
             <div className="fab-order-wrap">
               <span className="fab-order-caption">毎週木曜10時 予約開始</span>
-              <button
-                type="button"
+              <a
+                href="/order/"
                 className="fab-order"
-                onClick={scrollToShowcase}
-                aria-label="ご注文欄へ移動"
+                aria-label="商品選択ページへ"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M6 8h12l-1 12H7L6 8z" />
                   <path d="M9 8V6a3 3 0 0 1 6 0v2" />
                 </svg>
                 ご注文
-              </button>
+              </a>
             </div>
           )}
 

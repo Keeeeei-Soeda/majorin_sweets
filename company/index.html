@@ -84,11 +84,35 @@
     margin: 0 0 20px; padding-bottom: 14px;
     border-bottom: 1px solid rgba(212, 175, 110, 0.25);
   }
+  .block__subtitle {
+    font-family: var(--font-body-jp); font-size: 0.92rem; font-weight: 500;
+    letter-spacing: 0.12em; color: var(--color-gold);
+    margin: 28px 0 12px;
+  }
+  .block__subtitle:first-of-type { margin-top: 8px; }
   .block__lead {
     font-size: 0.88rem; line-height: 2.1; color: var(--color-text);
     letter-spacing: 0.05em; margin: 0 0 18px;
   }
   .block__lead:last-child { margin-bottom: 0; }
+  .cake-meaning {
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+  }
+  .cake-meaning li {
+    font-size: 0.88rem; line-height: 2.05; color: var(--color-text);
+    letter-spacing: 0.04em;
+    padding: 10px 0 10px 0;
+    border-bottom: 1px solid rgba(212, 175, 110, 0.14);
+  }
+  .cake-meaning li:last-child { border-bottom: none; padding-bottom: 0; }
+  .cake-meaning__name {
+    display: block;
+    color: var(--color-gold-bright);
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
 
   /* 定義リスト */
   .spec { margin: 0; }
@@ -181,9 +205,45 @@
     <p class="block__lead">
       MAJORINS は、<a href="https://www.mama-syokuzai.co.jp/" target="_blank" rel="noopener noreferrer">ママ食材株式会社</a>が運営するスイーツブランドです。
     </p>
+
+    <h3 class="block__subtitle">二つの食の流通</h3>
     <p class="block__lead">
-      <!-- ▼原稿待ち：ブランドの成り立ち・想いを2〜3段落で -->
-      <span class="tbd">原稿待ち</span> ブランドの成り立ち、大切にしていること、これからについて。
+      私たちは、二つの食の流通をさせていただいております。ひとつは青果物流・青果加工卸、もうひとつは製菓業卸です。どちらの業態も輝く女性が主体——まさにママ食材です。
+    </p>
+
+    <h3 class="block__subtitle">MAJORINS という製菓ブランド</h3>
+    <p class="block__lead">
+      今回の製菓ブランド MAJORINS は、弊社の専務取締役の魔女が手がける、ワンランクアップの生パウンドケーキ。一年かけて創り上げた商品です。
+    </p>
+
+    <h3 class="block__subtitle">こだわりの生パウンドケーキ</h3>
+    <p class="block__lead">
+      特徴は、厳選した米粉と名古屋コーチン卵をベースに、口当たりと後味にこだわった逸品であること。「食べたら奇跡！」というキャッチのもと、召し上がったときに心から湧き立つエネルギーを感じ、貴方の奇跡を起こしていく——唯一無二のスピリチュアルスイーツです。
+    </p>
+
+    <h3 class="block__subtitle">最初の3種に込めた意味</h3>
+    <p class="block__lead">
+      最初の発売の3種には、それぞれ意味がございます。ピンときたものを選んでいただきたいです。
+    </p>
+    <ul class="cake-meaning">
+      <li>
+        <span class="cake-meaning__name">Noir Melt / ノワール メルト</span>
+        ダークな闇の中に眠る可能性を呼び覚ます。
+      </li>
+      <li>
+        <span class="cake-meaning__name">Verdant Veil / ヴァーダント ベール</span>
+        奇跡が動き出し、新緑の芽吹きを起こす。
+      </li>
+      <li>
+        <span class="cake-meaning__name">Passion Orange / パッションオレンジヴェール</span>
+        遂に夢が実現化し、奇跡が起こった。
+      </li>
+    </ul>
+
+    <h3 class="block__subtitle">今後のお知らせ</h3>
+    <p class="block__lead">
+      この後も続々とスピリチュアルスイーツを展開していきます。情報は
+      <a href="https://www.instagram.com/majorins_sweets/" target="_blank" rel="noopener noreferrer">Instagram</a>、公式 LINE 等でお知らせしていきますので、お見逃しなく。
     </p>
   </section>
 
@@ -252,7 +312,7 @@
       </div>
       <div class="spec__row">
         <p class="spec__key">メールアドレス</p>
-        <p class="spec__val"><a href="/contact/">お問合せフォーム</a>よりご連絡ください</p>
+        <p class="spec__val"><a href="mailto:mjshop@majorins.jp">mjshop@majorins.jp</a></p>
       </div>
       <div class="spec__row">
         <p class="spec__key">販売価格</p>

@@ -1,0 +1,13 @@
+{
+  "regular4800": {
+    "noir": "price_1Tfr7c3A10QFS30cZiB51VM1",
+    "verdant": "price_1Tfr7d3A10QFS30cxsuzLgbC",
+    "passion": "price_1Tfr7f3A10QFS30c2sjr3cti"
+  },
+  "sale4000": {
+    "noir": "price_1UEOOl3A10QFS30cIJ7JlKE1",
+    "verdant": "price_1UEOOs3A10QFS30cS9FtPNAj",
+    "passion": "price_1UEOOs3A10QFS30cTKPJlmWk"
+  },
+  "note": "2026-09-11: 通常価格を誤設定の ¥4,600 から正しい ¥4,800 に戻し、期間限定を ¥4,000 に更新"
+}

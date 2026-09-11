@@ -6,35 +6,39 @@
  *
  * GET  /status    公開：残り個数・受付可否・セール・配送目安
  * POST /checkout  注文内容から Stripe Checkout Session を作成
- * POST /contact   お問合せ受付（KV 保存）
- * POST /webhook   Stripe checkout.session.completed
+ * POST /contact   お問合せ受付（KV 保存 + Resend メール通知 + GAS シート追記）
+ * POST /webhook   Stripe checkout.session.completed（在庫 + GAS 注文シート追記）
+ *
+ * Contact secrets:
+ *   RESEND_API_KEY      … Resend API キー（必須・メール通知）
+ *   CONTACT_NOTIFY_TO   … 通知先（省略時 mjshop@majorins.jp、カンマ区切り可）
+ *   CONTACT_FROM        … 送信元（省略時 MAJORINS <mjshop@majorins.jp>）
+ *   CONTACT_WEBHOOK_URL … 任意（Slack Incoming Webhook 等）
+ * Sheet sync（任意・未設定でも本線は動作）:
+ *   SHEET_SYNC_URL      … GAS ウェブアプリ URL（省略時は既定 URL）
+ *   SHEET_SYNC_TOKEN    … GAS の SYNC_TOKEN（未設定なら空文字）
  */
 
 const LIMIT_PER_ITEM = 10;
 const PRODUCT_KEYS = ['noir', 'verdant', 'passion'];
-// 2026-09-09: 通常価格を ¥4,600 に更新（旧 ¥4,800 Price は残置・非使用）
-// const KEY_TO_PRICE = {
-//   noir: 'price_1Tfr7c3A10QFS30cZiB51VM1',
-//   verdant: 'price_1Tfr7d3A10QFS30cxsuzLgbC',
-//   passion: 'price_1Tfr7f3A10QFS30c2sjr3cti',
-// };
+// 2026-09-11: 通常価格を ¥4,800 に戻す（誤設定だった ¥4,600 Price は webhook 逆引き用に残置）
 const KEY_TO_PRICE = {
-  noir: 'price_1UDgXT3A10QFS30cZgeISwBX',
-  verdant: 'price_1UDgXU3A10QFS30chLVkaZbf',
-  passion: 'price_1UDgXU3A10QFS30ca13csPYP',
+  noir: 'price_1Tfr7c3A10QFS30cZiB51VM1',
+  verdant: 'price_1Tfr7d3A10QFS30cxsuzLgbC',
+  passion: 'price_1Tfr7f3A10QFS30c2sjr3cti',
 };
 
-// ===== 2026-09: 期間限定 特別価格（1本 800円OFF / ¥4,600 → ¥3,800）=====
+// ===== 2026-09: 期間限定 特別価格（1本 800円OFF / ¥4,800 → ¥4,000）=====
 // 期間: 2026-09-14 00:00 JST 〜 2026-09-26 00:00 JST（= 9/25 24:00）
 // mo は 0-based（8 = 9月）
 const SALE_START_JST = { y: 2026, mo: 8, d: 14, h: 0, mi: 0 };
 const SALE_END_JST   = { y: 2026, mo: 8, d: 26, h: 0, mi: 0 };
 const KEY_TO_PRICE_SALE = {
-  noir: 'price_1UDgXT3A10QFS30cq0qW2pRW',
-  verdant: 'price_1UDgXU3A10QFS30crKRgKg2z',
-  passion: 'price_1UDgXU3A10QFS30ceoA55vpv',
+  noir: 'price_1UEOOl3A10QFS30cIJ7JlKE1',
+  verdant: 'price_1UEOOs3A10QFS30cS9FtPNAj',
+  passion: 'price_1UEOOs3A10QFS30cTKPJlmWk',
 };
-const SALE_PRICE_YEN = { noir: 3800, verdant: 3800, passion: 3800 };
+const SALE_PRICE_YEN = { noir: 4000, verdant: 4000, passion: 4000 };
 
 function isSaleActive(nowMs) {
   const s = SALE_START_JST;
@@ -53,25 +57,32 @@ function yenMapFor(nowMs) {
 }
 // ===== ここまで =====
 
-// 2026-09-09: 特別価格 Price ID も逆引きできるよう両方をマージ（旧実装は下記）
-// const PRICE_TO_KEY = Object.fromEntries(
-//   Object.entries(KEY_TO_PRICE).map(([k, v]) => [v, k]),
-// );
-// 旧 ¥4,800 Price も webhook 在庫反映のため残す
+// 特別価格・誤設定だった ¥4,600 / 旧 ¥3,800 Price も webhook 在庫反映のため残す
 const PRICE_TO_KEY = Object.fromEntries(
   [
     ...Object.entries(KEY_TO_PRICE),
     ...Object.entries(KEY_TO_PRICE_SALE),
-    ['noir', 'price_1Tfr7c3A10QFS30cZiB51VM1'],
-    ['verdant', 'price_1Tfr7d3A10QFS30cxsuzLgbC'],
-    ['passion', 'price_1Tfr7f3A10QFS30c2sjr3cti'],
+    // 2026-09-09 一時設定の ¥4,600
+    ['noir', 'price_1UDgXT3A10QFS30cZgeISwBX'],
+    ['verdant', 'price_1UDgXU3A10QFS30chLVkaZbf'],
+    ['passion', 'price_1UDgXU3A10QFS30ca13csPYP'],
+    // 2026-09-09 一時設定の特別価格 ¥3,800
+    ['noir', 'price_1UDgXT3A10QFS30cq0qW2pRW'],
+    ['verdant', 'price_1UDgXU3A10QFS30crKRgKg2z'],
+    ['passion', 'price_1UDgXU3A10QFS30ceoA55vpv'],
   ].map(([k, v]) => [v, k]),
 );
-// 2026-09-09: 通常表示・計算を ¥4,600 に（旧: 4800）
-// const PRICE_YEN = { noir: 4800, verdant: 4800, passion: 4800 };
-const PRICE_YEN = { noir: 4600, verdant: 4600, passion: 4600 };
+// 2026-09-11: 通常表示・計算を ¥4,800 に戻す
+const PRICE_YEN = { noir: 4800, verdant: 4800, passion: 4800 };
 const FREE_SHIPPING_YEN = 10000;
 const SHIPPING_RATE_PAID = 'shr_1U8cKh3A10QFS30cDgDiCewG';
+const DEFAULT_SHEET_SYNC_URL =
+  'https://script.google.com/macros/s/AKfycbzQNDSrGqT7QGV15K0rl0Kl_vyfBp-bYyaCIi4TKYSb2CDeT0weZQ0GkMmOtVufQx-H/exec';
+const PRODUCT_LABELS = {
+  noir: 'Noir Melt / ノワール メルト',
+  verdant: 'Verdant Veil / ヴァーダント ベール',
+  passion: 'Passion Orange / パッションオレンジヴェール',
+};
 const SHIPPING_RATE_FREE = 'shr_1UARvb3A10QFS30c5a46Ocnr';
 const SITE_ORIGIN = 'https://shop.majorins.jp';
 
@@ -233,8 +244,8 @@ function buildStatus(nowMs, counts) {
     // 2026-09-09: 特別価格情報をフロントへ渡す
     sale: {
       active: saleOn,
-      unitPrice: saleOn ? 3800 : 4600,
-      regularPrice: 4600,
+      unitPrice: saleOn ? 4000 : 4800,
+      regularPrice: 4800,
       discount: 800,
       label: '特別価格',
       startsAt: jstToUtcMs(SALE_START_JST.y, SALE_START_JST.mo, SALE_START_JST.d, SALE_START_JST.h, SALE_START_JST.mi),
@@ -286,6 +297,155 @@ async function fetchSessionLineItems(sessionId, secretKey) {
     throw new Error(`stripe session ${res.status}: ${await res.text()}`);
   }
   return res.json();
+}
+
+function formatJstDateTime(ms = Date.now()) {
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date(ms));
+  const get = (type) => parts.find((p) => p.type === type)?.value || '';
+  return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}:${get('second')}`;
+}
+
+function sheetSyncUrl(env) {
+  return String(env.SHEET_SYNC_URL || DEFAULT_SHEET_SYNC_URL).trim();
+}
+
+function sheetSyncToken(env) {
+  return String(env.SHEET_SYNC_TOKEN || '').trim();
+}
+
+/**
+ * GAS ウェブアプリへ POST。
+ * script.google.com の 302 は follow で問題なく doPost まで届く。
+ */
+async function postToGas(url, payload) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow',
+  });
+
+  const text = await res.text().catch(() => '');
+  let json = null;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    // GAS が HTML を返すケースもある
+  }
+  return {
+    ok: Boolean(res.ok && json && json.ok !== false),
+    status: res.status,
+    body: json || text.slice(0, 300),
+  };
+}
+
+async function syncToSheet(env, type, fields) {
+  const url = sheetSyncUrl(env);
+  if (!url) return { skipped: true, reason: 'no_url' };
+  return postToGas(url, {
+    token: sheetSyncToken(env),
+    type,
+    fields,
+  });
+}
+
+function formatShippingAddress(session) {
+  const details = session.shipping_details || session.collected_information?.shipping_details;
+  const addr = details?.address || {};
+  const lines = [
+    details?.name,
+    [addr.postal_code, addr.state, addr.city, addr.line1, addr.line2].filter(Boolean).join(' '),
+    addr.country && addr.country !== 'JP' ? addr.country : '',
+  ].filter(Boolean);
+  return lines.join(' / ') || '';
+}
+
+function formatLineItemsSummary(lineItems) {
+  const parts = [];
+  for (const item of lineItems || []) {
+    const priceId = item.price?.id || item.price;
+    const key = mapPriceToKey(typeof priceId === 'string' ? priceId : '');
+    const qty = Number(item.quantity || 0);
+    if (!qty) continue;
+    const label =
+      PRODUCT_LABELS[key] ||
+      item.description ||
+      item.price?.product?.name ||
+      key ||
+      (typeof priceId === 'string' ? priceId : 'item');
+    parts.push(`${label} x${qty}`);
+  }
+  return parts.join(' / ');
+}
+
+function extractRemarks(session) {
+  const fields = session.custom_fields || [];
+  for (const f of fields) {
+    if (f?.key === 'remarks') {
+      return String(f.text?.value || f.value || '').trim();
+    }
+  }
+  return '';
+}
+
+function yenFromStripeAmount(amount) {
+  if (amount == null || amount === '') return '';
+  const n = Number(amount);
+  return Number.isFinite(n) ? String(n) : String(amount);
+}
+
+async function syncContactToSheet(env, record) {
+  return syncToSheet(env, 'contact', {
+    受付日時: formatJstDateTime(Date.parse(record.createdAt) || Date.now()),
+    受付ID: record.id || '',
+    お名前: record.name || '',
+    メール: record.email || '',
+    電話: record.tel || '',
+    郵便番号: record.zip || '',
+    住所: record.address || '',
+    種別: record.category || '',
+    内容: record.message || '',
+  });
+}
+
+async function syncOrderToSheet(env, session, lineItems) {
+  const customer = session.customer_details || {};
+  const shippingCost =
+    session.shipping_cost?.amount_total ??
+    session.total_details?.amount_shipping ??
+    '';
+  const subtotal =
+    session.amount_subtotal != null
+      ? session.amount_subtotal
+      : session.amount_total != null && shippingCost !== ''
+        ? Number(session.amount_total) - Number(shippingCost)
+        : '';
+
+  return syncToSheet(env, 'order', {
+    注文日時: formatJstDateTime(
+      session.created ? Number(session.created) * 1000 : Date.now(),
+    ),
+    'Session ID': session.id || '',
+    お客様名: session.shipping_details?.name || customer.name || '',
+    メール: customer.email || session.customer_email || '',
+    電話: customer.phone || '',
+    配送先住所: formatShippingAddress(session),
+    商品内容: formatLineItemsSummary(lineItems),
+    小計: yenFromStripeAmount(subtotal),
+    送料: yenFromStripeAmount(shippingCost),
+    合計: yenFromStripeAmount(session.amount_total),
+    '備考（のし等）': extractRemarks(session),
+    支払い状況: session.payment_status || session.status || '',
+  });
 }
 
 async function createCheckoutSession(env, items, opts = {}) {
@@ -457,10 +617,11 @@ async function applySession(env, session) {
     return { ok: true, skipped: 'not_paid' };
   }
 
+  let fullSession = session;
   let lineItems = session.line_items?.data;
-  if (!lineItems) {
-    const full = await fetchSessionLineItems(sessionId, env.STRIPE_SECRET_KEY);
-    lineItems = full.line_items?.data || [];
+  if (!lineItems || !session.customer_details) {
+    fullSession = await fetchSessionLineItems(sessionId, env.STRIPE_SECRET_KEY);
+    lineItems = fullSession.line_items?.data || [];
   }
 
   const now = Date.now();
@@ -479,7 +640,98 @@ async function applySession(env, session) {
 
   await env.STOCK.put(`week:${weekId}:counts`, JSON.stringify(counts));
   await env.STOCK.put(seenKey, '1', { expirationTtl: 60 * 60 * 24 * 40 });
-  return { ok: true, weekId, added, counts };
+
+  // GAS シート同期は保険（失敗しても在庫反映は成功扱い）
+  let sheet = null;
+  try {
+    sheet = await syncOrderToSheet(env, fullSession, lineItems);
+  } catch (err) {
+    sheet = { ok: false, error: String(err.message || err) };
+  }
+
+  return { ok: true, weekId, added, counts, sheet };
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function contactNotifyRecipients(env) {
+  const raw = String(env.CONTACT_NOTIFY_TO || 'mjshop@majorins.jp');
+  return raw
+    .split(/[,;\s]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+async function sendContactEmail(env, record) {
+  if (!env.RESEND_API_KEY) return { skipped: true, reason: 'no_api_key' };
+
+  const to = contactNotifyRecipients(env);
+  if (!to.length) return { skipped: true, reason: 'no_recipients' };
+
+  const from = String(env.CONTACT_FROM || 'MAJORINS <mjshop@majorins.jp>').trim();
+  const subject = `【MAJORINS お問合せ】${record.category || 'その他'} / ${record.name}`;
+  const lines = [
+    'MAJORINS サイトからお問合せがありました。',
+    '',
+    `受付ID: ${record.id}`,
+    `日時: ${record.createdAt}`,
+    `お名前: ${record.name}`,
+    `メール: ${record.email}`,
+    `電話: ${record.tel || '（未入力）'}`,
+    `郵便番号: ${record.zip || '（未入力）'}`,
+    `住所: ${record.address || '（未入力）'}`,
+    `種別: ${record.category || '（未選択）'}`,
+    '',
+    '—— お問合せ内容 ——',
+    record.message,
+    '',
+    'このメールに返信すると、お客様のメールアドレスへ送れます。',
+  ];
+  const text = lines.join('\n');
+  const html = `
+    <p>MAJORINS サイトからお問合せがありました。</p>
+    <table style="border-collapse:collapse;font-size:14px;line-height:1.6">
+      <tr><td style="padding:2px 12px 2px 0;color:#666">受付ID</td><td>${escapeHtml(record.id)}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#666">日時</td><td>${escapeHtml(record.createdAt)}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#666">お名前</td><td>${escapeHtml(record.name)}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#666">メール</td><td><a href="mailto:${escapeHtml(record.email)}">${escapeHtml(record.email)}</a></td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#666">電話</td><td>${escapeHtml(record.tel || '（未入力）')}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#666">郵便番号</td><td>${escapeHtml(record.zip || '（未入力）')}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#666">住所</td><td>${escapeHtml(record.address || '（未入力）')}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#666">種別</td><td>${escapeHtml(record.category || '（未選択）')}</td></tr>
+    </table>
+    <p style="margin:20px 0 6px;color:#666">お問合せ内容</p>
+    <pre style="white-space:pre-wrap;font-family:inherit;background:#f7f5f2;padding:14px;border-radius:6px">${escapeHtml(record.message)}</pre>
+    <p style="color:#888;font-size:12px">このメールに返信すると、お客様のメールアドレスへ送れます。</p>
+  `;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from,
+      to,
+      reply_to: record.email,
+      subject,
+      text,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '');
+    return { ok: false, status: res.status, error: errBody.slice(0, 500) };
+  }
+  return { ok: true };
 }
 
 async function handleContact(env, payload) {
@@ -519,22 +771,73 @@ async function handleContact(env, payload) {
   };
   await env.STOCK.put(id, JSON.stringify(record), { expirationTtl: 60 * 60 * 24 * 120 });
 
+  // Resend で運営宛に通知（失敗しても KV 保存は成功扱い）
+  try {
+    await sendContactEmail(env, record);
+  } catch {
+    // ignore
+  }
+
   // 任意: CONTACT_WEBHOOK_URL があれば通知（Slack Incoming Webhook 等）
-  if (env.CONTACT_WEBHOOK_URL) {
-    try {
-      await fetch(env.CONTACT_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: `【MAJORINS お問合せ】${name} <${email}>\n種別: ${category || 'なし'}\n${message}`,
-        }),
-      });
-    } catch {
-      // 保存は成功しているので通知失敗は握りつぶす
-    }
+  try {
+    await notifyContactSlack(env, record);
+  } catch {
+    // 保存は成功しているので通知失敗は握りつぶす
+  }
+
+  // GAS シート同期（失敗しても問い合わせ自体は成功扱い）
+  try {
+    await syncContactToSheet(env, record);
+  } catch {
+    // ignore
   }
 
   return { ok: true, status: 200, body: { ok: true, id } };
+}
+
+function slackMrkdwnEscape(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+async function notifyContactSlack(env, record) {
+  if (!env.CONTACT_WEBHOOK_URL) return;
+
+  const category = record.category || '（未選択）';
+  const addressLine = [record.zip, record.address].filter(Boolean).join(' ').trim() || '（未入力）';
+  const tel = record.tel || '（未入力）';
+  const fallback = [
+    `【MAJORINS お問合せ】${record.name} <${record.email}>`,
+    `種別: ${category}`,
+    record.message,
+  ].join('\n');
+
+  const body = [
+    'HPへ問い合わせがありました。',
+    '',
+    `お名前: ${slackMrkdwnEscape(record.name)}`,
+    `メール: ${slackMrkdwnEscape(record.email)}`,
+    `電話: ${slackMrkdwnEscape(tel)}`,
+    `住所: ${slackMrkdwnEscape(addressLine)}`,
+    `種別: ${slackMrkdwnEscape(category)}`,
+    `内容: ${slackMrkdwnEscape(record.message)}`,
+  ].join('\n');
+
+  await fetch(env.CONTACT_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text: fallback,
+      blocks: [
+        {
+          type: 'section',
+          text: { type: 'mrkdwn', text: body },
+        },
+      ],
+    }),
+  });
 }
 
 export default {

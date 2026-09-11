@@ -582,35 +582,35 @@
   var SHIPPING_FEE  = 1300;
   var MAX_PER_ORDER = 10;
 
-  // 2026-09-09: 期間限定 特別価格。/status の sale が正、取得前は下記をフォールバックに使う
+  // 2026-09-11: 期間限定 特別価格。/status の sale が正、取得前は下記をフォールバックに使う
   var SALE_FALLBACK = {
     active: false,
-    unitPrice: 4600,
-    regularPrice: 4600,
+    unitPrice: 4800,
+    regularPrice: 4800,
     discount: 800,
     label: '特別価格'
   };
   var SALE = SALE_FALLBACK;
 
-  // 2026-09-09: /status 取得前の JST フォールバック（9/14 00:00 〜 9/26 00:00 JST）
+  // 2026-09-11: /status 取得前の JST フォールバック（9/14 00:00 〜 9/26 00:00 JST）
   function isSaleActiveLocal(nowMs) {
     var start = Date.UTC(2026, 8, 14, 0 - 9, 0, 0, 0);
     var end = Date.UTC(2026, 8, 26, 0 - 9, 0, 0, 0);
     return nowMs >= start && nowMs < end;
   }
   if (isSaleActiveLocal(Date.now())) {
-    SALE = { active: true, unitPrice: 3800, regularPrice: 4600, discount: 800, label: '特別価格' };
+    SALE = { active: true, unitPrice: 4000, regularPrice: 4800, discount: 800, label: '特別価格' };
   }
 
   var CAKES = [
-    // 2026-09-09: 通常価格 ¥4,600（旧: 4800）
-    { sku: 'noir', nameEn: 'Noir Melt', nameJp: 'ノワール メルト', price: 4600,
+    // 2026-09-11: 通常価格 ¥4,800
+    { sku: 'noir', nameEn: 'Noir Melt', nameJp: 'ノワール メルト', price: 4800,
       img: '/images/showcase/cake-noir-melt.png?v=20260821',
       desc: 'カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。' },
-    { sku: 'verdant', nameEn: 'Verdant Veil', nameJp: 'ヴァーダント ベール', price: 4600,
+    { sku: 'verdant', nameEn: 'Verdant Veil', nameJp: 'ヴァーダント ベール', price: 4800,
       img: '/images/showcase/cake-verdant-veil.png?v=20260821',
       desc: '香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。' },
-    { sku: 'passion', nameEn: 'Passion Orange', nameJp: 'パッションオレンジヴェール', price: 4600,
+    { sku: 'passion', nameEn: 'Passion Orange', nameJp: 'パッションオレンジヴェール', price: 4800,
       img: '/images/showcase/cake-passion-orange.png?v=20260821',
       desc: '燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。' }
   ];

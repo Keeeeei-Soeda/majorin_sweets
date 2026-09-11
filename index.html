@@ -1251,6 +1251,7 @@
 
     /* === [ADD] 浮遊「ご注文」ボタン（B: アイコン＋テキスト）=== */
     /* 2026-09-01: キャプション追加に伴い、位置指定を .fab-order-wrap へ移動 */
+    /* 2026-09-10: 視認性向上のためサイズを約2倍に拡大 */
     .fab-order-wrap {
       position: fixed;
       right: 24px;
@@ -1259,20 +1260,20 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 7px;
+      gap: 14px;
       animation: fabOrderIn .8s ease both;
     }
 
     .fab-order-caption {
       font-family: 'Noto Serif JP', serif;
-      font-size: 11px;
+      font-size: 22px;
       letter-spacing: 0.08em;
       line-height: 1.5;
       color: #f0d090;
       background: rgba(20, 8, 13, 0.72);
       border: 1px solid rgba(212, 175, 110, 0.4);
-      border-radius: 20px;
-      padding: 5px 13px;
+      border-radius: 40px;
+      padding: 10px 26px;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       white-space: nowrap;
@@ -1282,16 +1283,16 @@
     .fab-order {
       display: inline-flex;
       align-items: center;
-      gap: 9px;
-      padding: 13px 24px 13px 20px;
+      gap: 18px;
+      padding: 26px 48px 26px 40px;
       font-family: 'Noto Serif JP', serif;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 28px;
       letter-spacing: 0.1em;
       color: #f0d090;
       background: rgba(20, 8, 13, 0.72);
       border: 1px solid rgba(212, 175, 110, 0.55);
-      border-radius: 40px;
+      border-radius: 80px;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       cursor: pointer;
@@ -1307,8 +1308,8 @@
       outline: none;
     }
     .fab-order svg {
-      width: 17px;
-      height: 17px;
+      width: 34px;
+      height: 34px;
       stroke: currentColor;
       fill: none;
       stroke-width: 1.4;
@@ -1318,11 +1319,11 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     @media (max-width: 520px) {
-      /* 2026-09-01: 位置指定をラッパーへ移動 */
-      .fab-order-wrap { right: 16px; bottom: 16px; }
-      .fab-order { padding: 11px 18px 11px 15px; font-size: 13px; }
-      .fab-order svg { width: 16px; height: 16px; }
-      .fab-order-caption { font-size: 10px; padding: 4px 11px; }
+      /* 2026-09-01: 位置指定をラッパーへ移動 / 2026-09-10: モバイルも約2倍 */
+      .fab-order-wrap { right: 16px; bottom: 16px; gap: 12px; }
+      .fab-order { padding: 22px 36px 22px 30px; font-size: 26px; gap: 16px; }
+      .fab-order svg { width: 32px; height: 32px; }
+      .fab-order-caption { font-size: 20px; padding: 8px 22px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .fab-order-wrap { animation: none; }
@@ -2207,7 +2208,7 @@
             {SALE_ACTIVE && (
               <div className="showcase-sale-banner" data-sale-banner>
                 <span className="showcase-sale-banner__label">期間限定</span>
-                <span>9/14（月）〜 9/25（金）は全商品 <strong>800円OFF</strong>（¥4,600→¥3,800）の特別価格でご案内しております。</span>
+                <span>9/14（月）〜 9/25（金）は全商品 <strong>800円OFF</strong>（¥4,800→¥4,000）の特別価格でご案内しております。</span>
               </div>
             )}
 
@@ -2237,8 +2238,8 @@
                     <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
                     {/* 2026-09-09: 期間限定 特別価格。旧: <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div> */}
                     <div className="hover-card-price">
-                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
-                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,800</s>}
+                      {SALE_ACTIVE ? '¥4,000' : '¥4,800'}
                       <span className="hover-card-price-unit">/ 1本</span>
                     </div>
                     <div className="hover-card-ingredients">
@@ -2272,8 +2273,8 @@
                     <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
                     {/* 2026-09-09: 期間限定 特別価格。旧: <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div> */}
                     <div className="hover-card-price">
-                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
-                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,800</s>}
+                      {SALE_ACTIVE ? '¥4,000' : '¥4,800'}
                       <span className="hover-card-price-unit">/ 1本</span>
                     </div>
                     <div className="hover-card-ingredients">
@@ -2307,8 +2308,8 @@
                     <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
                     {/* 2026-09-09: 期間限定 特別価格。旧: <div className="hover-card-price">¥4,800<span className="hover-card-price-unit">/ 1本</span></div> */}
                     <div className="hover-card-price">
-                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
-                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,800</s>}
+                      {SALE_ACTIVE ? '¥4,000' : '¥4,800'}
                       <span className="hover-card-price-unit">/ 1本</span>
                     </div>
                     <div className="hover-card-ingredients">
@@ -2365,8 +2366,8 @@
                     <p className="hover-card-description">香高い西尾抹茶をたっぷり使用。生地と抹茶ガナッシュクリームがお口でほどけます。</p>
                     {/* 2026-09-09: 期間限定 特別価格。旧: ¥4,800 */}
                     <div className="hover-card-price">
-                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
-                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,800</s>}
+                      {SALE_ACTIVE ? '¥4,000' : '¥4,800'}
                       <span className="hover-card-price-unit">/ 1本</span>
                     </div>
                     <div className="hover-card-ingredients">
@@ -2394,8 +2395,8 @@
                     <p className="hover-card-description">カルダモンがほのかに香り、ビターチョコの生地とヘーゼルガナッシュクリームのアクセントが効いた大人チョコパウンドケーキ。</p>
                     {/* 2026-09-09: 期間限定 特別価格。旧: ¥4,800 */}
                     <div className="hover-card-price">
-                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
-                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,800</s>}
+                      {SALE_ACTIVE ? '¥4,000' : '¥4,800'}
                       <span className="hover-card-price-unit">/ 1本</span>
                     </div>
                     <div className="hover-card-ingredients">
@@ -2423,8 +2424,8 @@
                     <p className="hover-card-description">燦々と太陽の日差しを浴びた国産マンダリンとネーブルオレンジを惜しみなく染み込ませたフレッシュな逸品。</p>
                     {/* 2026-09-09: 期間限定 特別価格。旧: ¥4,800 */}
                     <div className="hover-card-price">
-                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,600</s>}
-                      {SALE_ACTIVE ? '¥3,800' : '¥4,600'}
+                      {SALE_ACTIVE && <s className="hover-card-price-was">¥4,800</s>}
+                      {SALE_ACTIVE ? '¥4,000' : '¥4,800'}
                       <span className="hover-card-price-unit">/ 1本</span>
                     </div>
                     <div className="hover-card-ingredients">

@@ -1,9 +1,18 @@
 # デプロイ: cd workers/stock && npx wrangler deploy
-# 秘密情報: npx wrangler secret put STRIPE_WEBHOOK_SECRET
-#           npx wrangler secret put STRIPE_SECRET_KEY
+# 秘密情報:
+#   npx wrangler secret put STRIPE_WEBHOOK_SECRET
+#   npx wrangler secret put STRIPE_SECRET_KEY
+#   npx wrangler secret put RESEND_API_KEY
+# 任意（省略時はコード既定値）:
+#   npx wrangler secret put CONTACT_NOTIFY_TO   # 既定: mjshop@majorins.jp
+#   npx wrangler secret put CONTACT_FROM        # 既定: MAJORINS <mjshop@majorins.jp>
 # Stripe Webhook URL: https://majorins-stock.majorins.workers.dev/webhook
 #   イベント: checkout.session.completed
 # Status API: https://majorins-stock.majorins.workers.dev/status
+# Contact API: https://majorins-stock.majorins.workers.dev/contact
+# Sheet sync (GAS):
+#   SHEET_SYNC_URL 省略時は majorins-sheet-sync の既定ウェブアプリ URL
+#   npx wrangler secret put SHEET_SYNC_TOKEN   # GAS の SYNC_TOKEN（任意）
 workers_dev = true
 
 name = "majorins-stock"

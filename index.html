@@ -1318,12 +1318,21 @@
       from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    @media (max-width: 520px) {
-      /* 2026-09-01: 位置指定をラッパーへ移動 / 2026-09-10: モバイルも約2倍 */
-      .fab-order-wrap { right: 16px; bottom: 16px; gap: 12px; }
-      .fab-order { padding: 22px 36px 22px 30px; font-size: 26px; gap: 16px; }
-      .fab-order svg { width: 32px; height: 32px; }
-      .fab-order-caption { font-size: 20px; padding: 8px 22px; }
+    @media (max-width: 800px) {
+      /* 2026-09-11: 800px以下は拡大前のサイズ（PC大画面のみ約2倍） */
+      .fab-order-wrap { right: 16px; bottom: 16px; gap: 7px; }
+      .fab-order {
+        gap: 9px;
+        padding: 11px 18px 11px 15px;
+        font-size: 13px;
+        border-radius: 40px;
+      }
+      .fab-order svg { width: 16px; height: 16px; }
+      .fab-order-caption {
+        font-size: 10px;
+        padding: 4px 11px;
+        border-radius: 20px;
+      }
     }
     @media (prefers-reduced-motion: reduce) {
       .fab-order-wrap { animation: none; }

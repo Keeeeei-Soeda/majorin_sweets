@@ -1544,10 +1544,10 @@
       return nowMs >= start && nowMs < start + 6 * 86400000;
     }
 
-    // 2026-09-27: 期間限定 特別価格（9/27 09:00 〜 11/1 00:00 JST = 10/31 23:59まで）※時刻は必ず JST 換算
+    // 2026-09-27: 期間限定 特別価格（9/27 07:21 〜 11/1 00:00 JST = 10/31 23:59まで）※時刻は必ず JST 換算
     function isSaleActiveLocal(nowMs = Date.now()) {
       const jst = (y, mo, d, h = 0, mi = 0) => Date.UTC(y, mo, d, h - 9, mi, 0, 0);
-      return nowMs >= jst(2026, 8, 27, 9, 0) && nowMs < jst(2026, 10, 1, 0, 0);
+      return nowMs >= jst(2026, 8, 27, 7, 21) && nowMs < jst(2026, 10, 1, 0, 0);
     }
 
     // マジョリンからの手紙（25件）
@@ -2217,7 +2217,7 @@
             {SALE_ACTIVE && (
               <div className="showcase-sale-banner" data-sale-banner>
                 <span className="showcase-sale-banner__label">期間限定</span>
-                <span>9/27（日）9:00 〜 10/31（土）は全商品 <strong>800円OFF</strong>（¥4,800→¥4,000）の特別価格でご案内しております。</span>
+                <span>9/27（日）7:21 〜 10/31（土）は全商品 <strong>800円OFF</strong>（¥4,800→¥4,000）の特別価格でご案内しております。</span>
               </div>
             )}
 

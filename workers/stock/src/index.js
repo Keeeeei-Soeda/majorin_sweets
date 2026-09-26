@@ -29,9 +29,9 @@ const KEY_TO_PRICE = {
 };
 
 // ===== 2026-09: 期間限定 特別価格（1本 800円OFF / ¥4,800 → ¥4,000）=====
-// 期間: 2026-09-27 09:00 JST 〜 2026-11-01 00:00 JST（= 10/31 23:59まで）
+// 期間: 2026-09-27 07:21 JST 〜 2026-11-01 00:00 JST（= 10/31 23:59まで）
 // mo は 0-based（8 = 9月, 10 = 11月）
-const SALE_START_JST = { y: 2026, mo: 8, d: 27, h: 9, mi: 0 };
+const SALE_START_JST = { y: 2026, mo: 8, d: 27, h: 7, mi: 21 };
 const SALE_END_JST   = { y: 2026, mo: 10, d: 1, h: 0, mi: 0 };
 const KEY_TO_PRICE_SALE = {
   noir: 'price_1UEOOl3A10QFS30cIJ7JlKE1',

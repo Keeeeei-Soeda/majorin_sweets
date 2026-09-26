@@ -29,10 +29,10 @@ const KEY_TO_PRICE = {
 };
 
 // ===== 2026-09: 期間限定 特別価格（1本 800円OFF / ¥4,800 → ¥4,000）=====
-// 期間: 2026-09-14 00:00 JST 〜 2026-09-26 00:00 JST（= 9/25 24:00）
-// mo は 0-based（8 = 9月）
-const SALE_START_JST = { y: 2026, mo: 8, d: 14, h: 0, mi: 0 };
-const SALE_END_JST   = { y: 2026, mo: 8, d: 26, h: 0, mi: 0 };
+// 期間: 2026-09-27 09:00 JST 〜 2026-11-01 00:00 JST（= 10/31 23:59まで）
+// mo は 0-based（8 = 9月, 10 = 11月）
+const SALE_START_JST = { y: 2026, mo: 8, d: 27, h: 9, mi: 0 };
+const SALE_END_JST   = { y: 2026, mo: 10, d: 1, h: 0, mi: 0 };
 const KEY_TO_PRICE_SALE = {
   noir: 'price_1UEOOl3A10QFS30cIJ7JlKE1',
   verdant: 'price_1UEOOs3A10QFS30cS9FtPNAj',
@@ -403,6 +403,20 @@ function yenFromStripeAmount(amount) {
   return Number.isFinite(n) ? String(n) : String(amount);
 }
 
+/** Stripe Dashboard の支払い詳細 URL（payment_intent 優先） */
+function stripeDashboardUrl(session) {
+  const pi =
+    typeof session.payment_intent === 'string'
+      ? session.payment_intent
+      : session.payment_intent?.id || '';
+  const base = session.livemode
+    ? 'https://dashboard.stripe.com'
+    : 'https://dashboard.stripe.com/test';
+  if (pi) return `${base}/payments/${pi}`;
+  if (session.id) return `${base}/payments/${session.id}`;
+  return '';
+}
+
 async function syncContactToSheet(env, record) {
   return syncToSheet(env, 'contact', {
     受付日時: formatJstDateTime(Date.parse(record.createdAt) || Date.now()),
@@ -435,6 +449,7 @@ async function syncOrderToSheet(env, session, lineItems) {
       session.created ? Number(session.created) * 1000 : Date.now(),
     ),
     'Session ID': session.id || '',
+    Stripe詳細: stripeDashboardUrl(session),
     お客様名: session.shipping_details?.name || customer.name || '',
     メール: customer.email || session.customer_email || '',
     電話: customer.phone || '',

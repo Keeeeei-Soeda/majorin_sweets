@@ -1544,10 +1544,10 @@
       return nowMs >= start && nowMs < start + 6 * 86400000;
     }
 
-    // 2026-09-09: 期間限定 特別価格（9/14 00:00 〜 9/26 00:00 JST）※時刻は必ず JST 換算
+    // 2026-09-27: 期間限定 特別価格（9/27 09:00 〜 11/1 00:00 JST = 10/31 23:59まで）※時刻は必ず JST 換算
     function isSaleActiveLocal(nowMs = Date.now()) {
       const jst = (y, mo, d, h = 0, mi = 0) => Date.UTC(y, mo, d, h - 9, mi, 0, 0);
-      return nowMs >= jst(2026, 8, 14, 0, 0) && nowMs < jst(2026, 8, 26, 0, 0);
+      return nowMs >= jst(2026, 8, 27, 9, 0) && nowMs < jst(2026, 10, 1, 0, 0);
     }
 
     // マジョリンからの手紙（25件）
@@ -1921,9 +1921,9 @@
                   tabIndex={0}
                   aria-label="チケットを使って扉を開く"
                 >
-                  {/* 2026-09-09: プレ販売にあわせて招待状画像を差し替え。旧: welcome_card.jpg?v=20260821 */}
+                  {/* 2026-09-27: 期間限定招待状を差し替え。旧: welcome_card_v2.jpg?v=20260909 */}
                   <img
-                    src="images/spring2026/welcome_card_v2.jpg?v=20260909"
+                    src="images/spring2026/welcome_card_v3.jpg?v=20260927"
                     alt="MAJORINS Museum チケット"
                     style={styles.ticketImage}
                     draggable={false}
@@ -2217,7 +2217,7 @@
             {SALE_ACTIVE && (
               <div className="showcase-sale-banner" data-sale-banner>
                 <span className="showcase-sale-banner__label">期間限定</span>
-                <span>9/14（月）〜 9/25（金）は全商品 <strong>800円OFF</strong>（¥4,800→¥4,000）の特別価格でご案内しております。</span>
+                <span>9/27（日）9:00 〜 10/31（土）は全商品 <strong>800円OFF</strong>（¥4,800→¥4,000）の特別価格でご案内しております。</span>
               </div>
             )}
 

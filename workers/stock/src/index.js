@@ -562,7 +562,7 @@ async function createCheckoutSession(env, items, opts = {}) {
   body.append('success_url', `${SITE_ORIGIN}/order/?success=1`);
   body.append('cancel_url', `${SITE_ORIGIN}/order/?canceled=1`);
   body.append('billing_address_collection', 'auto');
-  body.append('phone_number_collection[enabled]', 'false');
+  body.append('phone_number_collection[enabled]', 'true');
   body.append('shipping_address_collection[allowed_countries][0]', 'JP');
   body.append('allow_promotion_codes', 'true');
   body.append('locale', 'ja');
